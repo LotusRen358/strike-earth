@@ -61,6 +61,13 @@ html,body{margin:0;height:100%;overflow:hidden;background:#000;color:#fff;font-f
 #vig{position:fixed;inset:0;pointer-events:none;box-shadow:inset 0 0 120px 30px rgba(255,20,20,.75);opacity:0}
 .ov{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;background:rgba(10,8,26,.55);z-index:5}
 .ov.hide{display:none}
+#stSave{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px;font-weight:800;font-size:14px;color:#bff0ff;letter-spacing:.08em;text-shadow:0 1px 3px #000}
+#stSave i{width:16px;height:16px;border-radius:50%;border:2.5px solid rgba(150,230,255,.35);border-top-color:#9ae8ff;animation:svSpin .8s linear infinite}
+#stSave.done i{animation:none;border:0;width:auto;height:auto}#stSave.done i:before{content:'✓';color:#7affb0;font-style:normal;font-size:18px}
+#stSave.done span{color:#7affb0}
+@keyframes svSpin{to{transform:rotate(360deg)}}
+#stBtns{display:flex;flex-direction:column;align-items:center;transition:opacity .3s}
+#stBtns.wait{opacity:0;pointer-events:none}
 #oobWarn{position:absolute;left:50%;top:24%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 26px 9px;pointer-events:none;opacity:0;transition:opacity .25s;
  background:repeating-linear-gradient(135deg,rgba(255,40,50,.28) 0 14px,rgba(120,0,10,.28) 14px 28px);border:2px solid rgba(255,80,80,.95);box-shadow:0 0 18px rgba(255,40,60,.6),inset 0 0 14px rgba(255,40,60,.35);
  clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,14px 100%,0 50%);text-shadow:0 0 8px #ff2030,0 2px 2px #000;color:#fff;white-space:nowrap}
@@ -191,7 +198,7 @@ body.vwon #touch,body.cineon #touch{display:none!important}
 #vwBack{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 74px);z-index:27;display:none;padding:8px 16px;font-weight:800;color:#fff;background:rgba(42,90,176,.88);border:1px solid #9ac0ff;border-radius:16px;font-size:13px}
 @media (orientation:landscape) and (max-height:560px){#vwSide{top:calc(env(safe-area-inset-top) + 48px);gap:3px}#vwSide button{padding:4px 8px;font-size:11px;min-width:72px}#vwBar{padding-top:4px;padding-bottom:4px}#vwHelp{display:none}#vwBack{top:calc(env(safe-area-inset-top) + 56px)}}
 #cineBox{position:fixed;inset:0;z-index:25}
-#cineSkip{position:absolute;right:calc(env(safe-area-inset-right) + 14px);bottom:calc(11vh + 10px);display:none;padding:8px 16px;font-size:13px;font-weight:800;color:#fff;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.5);border-radius:16px}
+#cineSkip{pointer-events:auto;z-index:40;touch-action:none;position:absolute;right:calc(env(safe-area-inset-right) + 14px);bottom:calc(11vh + 10px);display:none;padding:8px 16px;font-size:13px;font-weight:800;color:#fff;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.5);border-radius:16px}
 #cineBox.hide{display:none}
 #cineBox .lb{position:absolute;left:0;right:0;height:11vh;background:#000}
 #cineBox .lb.t{top:0}#cineBox .lb.b{bottom:0}
@@ -662,8 +669,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   <div id="stGrid"></div>
   <div class="stat" id="stInfo"></div>
   <div class="stat" id="stNew" style="color:#9affc8;font-size:13px"></div>
-  <button class="btn" id="stNext">次のステージへ</button>
-  <button class="btn sb" id="stTitleBtn">セーブしてタイトルへ</button>
+  <div id="stSave"><i></i><span>オートセーブ中です…</span></div>
+  <div id="stBtns"><button class="btn" id="stNext">次のステージへ</button>
+  <button class="btn sb" id="stTitleBtn">タイトルへ</button></div>
 </div>
 
 <div class="ov hide" id="select"><h1 style="font-size:clamp(24px,5vw,44px)">ステージ選択<small id="ssInfo"></small></h1><div id="ssGrid"></div><button class="btn sb" id="ssClose">戻る</button></div>
@@ -1564,6 +1572,22 @@ function buildSignals(lines,leaves,pb,lim,noLines){
     guideSign(wx,7.35,wz,ry,3.6,1.8,ent);const k=new Merger();k.add(GB,0x7a8088,.08,1.4,.08,wx+.9*cs,6.7,wz-.9*sn);k.add(GB,0x7a8088,.08,1.4,.08,wx-.9*cs,6.7,wz+.9*sn);const km=k.build(detMat);WR.add(km);}}
  }
 }
+function fbSolids(ln,u,ent,span){
+ const H=5.8,W=2.6,rise=.18,tread=.3,n=Math.round(H/rise),sg=ln.o==='h'?1:-1,kids=ent.kids=ent.kids||[];
+ const box=(xa,xb,za,zb,h,y0,extra)=>{const r=lineRect(ln,u+Math.min(xa,xb),u+Math.max(xa,xb),sg*Math.min(za,zb),sg*Math.max(za,zb));kids.push(addSolid(Object.assign({x0:r.x0,x1:r.x1,z0:r.z0,z1:r.z1,h,y0:y0||0,hp:1e9,arm:0,name:'stairstep',rc:null},extra||{})));};
+ const T=.16,RH=1.15;
+ /* deck + landings (elevated : traffic passes underneath) */
+ const zl=span/2+W/2+.2,zend=zl+(W+.2)/2;
+ box(-W/2,W/2,-zend,zend,H+.12,H-.9,{step:true});
+ /* deck railings + landing ends + open side only where the stair starts */
+ box(W/2-T,W/2,-zend,zend,H+.12+RH,H,{noroof:true});
+ box(-W/2,-W/2+T,-span/2,span/2,H+.12+RH,H,{noroof:true});
+ for(const sz of[-1,1]){box(-W/2,W/2,sz*zend-T/2,sz*zend+T/2,H+.12+RH,H,{noroof:true});
+  const zc=sz*zl;
+  for(let i=0;i<n;i++){const xa=-(W/2+i*tread),xb=-(W/2+(i+1)*tread),h=H-(i+1)*rise+.06;
+   box(xa,xb,zc-(W-.3)/2,zc+(W-.3)/2,h,0,{step:true});
+   for(const z of[zc-W/2,zc+W/2])box(xa,xb,z-T/2,z+T/2,h+1.1,0,{noroof:true});}}
+}
 function buildFootbridges(lines,pb,lim,skip){
  for(const ln of lines){if(skip&&skip.includes(ln))continue;if(ln.b-ln.a<90||Math.random()>.4)continue;
   for(let t=0;t<12;t++){const u=rnd(ln.a+24,ln.b-24),p=lineXY(ln,u,0);if(Math.abs(p[0])>lim-6||Math.abs(p[1])>lim-6)continue;
@@ -1571,6 +1595,7 @@ function buildFootbridges(lines,pb,lim,skip){
    let ok=true;const FW2=2.6,FR=Math.round(5.8/.18)*.3,fr=[];for(const sz of[-1,1]){const r=lineRect(ln,u-(FW2/2+FR+1.8),u+FW2/2+.4,sz*(RW/2+1.6),sz*(RW/2+2+FW2+.8));fr.push(r);if(inSea((r.x0+r.x1)/2,(r.z0+r.z1)/2,2)||ringBlocked((r.x0+r.x1)/2,(r.z0+r.z1)/2,2)||rectHitsRoads(r,ln))ok=false;}if(!ok)continue;
    for(const r of fr){clearRect(r,.4);paintPlaza(r);}
    const fe=propAt(pb,p[0],p[1],lineRy(ln),4,RW/2+3,7.4,{hp:260,nocol:true,arm:.4,name:'footbridge'},(L,G)=>mdlFootbridge(L,G,RW+4));
+   try{fbSolids(ln,u,fe,RW+4);}catch(e){}
    /* guide sign hung on the girder, both directions */
    if(GSCOUNT<(isTouch?10:16)){const ry=lineRy(ln),cs=Math.cos(ry),sn=Math.sin(ry);for(const sx of[-1,1]){const lx=sx*1.62,lz=-RW*.18*sx;const wx=p[0]+lx*cs+lz*sn,wz=p[1]-lx*sn+lz*cs;guideSign(wx,5.0,wz,ry+(sx>0?Math.PI/2:-Math.PI/2),4.2,2.1,fe);}}
    break;}
@@ -1986,7 +2011,7 @@ function buildBackdrop(si){
   ring(kind==='mountain'?14:20,(a,c,s,sea)=>{const d=rnd(330,420),r=kind==='mountain'?rnd(80,130):rnd(70,110),h=kind==='mountain'?rnd(120,210):rnd(45,90);{const cl2=contLines(WORLD_LINES);if(nearCont(cl2,c*d,s*d,r*.8+10)||nearRingRoad(c*d,s*d,r*.8+10))return;}const g=hazeGeo(mountainGeo(r,h),.5);const m=new THREE.Mesh(g,bdMat);m.position.set(c*d,-2,s*d);m.rotation.y=Math.random()*6;WR.add(m);});
   ring(36,(a,c,s)=>{const d=rnd(270,320),r=rnd(30,60),h=rnd(14,30);{const cl2=contLines(WORLD_LINES);if(nearCont(cl2,c*d,s*d,r+8)||nearRingRoad(c*d,s*d,r+8))return;}M.add(GS12,hz(0x4a7a3a,.45),r,h,r*rnd(.8,1.3),c*d,-h*.2,s*d);});
   if(si===3){for(let i=0;i<3;i++){const PM=new Merger(),L=new LM(PM,0,0,0,0);mdlPlane(L,{add:()=>{}},[0x2a5ab0,0xc8302a,0x2aa868][i],1.2);const pl=PM.build(detMat);WR.add(pl);
-    const d=rnd(230,300),y=rnd(55,95),sp=rnd(.05,.08)*(i%2?1:-1);let a=rnd(0,6.28);worldTick.push(dt=>{a+=sp*dt;pl.position.set(Math.cos(a)*d,y+Math.sin(a*3)*3,Math.sin(a)*d);pl.rotation.set(0,-a+(sp>0?0:Math.PI),sp>0?-.18:.18);});}}
+    const d=rnd(230,300),y=rnd(55,95),sp=rnd(.05,.08)*(i%2?1:-1);let a=rnd(0,6.28);worldTick.push(dt=>{a+=sp*dt;pl.position.set(Math.cos(a)*d,y+Math.sin(a*3)*3,Math.sin(a)*d);pl.rotation.set(sp>0?-.18:.18,-a+(sp>0?-Math.PI/2:Math.PI/2),0,'YXZ');});}}
  }
  if(si===7){ring(10,(a,c,s)=>{const d=rnd(240,320),x=c*d,z=s*d;for(let k=0;k<12;k++)SMK[1].push(x+k*5+rnd(-3,3),12+k*9,z+k*3);G.add(GS,0xff7a2a,14,8,14,x,6,z);});}
  if(M.n){const m=M.build(bdMat);WR.add(m);}if(G.n)WR.add(G.build(glowMat2));
@@ -2446,7 +2471,7 @@ let FTY=1.5;
 function groundH(x,z,alt){const b=roofAt(x,z,alt+.6);return b?b.h:0;}
 function ceilAt(x,z,alt){for(const b of gridNear(x,z,1)){if(!b.alive||b.nocol||(b.y0||0)<=2)continue;if(x<b.x0||x>b.x1||z<b.z0||z>b.z1)continue;if(b.y0>alt+.2&&alt+1.9>b.y0)return b;}return null;}
 function boostFx(x,y,z){for(let i=0;i<2;i++)emit(x+rnd(-.3,.3),y+.9,z+rnd(-.3,.3),rnd(-1.2,1.2),rnd(-9,-5),rnd(-1.2,1.2),Math.random()<.5?0x8ad8ff:0xffffff,rnd(.18,.32),rnd(.2,.35),0,true);}
-function mantle(o,r){if(o.alt<.5)return;for(const b of gridNear(o.x,o.z,r+1)){if(!b.alive||b.nocol||b.ghost||b.step||b.noroof)continue;if(o.x<b.x0-r||o.x>b.x1+r||o.z<b.z0-r||o.z>b.z1+r)continue;const d=b.h-o.alt;if(d>0&&d<1.8&&(b.y0||0)<=o.alt+.5){o.alt=b.h+.02;o.vy=Math.max(0,o.vy);o.x=clamp(o.x,b.x0+.3,b.x1-.3);o.z=clamp(o.z,b.z0+.3,b.z1-.3);return;}}}
+function mantle(o,r){if(o.alt<.5)return;for(const b of gridNear(o.x,o.z,r+1)){if(!b.alive||b.nocol||b.ghost||b.step||b.noroof||b.name==='stairstep')continue;if(o.x<b.x0-r||o.x>b.x1+r||o.z<b.z0-r||o.z>b.z1+r)continue;const d=b.h-o.alt;if(d>0&&d<1.8&&(b.y0||0)<=o.alt+.5){o.alt=b.h+.02;o.vy=Math.max(0,o.vy);o.x=clamp(o.x,b.x0+.3,b.x1-.3);o.z=clamp(o.z,b.z0+.3,b.z1-.3);return;}}}
 function playerVert(dt){
  if(P.boost===undefined)P.boost=1;if(!P.vy)P.vy=P.vy||0;
  const bh=!!(keys.Space||input.boostT)&&!P.dead;
@@ -2555,7 +2580,7 @@ function collide(o,r,alt){
  if(SEA.length&&!(o===P&&veh&&veh.type==='heli')){if(inSea(o.x,o.z,r*.6)){if(o._sx!==undefined){o.x=o._sx;o.z=o._sz;if(o.vx!==undefined){o.vx*=-.2;o.vz*=-.2;}}}else{o._sx=o.x;o._sz=o.z;}}
  for(const b of (GRID_OK?gridNear(o.x,o.z,r+1):buildings)){
   if(!b.alive||b.nocol)continue;
-  if(b.step){if((alt||0)>=b.h-.45)continue;}
+  if(b.step){if((alt||0)>=b.h-.45)continue;if((b.y0||0)>2&&(!alt||alt+1.8<b.y0))continue;}
   else if(b.y0>2){if(!alt||alt+1.8<b.y0||alt>=b.h-.35)continue;}else if(alt&&alt>=b.h-.35)continue;
   if(b.small&&!b.step&&o===P&&veh&&veh.type!=='heli'){if(o.x>b.x0-r&&o.x<b.x1+r&&o.z>b.z0-r&&o.z<b.z1+r){b.hp=0;collapse(b);}continue;}
   if(o.x<b.x0-r||o.x>b.x1+r||o.z<b.z0-r||o.z>b.z1+r)continue;
@@ -3796,6 +3821,8 @@ function showStageClear(){
  $('stNew').textContent=nx?(nx.boss?'次のステージ：母艦（UFO）襲来！':nw.length?'次のステージ新登場：'+nw.join('・'):'次のステージ：さらに激しい戦い'):'';
  $('stNext').textContent='STAGE '+(n+1)+' へ出撃';
  $('stage').classList.remove('hide');$('hud').style.display='none';
+ try{const sv=$('stSave'),bt=$('stBtns');if(sv&&sv.classList&&sv.lastChild){sv.classList.remove('done');sv.lastChild.textContent='オートセーブ中です…';bt.classList.add('wait');
+  setTimeout(()=>{try{saveGame();}catch(e){}sv.classList.add('done');sv.lastChild.textContent='オートセーブ完了（STAGE '+n+' まで記録しました）';bt.classList.remove('wait');},1300);}}catch(e){}
  if(document.exitPointerLock)try{document.exitPointerLock();}catch(e){}lockWanted=false;
  try{tone(523,523,.14,.25,'square');setTimeout(()=>tone(659,659,.14,.25,'square'),150);setTimeout(()=>tone(784,784,.3,.28,'square'),300);}catch(e){}
 }
@@ -4690,7 +4717,7 @@ function endOutro(){
  for(const j of JL){j.g.visible=true;j.g.rotation.set(0,j.g.rotation.y,0);}
  pm.visible=false;for(const a of allies)a.g.visible=false;CIN.fly={t:0,out:true,x:TRN.g.position.x,y:TRN.g.position.y,z:TRN.g.position.z};
 }
-function skipCine(){if(!CINE)return;if(CIN.mode==='in')finishIntro();else if(CIN.mode==='out'){CIN.t=Math.max(CIN.t,99);}}
+function skipCine(){if(!CINE)return;if(CIN.mode==='in')finishIntro();else if(CIN.mode==='out'){CIN.t=Math.max(CIN.t,99);try{endOutro();}catch(e){}}}
 function easeIO(t){t=clamp(t,0,1);return t*t*(3-2*t);}
 function updateCine(dt){
  CIN.t+=dt;const t=CIN.t;{const sv=t>2.5;if(CIN.skv!==sv){CIN.skv=sv;$('cineSkip').style.display=sv?'block':'none';}}
@@ -5027,7 +5054,7 @@ updateTitleBtns();
 $('stNext').addEventListener('click',nextStage);
 $('hqBtn').addEventListener('click',e=>{e.stopPropagation();toggleHQ();});
 $('cineBox').addEventListener('pointerdown',e=>{e.preventDefault();});
-$('cineSkip').addEventListener('click',e=>{e.stopPropagation();if(CIN.t>2.5)skipCine();});
+{const sk=$('cineSkip');let dn=0;const go=e=>{e.preventDefault();e.stopPropagation();const n=performance.now();if(n-dn<300)return;dn=n;if(CINE&&CIN.t>2.5)skipCine();};sk.addEventListener('pointerdown',go);sk.addEventListener('click',go);}
 addEventListener('keydown',e=>{if(CINE&&CIN.t>2.5&&(e.code==='Enter'||e.code==='Escape'))skipCine();});
 $('retryBtn').addEventListener('click',startGame);
 try{const lg=$('legal');
@@ -5068,7 +5095,7 @@ try{const tc=$('tc');
   try{updateTitleBtns();}catch(err){}try{setText($('hiTxt'),'HI '+S.hi);}catch(err){}
   pend=null;conf(false);const m=mine();$('tcOut').value=enc(m);$('tcSum').textContent='内容：'+sum(m);$('tcIn').value='';msg('読み込みました。'+sum(m)+'。「続きから」で再開できます。');});
 }catch(e){}
-try{const fb=$('fb'),FBTO='n.kaneta@tetoterasu.com',VER='v49';
+try{const fb=$('fb'),FBTO='n.kaneta@tetoterasu.com',VER='v50';
  const info=()=>{const ua=navigator.userAgent||'';let dev=/iPhone/.test(ua)?'iPhone':/iPad/.test(ua)?'iPad':/Android/.test(ua)?'Android':/Mac/.test(ua)?'Mac':/Windows/.test(ua)?'Windows':'その他';
   return '--- 端末とゲームの状況 ---\nバージョン：'+VER+'\n端末：'+dev+'（'+innerWidth+'×'+innerHeight+(matchMedia('(orientation:landscape)').matches?'・横':'・縦')+'）\nコントローラー：'+(PAD.on?'あり':'なし')+'\n到達ステージ：'+SAVE.max+' / '+MAXST+'\n現在のステージ：'+(wave||'-')+'\nブラウザ：'+ua;};
  const body=()=>{const t=$('fbText').value.trim(),n=$('fbName').value.trim();return '【種類】'+$('fbType').value+'\n\n【内容】\n'+t+'\n\n【お名前】'+(n||'（未記入）')+($('fbInfo').checked?'\n\n'+info():'');};
