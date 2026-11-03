@@ -4958,6 +4958,7 @@ function resetGame(){
  resetNewStuff();
 }
 let START_N=1;
+let RETRY_N=1;
 function startGame(n){
  TRN.g.visible=false;
  START_N=(typeof n==='number'&&n>=1)?Math.min(MAXST,n):1;
@@ -4980,6 +4981,7 @@ function endGame(win){
   const sc=S.score+(win?Math.round(hpRatio*5000):0);
   S.score=sc;
   const rank=!win?'—':sc>=100000?'S':sc>=65000?'A':sc>=35000?'B':'C';
+  RETRY_N=win?1:Math.max(1,Math.min(MAXST,wave||1));$('retryBtn').textContent=win?'もう一度（STAGE 1 から）':'STAGE '+RETRY_N+' から再挑戦';
   $('endTitle').textContent=win?'作戦成功！':'作戦失敗…';
   setRank('endRank',rank);$('endRank').style.display=win?'block':'none';
   $('endScore').textContent='SCORE '+sc+(sc>=S.hi?'　NEW RECORD!':'　HI '+S.hi);
@@ -5056,7 +5058,7 @@ $('hqBtn').addEventListener('click',e=>{e.stopPropagation();toggleHQ();});
 $('cineBox').addEventListener('pointerdown',e=>{e.preventDefault();});
 {const sk=$('cineSkip');let dn=0;const go=e=>{e.preventDefault();e.stopPropagation();const n=performance.now();if(n-dn<300)return;dn=n;if(CINE&&CIN.t>2.5)skipCine();};sk.addEventListener('pointerdown',go);sk.addEventListener('click',go);}
 addEventListener('keydown',e=>{if(CINE&&CIN.t>2.5&&(e.code==='Enter'||e.code==='Escape'))skipCine();});
-$('retryBtn').addEventListener('click',startGame);
+$('retryBtn').addEventListener('click',()=>startGame(RETRY_N||1));
 try{const lg=$('legal');
  const open=e=>{e.stopPropagation();lg.classList.remove('hide');},close=e=>{e.stopPropagation();lg.classList.add('hide');};
  $('legalBtn').addEventListener('click',open);$('legalClose').addEventListener('click',close);
@@ -5095,7 +5097,7 @@ try{const tc=$('tc');
   try{updateTitleBtns();}catch(err){}try{setText($('hiTxt'),'HI '+S.hi);}catch(err){}
   pend=null;conf(false);const m=mine();$('tcOut').value=enc(m);$('tcSum').textContent='内容：'+sum(m);$('tcIn').value='';msg('読み込みました。'+sum(m)+'。「続きから」で再開できます。');});
 }catch(e){}
-try{const fb=$('fb'),FBTO='n.kaneta@tetoterasu.com',VER='v50';
+try{const fb=$('fb'),FBTO='n.kaneta@tetoterasu.com',VER='v51';
  const info=()=>{const ua=navigator.userAgent||'';let dev=/iPhone/.test(ua)?'iPhone':/iPad/.test(ua)?'iPad':/Android/.test(ua)?'Android':/Mac/.test(ua)?'Mac':/Windows/.test(ua)?'Windows':'その他';
   return '--- 端末とゲームの状況 ---\nバージョン：'+VER+'\n端末：'+dev+'（'+innerWidth+'×'+innerHeight+(matchMedia('(orientation:landscape)').matches?'・横':'・縦')+'）\nコントローラー：'+(PAD.on?'あり':'なし')+'\n到達ステージ：'+SAVE.max+' / '+MAXST+'\n現在のステージ：'+(wave||'-')+'\nブラウザ：'+ua;};
  const body=()=>{const t=$('fbText').value.trim(),n=$('fbName').value.trim();return '【種類】'+$('fbType').value+'\n\n【内容】\n'+t+'\n\n【お名前】'+(n||'（未記入）')+($('fbInfo').checked?'\n\n'+info():'');};
