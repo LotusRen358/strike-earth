@@ -535,6 +535,26 @@ body:not(.mpc) .mpGuestOnly{display:none!important}body.mpc .mpHostOnly{display:
 #mpList div.me{background:rgba(40,70,110,.85)}
 #mpMsg,#mpStat{font-size:13px;line-height:1.6;color:#dfe8ff;min-height:1.2em}
 #mpStat.err{color:#ffb0a0}
+#settings{background:rgba(4,8,18,.93)!important}
+.pwRow{display:flex;align-items:center;justify-content:space-between;gap:14px;width:min(86vw,420px);margin:14px auto 0;padding:12px 14px;border-radius:14px;background:rgba(20,40,70,.75);border:1px solid #5a7aa8;text-align:left}
+.pwTx b{display:block;font-size:16px}.pwTx small{display:block;font-size:11px;opacity:.75;margin-top:3px;line-height:1.45}
+.tgl{flex:none;position:relative;width:92px;height:40px;border-radius:20px;border:2px solid #8a96aa;background:#3a4252;cursor:pointer;padding:0;transition:background .2s,border-color .2s}
+.tglK{position:absolute;top:3px;left:4px;width:30px;height:30px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.5);transition:left .2s}
+.tglT{position:absolute;top:0;bottom:0;right:12px;display:flex;align-items:center;font-size:14px;font-weight:900;color:#dfe4ee;letter-spacing:.05em}
+.tgl.on{background:#22b46a;border-color:#8affc0;box-shadow:0 0 12px rgba(60,220,140,.55)}
+.tgl.on .tglK{left:56px}.tgl.on .tglT{right:auto;left:12px;color:#fff}
+#title:not(.help) #mpBadge{margin:6px 0 0!important;width:min(46vw,460px);max-width:none;box-sizing:border-box;text-align:center;white-space:normal}
+#title:not(.help) #mpBtn{margin-top:8px}
+@media (orientation:landscape) and (max-height:560px){
+ #title:not(.help) h1.logo img{width:min(20vw,29vh,190px)!important}
+ #title:not(.help) #startBtn{padding:5px 16px!important;font-size:14px!important;margin-top:2px!important}
+ #title:not(.help) .trow{gap:5px!important;margin-top:5px!important}
+ #title:not(.help) .trow .btn.sb{padding:5px 9px!important;font-size:11px!important}
+ #title:not(.help) #mpBtn{margin-top:5px!important;padding:5px 14px!important;font-size:12px!important}
+ #title:not(.help) #mpBadge{font-size:10px!important;padding:3px 8px!important;margin-top:4px!important}
+ #title:not(.help) #viewerBtn{margin-top:5px!important;padding:5px 14px!important;font-size:11px!important}
+ #title:not(.help) .cpy{margin-top:4px!important;font-size:9px!important;line-height:1.4!important}
+}
 </style>
 </head>
 <body>
@@ -798,8 +818,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
  <label class="vl">効果音（射撃・爆発）<input type="range" id="setSe" min="0" max="100"></label>
  <label class="vl">仲間の声<input type="range" id="setVo" min="0" max="100"></label>
  <p style="font-size:11px;opacity:.7">仲間の声は端末の音声読み上げを使います（端末により声が異なります）</p>
- <label class="vl" style="display:flex;align-items:center;gap:8px;justify-content:center"><input type="checkbox" id="setLow" style="width:auto"> 省電力モード（30fps・端末が熱くなりにくい）</label>
- <p style="font-size:11px;opacity:.7">スマホでオンライン協力中は、自動で省電力（30fps）になります。</p>
+ <div class="pwRow"><div class="pwTx"><b>省電力モード</b><small>30fps で動かし、端末が熱くなりにくくなります</small></div><button type="button" id="setLow" class="tgl" role="switch" aria-checked="false"><span class="tglK"></span><span class="tglT">オフ</span></button></div>
+ <p style="font-size:11px;opacity:.7;margin-top:4px">※スマホでオンライン協力中は、この設定に関係なく自動で省電力になります。</p>
  <button class="btn sb" id="setClose">閉じる</button></div>
 <div class="ov hide" id="end">
   <h1 id="endTitle">作戦成功！</h1>
@@ -5960,7 +5980,7 @@ const _nv1=new THREE.Vector3(),_nv2=new THREE.Vector3();
 let NSAVE=null;
 const r1=v=>Math.round(v*10)/10,r2=v=>Math.round(v*100)/100;
 try{NET.name=(localStorage.getItem('seMpName')||'').slice(0,8);}catch(e){}
-try{const cb=$('setLow');cb.checked=LOWP();cb.addEventListener('change',()=>{LOWPW=cb.checked?1:0;try{localStorage.setItem('seLowPow',String(LOWPW));}catch(e){}});}catch(e){}
+try{const cb=$('setLow');const ui=()=>{const on=LOWP();cb.classList.toggle('on',on);cb.setAttribute('aria-checked',on?'true':'false');cb.querySelector('.tglT').textContent=on?'オン':'オフ';};ui();cb.addEventListener('click',e=>{e.stopPropagation();LOWPW=LOWP()?0:1;try{localStorage.setItem('seLowPow',String(LOWPW));}catch(e){}ui();});}catch(e){}
 if(!NET.name)NET.name='隊員'+(100+Math.floor(Math.random()*900));
 const netClean=n=>String(n||'').replace(/[<>&"'\\]/g,'').trim().slice(0,8)||'隊員';
 function netUseBC(){return /[?#&]bc\b/.test(location.search+location.hash);}
