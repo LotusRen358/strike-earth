@@ -555,6 +555,7 @@ body:not(.mpc) .mpGuestOnly{display:none!important}body.mpc .mpHostOnly{display:
  #title:not(.help) #viewerBtn{margin-top:5px!important;padding:5px 14px!important;font-size:11px!important}
  #title:not(.help) .cpy{margin-top:4px!important;font-size:9px!important;line-height:1.4!important}
 }
+.padf{outline:3px solid #ffd23a!important;outline-offset:-3px;box-shadow:inset 0 0 0 3px #ffd23a,inset 0 0 22px rgba(255,210,58,.75)!important;filter:brightness(1.3)!important;transform:scale(1.07)!important;position:relative;z-index:2;transition:transform .08s}
 </style>
 </head>
 <body>
@@ -606,7 +607,7 @@ body:not(.mpc) .mpGuestOnly{display:none!important}body.mpc .mpHostOnly{display:
     <span><b>W A S D</b> 移動</span><span><b>マウス</b> 照準</span>
     <span><b>左クリック</b> 射撃（押しっぱなし）</span><span><b>右クリック / E</b> ロケット</span>
     <span><b>Q</b> 衛星ストライク（ゲージ満タン）</span><span><b>Space（長押し）</b> ブースト上昇</span><span><b>Shift</b> ダッシュ（無敵）</span>
-    <span><b>P</b> 一時停止</span><span><b>M</b> 音のオン・オフ</span><span><b>コントローラー</b> R2射撃 L2ロケット ×ブースト ○ダッシュ △ストライク □砲台 L1/R1武器</span>
+    <span><b>P</b> 一時停止</span><span><b>M</b> 音のオン・オフ</span><span><b>コントローラー</b> 下の「コントローラー操作」を参照</span>
     <span><b>1〜8 / ホイール / F</b> 武器切替</span><span>光の柱＝武器ドロップ</span>
     <span><b>G</b> 砲台を投げて設置</span><span><b>X</b> 乗り物から降りる</span>
     <span>宝箱（街のどこか）＝戦車・ヘリ・ロボ</span><span>制限時間つき／時間が経つと別の場所に復活</span>
@@ -620,6 +621,16 @@ body:not(.mpc) .mpGuestOnly{display:none!important}body.mpc .mpHostOnly{display:
     <span><b>砲台</b> 投げて自動砲台を設置</span><span><b>降車</b> 乗り物から降りる</span><span><b>乗り物中</b> ボタンが専用技に変化（ロボ：叩きつけ・ジャンプ・ミサイル／戦車：突撃・拡散砲／ヘリ：高度・爆撃）</span><span><b>Ⅱ</b> 一時停止</span><span><b>ロックオンミサイル</b> 正面の敵を最大6体自動ロック→射撃で一斉発射</span><span>コントローラー操作中は画面のボタンが消え、触れると戻ります</span>
     <span>宝箱（街のどこか）＝戦車・ヘリ・ロボ</span><span>時間制限あり／時間で別の場所に復活</span>
     <span>緑＝回復　ピンク♥＝最大ライフUP</span><span>橙＝ロケット補給　色つき＝武器</span>
+  </div>
+  <div class="keys">
+    <span><b>コントローラー操作</b>（PlayStation／Xbox 共通の標準配置）</span>
+    <span><b>左スティック</b> 移動　<b>右スティック</b> 視点</span>
+    <span><b>R2（RT）</b> 射撃</span><span><b>L2（LT）</b> ズーム照準（視点がゆっくりになる）</span>
+    <span><b>R1（RB）</b> ロケット</span><span><b>L1（LB）</b> 砲台を投げて設置</span>
+    <span><b>×（A）</b> ブースト上昇（長押し）</span><span><b>○（B）／ L3押し込み</b> ダッシュ（無敵回避）</span>
+    <span><b>□（X）／ 十字↑</b> 衛星ストライク</span><span><b>△（Y）</b> 武器切替（乗り物中は降りる）</span>
+    <span><b>十字←→</b> 武器切替　<b>十字↓</b> 乗り物から降りる</span><span><b>OPTIONS（≡）</b> 一時停止</span>
+    <span><b>メニュー</b> 十字キー／左スティックで選択、×（A）で決定、○（B）で戻る</span>
   </div>
   <button class="btn" id="startBtn">はじめから</button>
   <div class="trow"><button class="btn sb" id="contBtn">続きから</button><button class="btn sb" id="selBtn">ステージ選択</button><button class="btn sb" id="setBtn">音量設定</button><button class="btn sb" id="helpBtn">操作説明</button></div>
@@ -2729,24 +2740,81 @@ function updateUiFade(){
  const idle=state==='play'&&!paused&&!padMode&&now-uiLast>4000;
  if(idle!==document.body.classList.contains('idle'))document.body.classList.toggle('idle',idle);
 }
+/* ===== v70 : コントローラー（一般的なTPSの標準配置） =====
+ 標準配列(Xbox / PlayStation 共通の番号)
+ 0:A/×  1:B/○  2:X/□  3:Y/△  4:LB/L1  5:RB/R1  6:LT/L2  7:RT/R2  8:View/Create  9:Menu/Options  10:L3  11:R3  12-15:十字↑↓←→ */
+PAD.adsK=0;PAD.ads=false;PAD.f=null;PAD.rep=0;PAD.dir='';PAD.warned=false;PAD.id='';
+function padRumble(s,ms){try{const gs=navigator.getGamepads?navigator.getGamepads():[];for(const g of gs){if(!g||!g.connected)continue;const a=g.vibrationActuator;if(a&&a.playEffect)a.playEffect('dual-rumble',{duration:ms,strongMagnitude:s,weakMagnitude:Math.min(1,s*1.3)}).catch(()=>{});}}catch(e){}}
+/* --- menu navigation with the pad --- */
+function padLayer(){
+ let best=null,bz=-1e9;
+ for(const o of document.querySelectorAll('.ov,#vw')){const cs=getComputedStyle(o);if(cs.display==='none'||cs.visibility==='hidden'||o.classList.contains('hide'))continue;const z=parseInt(cs.zIndex)||0;if(z>=bz){bz=z;best=o;}}
+ return best;
+}
+function padItems(L){
+ if(!L)return[];
+ return [...L.querySelectorAll('button,input[type=range],.ss,select')].filter(el=>{if(el.disabled)return false;const r=el.getBoundingClientRect();if(r.width<4||r.height<4)return false;const cs=getComputedStyle(el);return cs.visibility!=='hidden'&&cs.display!=='none'&&el.offsetParent!==null;});
+}
+function padFocus(el){if(PAD.f&&PAD.f!==el)PAD.f.classList.remove('padf');PAD.f=el;if(el){el.classList.add('padf');try{el.scrollIntoView({block:'nearest',inline:'nearest'});}catch(e){}}}
+function padPrimary(items){for(const id of['resumeBtn','stNext','retryBtn','contBtn','startBtn','mpGoCont','mpHost','ssClose','setClose']){const el=items.find(e=>e.id===id&&e.style.display!=='none');if(el)return el;}return items[0];}
+function padMove(dx,dy){
+ const items=padItems(padLayer());if(!items.length)return;
+ if(!PAD.f||!items.includes(PAD.f)){padFocus(padPrimary(items));return;}
+ if(PAD.f.type==='range'&&dx){const s=PAD.f,st=+(s.step||1)||1;s.value=clamp(+s.value+dx*Math.max(st,(+s.max-+s.min)/20),+s.min,+s.max);s.dispatchEvent(new Event('input',{bubbles:true}));s.dispatchEvent(new Event('change',{bubbles:true}));tone(880,880,.03,.04,'square');return;}
+ const a=PAD.f.getBoundingClientRect(),ax=a.left+a.width/2,ay=a.top+a.height/2;let best=null,bs=1e9;
+ for(const el of items){if(el===PAD.f)continue;const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,vx=x-ax,vy=y-ay,along=vx*dx+vy*dy;if(along<=2)continue;const side=Math.abs(vx*dy-vy*dx);const sc=along+side*2.2;if(sc<bs){bs=sc;best=el;}}
+ if(best){padFocus(best);tone(660,660,.025,.04,'square');}
+}
+function padBack(){
+ const items=padItems(padLayer());
+ const b=items.find(e=>e.id==='resumeBtn')||items.find(e=>/^(閉じる|戻る|やめる|✕|説明を閉じる|◀ ビューアに戻る)/.test((e.textContent||'').trim()));
+ if(b){b.click();return true;}return false;
+}
+function padUI(b,pr,ax,ay,dt){
+ const items=padItems(padLayer());
+ if(!items.length){if(PAD.f){PAD.f.classList.remove('padf');PAD.f=null;}return;}
+ if(!PAD.f||!items.includes(PAD.f))padFocus(padPrimary(items));
+ let dir='';if(b(12)||ay<-.6)dir='u';else if(b(13)||ay>.6)dir='d';else if(b(14)||ax<-.6)dir='l';else if(b(15)||ax>.6)dir='r';
+ if(dir){if(dir!==PAD.dir){PAD.rep=.38;PAD.dir=dir;padMove(dir==='l'?-1:dir==='r'?1:0,dir==='u'?-1:dir==='d'?1:0);}else{PAD.rep-=dt;if(PAD.rep<=0){PAD.rep=.12;padMove(dir==='l'?-1:dir==='r'?1:0,dir==='u'?-1:dir==='d'?1:0);}}}else PAD.dir='';
+ if(pr(0)){if(PAD.f){if(PAD.f.type==='range'){}else PAD.f.click();}else padClick();}
+ else if(pr(1))padBack();
+ else if(pr(9)){if(paused)setPause(false);else padClick();}
+}
 function pollPad(dt){
  let gp=null;try{const gs=navigator.getGamepads?navigator.getGamepads():[];for(const g of gs)if(g&&g.connected){gp=g;break;}}catch(e){}
- if(!gp){if(PAD.on){PAD.on=false;input.stx=input.stz=0;input.fireT=input.rocketT=input.boostT=false;}return;}
- const B=gp.buttons,b=i=>!!(B[i]&&(B[i].pressed||B[i].value>.35)),pr=i=>b(i)&&!PAD.prev[i],dz=v=>Math.abs(v)<.16?0:(v-Math.sign(v)*.16)/.84;
- const ax=dz(gp.axes[0]||0),ay=dz(gp.axes[1]||0),rx=dz(gp.axes[2]||0),ry=dz(gp.axes[3]||0);
+ if(!gp){if(PAD.on){PAD.on=false;input.stx=input.stz=0;input.fireT=input.rocketT=input.boostT=false;PAD.ads=false;if(PAD.f){PAD.f.classList.remove('padf');PAD.f=null;}}PAD.adsK=Math.max(0,PAD.adsK-dt*6);return;}
+ const std=gp.mapping==='standard',B=gp.buttons,A=gp.axes;
+ /* non-standard Android pads: triggers often come in on axes */
+ const trig=i=>{if(B[i]&&(B[i].pressed||B[i].value>.35))return true;if(!std&&A.length>=6){const v=i===6?(A.length>=8?A[6]:A[4]):(A.length>=8?A[7]:A[5]);return v>.3;}return false;};
+ const b=i=>(i===6||i===7)?trig(i):!!(B[i]&&(B[i].pressed||B[i].value>.5)),pr=i=>b(i)&&!PAD.prev[i],dz=v=>Math.abs(v)<.15?0:(v-Math.sign(v)*.15)/.85;
+ let ax=dz(A[0]||0),ay=dz(A[1]||0),rx=dz(A[2]||0),ry=dz(A[3]||0);
+ if(!std&&A.length>=6&&Math.abs(A[3]||0)<.05&&Math.abs(A[5]||0)>.2){ry=dz(A[5]||0);}
  let any=ax||ay||rx||ry;for(let i=0;i<B.length;i++)if(b(i))any=true;
- if(any&&!PAD.on){PAD.on=true;if(state==='play')toast('コントローラーで操作中（画面に触れるとボタンが戻ります）','#9ad8ff');}
+ if(any&&!PAD.on){PAD.on=true;PAD.id=gp.id;
+  toast(std?'コントローラー接続：R2射撃・L2ズーム・R1ロケット・L1砲台・×ブースト・○ダッシュ・□ストライク・△武器切替':'コントローラーを検出（標準配列ではないため、一部のボタンが違う場合があります）','#9ad8ff');}
  if(any)uiExt();
  if(PAD.on){
+  const playing=state==='play'&&!paused;
   if(CINE&&(pr(9)||pr(0))&&CIN.t>2.5)skipCine();
-  else if(state==='play'&&!paused){
-   input.stx=ax;input.stz=-ay;P.yaw-=rx*Math.abs(rx)*3.2*dt;P.pitch=clamp(P.pitch-ry*Math.abs(ry)*1.9*dt,-.95,.7);
-   input.fireT=b(7);input.rocketT=b(6);input.boostT=b(0);
-   if(pr(1))input.dashReq=true;if(pr(3))strike();if(pr(2))throwTurret();if(pr(5))nextWeapon(1);if(pr(4))nextWeapon(-1);if(pr(8)||pr(12))exitVehicle();if(pr(9))setPause(true);
-  }else if(paused&&(pr(9)||pr(0)||pr(1))){setPause(false);}
-  else if(pr(0)||pr(9))padClick();
+  else if(playing){
+   if(PAD.f){PAD.f.classList.remove('padf');PAD.f=null;}
+   PAD.ads=b(6)&&!veh;
+   const sens=1-PAD.adsK*.55;
+   /* response curve : precise near centre, fast at full tilt */
+   const cx=rx*Math.abs(rx)*.6+rx*.4,cy=ry*Math.abs(ry)*.6+ry*.4;
+   input.stx=ax;input.stz=-ay;P.yaw-=cx*3.4*sens*dt;P.pitch=clamp(P.pitch-cy*2.1*sens*dt,-.95,.7);
+   input.fireT=b(7);input.rocketT=b(5);input.boostT=b(0);
+   if(pr(1)||pr(10))input.dashReq=true;
+   if(pr(2)||pr(12))strike();
+   if(pr(4))throwTurret();
+   if(pr(3)){if(veh)exitVehicle();else nextWeapon(1);}
+   if(pr(15))nextWeapon(1);if(pr(14))nextWeapon(-1);
+   if(pr(13)||pr(8))exitVehicle();
+   if(pr(9))setPause(true);
+  }else{PAD.ads=false;input.fireT=input.rocketT=input.boostT=false;padUI(b,pr,ax,ay,dt);}
  }
- PAD.prev=[];for(let i=0;i<B.length;i++)PAD.prev[i]=b(i);
+ PAD.adsK+=((PAD.ads?1:0)-PAD.adsK)*Math.min(1,dt*12);
+ PAD.prev=[];for(let i=0;i<Math.max(B.length,16);i++)PAD.prev[i]=b(i);
 }
 /* stage select / settings UI */
 function openSelect(){
@@ -4450,6 +4518,7 @@ function hurt(d){
  if(NET.redir){netDmg(NET.redir,d);return;}
  if(SHT>0&&!P.dead){shieldHit(pm);return;}
  if(P.dead||P.iframe>0||state==='win'||bossDie>0)return;
+ if(PAD.on)padRumble(Math.min(1,.25+d/40),110);
  if(!veh&&!NET.on){const gd=allies.find(a=>a.role==='guard'&&!a.down&&Math.hypot(a.x-P.x,a.z-P.z)<7&&Math.abs((a.alt||0)-P.alt)<3);if(gd){hurtAlly(gd,d*.5);d*=.5;if(limit('guardsay',3000))vox(gd,'cover',true);}}
  ST.dmg+=d;P.lh=S.time;
  if(veh){vehDamage(d);return;}
@@ -6373,7 +6442,7 @@ function update(dt){
  }else{updateCamera(dt);}
  updateWorld(dt);updateExtract();updateTransportFly(dt);updateParts(dt);updateFx(dt);followSun(dt);
  shake*=Math.exp(-dt*6);
- fovK*=Math.exp(-dt*8);{const f=72+fovK;if(Math.abs(camera.fov-f)>.05){camera.fov=f;camera.updateProjectionMatrix();}}
+ fovK*=Math.exp(-dt*8);{const f=72+fovK-PAD.adsK*26;if(Math.abs(camera.fov-f)>.05){camera.fov=f;camera.updateProjectionMatrix();}}
  flushDmg(dt);drawFx(dt);if(state!=='title'&&!CINE&&state!=='clear')drawLabels();
  sunGlow.scale.setScalar(1+Math.sin(performance.now()/1500)*.03);
  if(state!=='title')updateHud(dt);
