@@ -638,6 +638,12 @@ body #bWeapon{right:calc(236px + env(safe-area-inset-right))!important;bottom:ca
 .tb .cap{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);font-style:normal;font-size:9px;font-weight:800;letter-spacing:.06em;color:#cfe8f6;white-space:nowrap;text-shadow:0 0 3px #000,0 0 3px #000;pointer-events:none}
 #bWeapon .sub{position:absolute;left:50%;top:-18px;transform:translateX(-50%);white-space:nowrap;font-size:11px}
 #bDash .ic,#bRocket .ic,#bTurret .ic,#bWeapon .ic{transform:translateY(-5px)}
+
+#verBox{display:inline-flex;align-items:center;gap:8px;font-size:12px;opacity:.9}#verBox b{font-weight:800;letter-spacing:.04em}
+#verUp{padding:2px 10px!important;border:1px solid rgba(255,255,255,.35)!important;border-radius:8px;text-decoration:none!important}
+#verUp.new{background:#ffb84a;color:#1a1a1a;border-color:#ffd38a!important;animation:rgp .7s infinite alternate}
+#verMsg{font-style:normal;font-size:11px;color:#9ad8ff}#verMsg.new{color:#ffd070}
+.pVer{font-size:11px;opacity:.6;margin-top:6px}
 </style>
 </head>
 <body>
@@ -722,7 +728,7 @@ body #bWeapon{right:calc(236px + env(safe-area-inset-right))!important;bottom:ca
   <button class="btn" id="brkBtn">兵舎（装備・バッジ・階級）</button>
   <button class="btn" id="viewerBtn" style="background:linear-gradient(180deg,#4a6a9a,#2a3a6a);border-color:#9ac0ff;box-shadow:0 0 16px rgba(80,140,255,.5);font-size:15px;padding:10px 26px;letter-spacing:.1em">図鑑・街の探索</button>
   <button id="hqBtn" style="display:none;margin-top:10px;background:rgba(0,0,0,.45);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:14px;padding:6px 14px;font-size:12px">画質</button>
-  <p class="cpy">© 2026 テトテラス　All Rights Reserved.<br><button id="tcBtn" class="lnk" type="button">引き継ぎコード</button>　<button id="fbBtn" class="lnk" type="button">ご意見・不具合の報告</button>　<button id="legalBtn" class="lnk" type="button">利用規約・プライバシー</button></p>
+  <p class="cpy"><span id="verBox">Ver <b class="verNo"></b><button id="verUp" class="lnk" type="button">更新</button><em id="verMsg"></em></span><br>© 2026 テトテラス　All Rights Reserved.<br><button id="tcBtn" class="lnk" type="button">引き継ぎコード</button>　<button id="fbBtn" class="lnk" type="button">ご意見・不具合の報告</button>　<button id="legalBtn" class="lnk" type="button">利用規約・プライバシー</button></p>
 </div>
 
 <div class="ov hide" id="mp">
@@ -882,6 +888,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 <div class="ov hide" id="pause">
   <h1 style="font-size:clamp(30px,6vw,56px)">一時停止</h1>
   <p>クリック（タップ）で再開します</p>
+  <p class="pVer">Ver <b class="verNo"></b></p>
   <button class="btn" id="resumeBtn">再 開</button>
   <div class="trow"><button class="btn sb mpOn2" id="pVoiceBtn" style="display:none">🎤 声：オフ</button><button class="btn sb" id="pSetBtn">設定</button><button class="btn sb" id="pFbBtn">不具合報告</button><button class="btn sb" id="pTitleBtn">タイトルへ</button></div>
 </div>
@@ -4768,6 +4775,26 @@ let LASTF=null;
 $('dpGo').addEventListener('click',e=>{e.stopPropagation();$('dfPick').classList.add('hide');startGame(DPN);});
 $('dpBack').addEventListener('click',e=>{e.stopPropagation();$('dfPick').classList.add('hide');DL=SAVE.diff;});
 try{for(const[id,t]of[['bDash','ダッシュ'],['bRocket','ロケット'],['bTurret','砲台'],['bWeapon','武器'],['bExit','降りる']]){const el=$(id);if(el&&!el.querySelector('.cap')){const c=document.createElement('i');c.className='cap';c.textContent=t;el.appendChild(c);}}}catch(e){}
+/* ---------- バージョン表示と更新 ---------- */
+const GAME_VER='1.01';
+function verCmp(a,b){const x=String(a).split('.').map(Number),y=String(b).split('.').map(Number);for(let i=0;i<Math.max(x.length,y.length);i++){const d=(x[i]||0)-(y[i]||0);if(d)return d>0?1:-1;}return 0;}
+function hardReload(){try{saveGame();}catch(e){}const u=location.pathname+'?r='+Date.now()+location.hash;try{location.replace(u);}catch(e){location.reload();}}
+let VER_NEW=null;
+function checkUpdate(manual){
+ const msg=$('verMsg'),btn=$('verUp');if(!msg||!btn)return;
+ if(manual&&VER_NEW){hardReload();return;}
+ if(!/^https?:/.test(location.protocol)){if(manual)hardReload();return;}
+ if(manual)msg.textContent='確認中…';
+ try{fetch(location.pathname+'?vc='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{
+   const m=t&&t.match(/const GAME_VER='([0-9.]+)'/);
+   if(m&&verCmp(m[1],GAME_VER)>0){VER_NEW=m[1];msg.textContent='新しい Ver '+m[1]+' があります';msg.classList.add('new');btn.classList.add('new');btn.textContent='更新する';if(manual)hardReload();}
+   else{msg.classList.remove('new');btn.classList.remove('new');msg.textContent=manual?'最新です':'';if(manual)setTimeout(hardReload,500);}
+  }).catch(()=>{if(manual)hardReload();});}catch(e){if(manual)hardReload();}
+}
+for(const el of document.querySelectorAll('.verNo'))el.textContent=GAME_VER;
+try{document.title=document.title.replace(/\s*Ver[ .0-9]*$/,'')+' Ver '+GAME_VER;}catch(e){}
+$('verUp').addEventListener('click',e=>{e.stopPropagation();checkUpdate(true);});
+setTimeout(()=>checkUpdate(false),2500);
 $('ssRecBtn').addEventListener('click',e=>{e.stopPropagation();SSREC=!SSREC;openSelect();});
 $('ssBrk').addEventListener('click',e=>{e.stopPropagation();openBarracks('eq');});
 $('brkBtn').addEventListener('click',e=>{e.stopPropagation();openBarracks();});
