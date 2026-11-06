@@ -607,6 +607,7 @@ body:not(.mpc) .mpGuestOnly{display:none!important}body.mpc .mpHostOnly{display:
 #bBoost .pct{color:#9ae8ff}#bBoost .pct.z{color:#ff9a6a}
 .rg.bo.up .rf,.rg.st.up .rf{animation:trU .7s ease-in-out infinite}.rg.bo.dn .rf{stroke:#8af0ff}
 .gw{overflow:visible}
+#dfPick{z-index:78;background:rgba(6,10,18,.93)}#dpGo{font-size:20px;padding:12px 36px}
 </style>
 </head>
 <body>
@@ -878,9 +879,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <div class="ov hide" id="select"><h1 style="font-size:clamp(24px,5vw,44px)">ステージ選択<small id="ssInfo"></small></h1><div id="ssDiff" class="dfRow"></div><div class="ssTools"><button class="btn sb" id="ssRecBtn">記録の確認・削除</button><button class="btn sb" id="ssBrk">装備を変える</button></div><div id="ssGrid"></div><button class="btn sb" id="ssClose">戻る</button></div>
 <div class="ov hide" id="recPop"></div>
+<div class="ov hide" id="dfPick"><h1 style="font-size:clamp(24px,5vw,40px)">難易度を選んで出撃</h1><div id="dpChips" class="dfRow"></div><p id="dpInfo" style="text-align:center;font-size:14px;margin:6px 0 12px"></p><div class="ssTools"><button class="btn" id="dpGo">出撃する</button><button class="btn sb" id="dpBack">戻る</button></div></div>
 <div class="ov hide" id="brk"><h1 style="font-size:clamp(24px,5vw,40px)">兵舎</h1><div id="brkHead"></div><div id="brkTabs"><button type="button" data-t="eq">装備</button><button type="button" data-t="bd">バッジ</button><button type="button" data-t="rk">階級・記録</button></div><div id="brkBody"></div><button class="btn sb" id="brkClose">閉じる</button></div>
 <div class="ov hide" id="settings"><h1 style="font-size:clamp(24px,5vw,40px)">設定</h1>
- <div class="setSec"><b>難易度</b><div id="setDiff" class="dfRow"></div></div>
+ <div class="setSec"><b>標準の難易度</b><small style="display:block;opacity:.75;font-size:11px">「はじめから」「続きから」「ステージ選択」で最初に選ばれている難易度です（出撃のたびに変えられます）</small><div id="setDiff" class="dfRow"></div></div>
  <label class="vl">BGM<input type="range" id="setBgm" min="0" max="100"></label>
  <label class="vl">効果音（射撃・爆発）<input type="range" id="setSe" min="0" max="100"></label>
  <label class="vl">仲間の声<input type="range" id="setVo" min="0" max="100"></label>
@@ -1257,6 +1259,57 @@ function mdlGasSphere(L,G,r){
  for(let i=0;i<10;i++){const a=i/10*6.283;L.add(GC,0x9aa0aa,.32,y,.32,Math.cos(a)*r*.86,y/2,Math.sin(a)*r*.86);}
  L.add(GC,0x8a8e98,2,.4,2,0,y+r,0);
  G.add(GS,0xff3a2a,.25,.25,.25,0,y+r+.5,0);
+}
+let GBM=null;
+function gasBurst(b){
+ const r=Math.max(3,(b.h-3)/2),cy=r+3,X=b.x,Z=b.z;
+ b.pb.squash(b,1);b.col=-1;
+ if(!GBM)GBM={sh:new THREE.MeshStandardMaterial({color:0xe2e6ea,roughness:.55,metalness:.3}),in:new THREE.MeshStandardMaterial({color:0x2c2a2a,roughness:.95,metalness:.1,side:THREE.BackSide}),
+  fr:new THREE.MeshStandardMaterial({color:0xd8dce2,roughness:.6,metalness:.3,side:THREE.DoubleSide}),bu:new THREE.MeshStandardMaterial({color:0x3a3634,roughness:.95,side:THREE.DoubleSide}),
+  lg:new THREE.MeshStandardMaterial({color:0x8a9098,roughness:.6,metalness:.5}),bl:new THREE.MeshStandardMaterial({color:0x4a7ab8,roughness:.5,side:THREE.DoubleSide})};
+ const hsh=k=>{const v=Math.sin(k*12.9898+X*.71+Z*.37)*43758.5453;return v-Math.floor(v);};
+ /* 残った下部：ギザギザの王冠形 */
+ const N=30,T0=Math.PI*.5,cg=new THREE.SphereGeometry(r,N,9,0,Math.PI*2,T0,Math.PI-T0),pos=cg.attributes.position;
+ for(let i=0;i<pos.count;i++){const x=pos.getX(i),y=pos.getY(i),z=pos.getZ(i),th=Math.acos(clamp(y/r,-1,1));const row=Math.round((th-T0)/((Math.PI-T0)/9));if(row>1)continue;
+  let a=Math.atan2(z,x);if(a<0)a+=Math.PI*2;const k=Math.round(a/(Math.PI*2)*N)%N;const h=hsh(k);
+  const lift=row===0?(k%2===0?(.25+.55*h):(-.12+.18*h)):(k%2===0?.08+.2*h:-.05);const t2=Math.max(.12,th-lift);pos.setXYZ(i,r*Math.sin(t2)*Math.cos(a),r*Math.cos(t2),r*Math.sin(t2)*Math.sin(a));}
+ cg.computeVertexNormals();
+ const crown=new THREE.Group();crown.position.set(X,cy,Z);const o=new THREE.Mesh(cg,GBM.sh),ii=new THREE.Mesh(cg,GBM.in);ii.scale.setScalar(.985);o.castShadow=true;crown.add(o,ii);
+ const bd=new THREE.Mesh(new THREE.CylinderGeometry(r*1.01,r*1.01,.55,N,1,true),GBM.bl);bd.position.y=-r*.08;crown.add(bd);
+ WR.add(crown);
+ const legs=[];for(let i=0;i<10;i++){const a=i/10*6.283,pv=new THREE.Group(),lg=new THREE.Mesh(TCYL,GBM.lg);lg.scale.set(.32,cy,.32);lg.position.y=cy/2;lg.castShadow=true;pv.add(lg);
+  pv.position.set(X+Math.cos(a)*r*.86,0,Z+Math.sin(a)*r*.86);WR.add(pv);const d=new THREE.Vector3(Math.cos(a)*rnd(.6,1),0,Math.sin(a)*rnd(.6,1)).normalize();
+  legs.push({pv,ax:new THREE.Vector3(d.z,0,-d.x),t0:1.1+Math.random()*1.3,th:0,om:0,done:false,x:pv.position.x,z:pv.position.z,d});}
+ const CR={t0:1.75,vy:0,tx:rnd(-.5,.5),tz:rnd(-.5,.5),done:false};
+ const gasLater=dt=>{
+  for(const L of legs){if(L.done||T<L.t0)continue;if(L.th===0&&limit('gleg',60))tone(220,90,.12,.08,'sawtooth');L.om+=dt*(3+L.th*5);L.th=Math.min(1.5,L.th+L.om*dt);L.pv.quaternion.setFromAxisAngle(L.ax,L.th);
+   if(L.th>=1.5){L.done=true;for(let k=0;k<5;k++)emit(L.x+L.d.x*cy*.6,.3,L.z+L.d.z*cy*.6,rnd(-3,3),rnd(1,4),rnd(-3,3),0x8a8a90,rnd(.6,1.2),rnd(.8,1.4),-1,false);}}
+  if(CR.done||T<CR.t0)return;
+  CR.vy-=26*dt;crown.position.y+=CR.vy*dt;crown.rotation.x+=CR.tx*dt;crown.rotation.z+=CR.tz*dt;
+  if(crown.position.y<=r*.55){CR.done=true;WR.remove(crown);
+   try{sfxBoom(.45);}catch(e){}shake=Math.max(shake,.7);
+   for(let k=0;k<26;k++){const a=Math.random()*6.283;emit(X+Math.cos(a)*r*.7,rnd(.3,2),Z+Math.sin(a)*r*.7,Math.cos(a)*rnd(3,9),rnd(2,7),Math.sin(a)*rnd(3,9),k%3?0x9a9aa2:0x5a5a60,rnd(1.2,2.6),rnd(1.2,2.2),-1,false);}
+   const cols=9;for(let ry=0;ry<2;ry++)for(let cx=0;cx<cols;cx++){
+    const tA=T0+ry*((Math.PI-T0)/2)+.02,tL=(Math.PI-T0)/2-.04,pA=cx*(Math.PI*2/cols)+.03,pL=Math.PI*2/cols-.06;
+    const g=new THREE.SphereGeometry(r,4,3,pA,pL,tA,tL);g.computeBoundingBox();const c=new THREE.Vector3();g.boundingBox.getCenter(c);g.translate(-c.x,-c.y,-c.z);
+    const m=new THREE.Mesh(g,(cx+ry)%3===0?GBM.bu:GBM.fr);m.castShadow=true;m.position.set(X+c.x,crown.position.y+c.y*.5,Z+c.z);m.rotation.set(rnd(-.4,.4),rnd(0,6),rnd(-.4,.4));WR.add(m);
+    const d=new THREE.Vector3(c.x,0,c.z).normalize(),sp=rnd(3,8);fr.push({m,vx:d.x*sp,vy:rnd(3,7),vz:d.z*sp,ax:rnd(-3,3),az:rnd(-3,3),done:false,lift:.25});}
+   bd.visible=false;}
+ };
+ /* 弾け飛ぶ上部の破片 */
+ const fr=[];const cols=8,rows=3;
+ for(let ry=0;ry<rows;ry++)for(let cx=0;cx<cols;cx++){
+  const tA=ry*(T0/rows)+.02,tL=T0/rows-.04+(ry===rows-1?.18:0),pA=cx*(Math.PI*2/cols)+.03,pL=Math.PI*2/cols-.06;
+  const g=new THREE.SphereGeometry(r,4,3,pA,pL,tA,tL);g.computeBoundingBox();const c=new THREE.Vector3();g.boundingBox.getCenter(c);g.translate(-c.x,-c.y,-c.z);
+  const m=new THREE.Mesh(g,(cx+ry)%3===0?GBM.bu:GBM.fr);m.castShadow=true;m.position.set(X+c.x,cy+c.y,Z+c.z);WR.add(m);
+  const d=c.clone().normalize(),sp=rnd(16,30)*(1.1-ry*.15);
+  fr.push({m,vx:d.x*sp,vy:d.y*sp*.7+rnd(8,15),vz:d.z*sp,ax:rnd(-5,5),az:rnd(-5,5),done:false,lift:.2+Math.abs(c.y)*.02});}
+ for(let i=0;i<40;i++){const a=Math.random()*6.283,u=Math.random();emit(X+Math.cos(a)*r*.6,cy+r*.3,Z+Math.sin(a)*r*.6,Math.cos(a)*rnd(10,26),rnd(6,20),Math.sin(a)*rnd(10,26),u<.5?0xe8ecf0:0x6a6a72,rnd(.3,.8),rnd(.8,1.6),18,false);}
+ for(let i=0;i<18;i++){const a=Math.random()*6.283;emit(X,cy,Z,Math.cos(a)*rnd(8,20),rnd(-2,10),Math.sin(a)*rnd(8,20),[0xffe08a,0xff9a3a,0xff5a1a][i%3],rnd(1.2,2.4),rnd(.5,.9),-2,true);}
+ try{flashScr(.18,'#ffd8a0');}catch(e){}
+ let T=0;
+ worldTick.push(dt=>{if(T>16)return;T+=dt;gasLater(dt);for(const f of fr){if(f.done)continue;f.vy-=26*dt;f.m.position.x+=f.vx*dt;f.m.position.y+=f.vy*dt;f.m.position.z+=f.vz*dt;f.m.rotation.x+=f.ax*dt;f.m.rotation.z+=f.az*dt;
+  if(f.m.position.y<=f.lift&&f.vy<0){if(Math.abs(f.vy)>7){f.vy*=-.25;f.vx*=.45;f.vz*=.45;f.ax*=.5;f.az*=.5;f.m.position.y=f.lift;}else{f.m.position.y=f.lift;f.done=true;f.m.rotation.x=Math.round(f.m.rotation.x/Math.PI)*Math.PI+rnd(-.35,.35);}}}});
 }
 function mdlOilTank(L,G,r,h){
  L.add(GCY16,0xd8dce2,r,h,r,0,h/2,0);L.add(GH,0xc8ccd4,r,r*.16,r,0,h,0);
@@ -2816,7 +2869,7 @@ function padItems(L){
  return [...L.querySelectorAll('button,input[type=range],.ss,select')].filter(el=>{if(el.disabled)return false;const r=el.getBoundingClientRect();if(r.width<4||r.height<4)return false;const cs=getComputedStyle(el);return cs.visibility!=='hidden'&&cs.display!=='none'&&el.offsetParent!==null;});
 }
 function padFocus(el){if(PAD.f&&PAD.f!==el)PAD.f.classList.remove('padf');PAD.f=el;if(el){el.classList.add('padf');try{el.scrollIntoView({block:'nearest',inline:'nearest'});}catch(e){}}}
-function padPrimary(items){for(const id of['resumeBtn','stNext','retryBtn','contBtn','startBtn','mpGoCont','mpHost','ssClose','setClose']){const el=items.find(e=>e.id===id&&e.style.display!=='none');if(el)return el;}return items[0];}
+function padPrimary(items){for(const id of['dpGo','resumeBtn','stNext','retryBtn','contBtn','startBtn','mpGoCont','mpHost','ssClose','setClose']){const el=items.find(e=>e.id===id&&e.style.display!=='none');if(el)return el;}return items[0];}
 function padMove(dx,dy){
  const items=padItems(padLayer());if(!items.length)return;
  if(!PAD.f||!items.includes(PAD.f)){padFocus(padPrimary(items));return;}
@@ -2923,7 +2976,8 @@ function collapse(b){
  if(!b.alive)return;
  if(NET.on&&!NET.rx&&b.bi!==undefined)netSendAll({t:'c',i:b.bi,w:wave});
  b.alive=false;b.col=0.001;ACOL.push(b);if(state==='play')SST.bld++;marksOff(b);
- if(b.pb&&!((b.y0||0)>.5)&&!KEEP_NAMES[b.name]&&b.h>1.6&&PHYS.length<14&&physStart(b)){}
+ if(b.name==='gas'&&b.pb){try{gasBurst(b);}catch(err){console.warn(err);}}
+ else if(b.pb&&!((b.y0||0)>.5)&&!KEEP_NAMES[b.name]&&b.h>1.6&&PHYS.length<14&&physStart(b)){}
  else if(b.pb&&(b.small||b.nocol)&&b.h>2.2&&b.w<4&&!((b.y0||0)>.5)&&TOPL.length<24){const dx=b.x-P.x,dz=b.z-P.z,dl=Math.hypot(dx,dz)||1,ra=rnd(-.6,.6);TOPL.push({b,t:0,fx:(dx/dl)*Math.cos(ra)-(dz/dl)*Math.sin(ra),fz:(dx/dl)*Math.sin(ra)+(dz/dl)*Math.cos(ra)});b.col=-1;}
  if(!b.pb&&!b.small&&!b.nocol&&b.mesh){
   const m=b.mesh;b.p0=m.position.clone();b.q0=m.quaternion.clone();b.s0=m.scale.clone();
@@ -3504,12 +3558,19 @@ function bMantis(T){const g=new THREE.Group(),n=new THREE.Group();g.add(n);const
  return{g,n,legs,arms};}
 
 function bWasp(T){const g=new THREE.Group(),n=new THREE.Group();g.add(n);const y=mat(T.color),k=mat(0x222222),wings=[];
- mk(n,SPHF,y,.55,.5,.65,0,1,-.9);mk(n,SPHF,k,.52,.48,.5,0,1,-1.5);mk(n,SPHF,y,.45,.42,.5,0,1,-2.0);
- const st=mk(n,CONEZ,k,.22,.22,.8,0,.98,-2.7);st.rotation.y=Math.PI;
- mk(n,SPHF,k,.5,.48,.55,0,1.05,0);mk(n,SPHF,mat(0xe86a1a),.42,.4,.4,0,1.1,.75);
+ /* 実際のハチと同じ構成：頭部 ― 細い首 ― 胸部 ― くびれ（腹柄） ― 腹部（縞のある節）― 針 */
+ mk(n,TCYLZ,k,.1,.1,.2,0,1.12,.52);mk(n,SPHF,mat(0xe86a1a),.38,.36,.34,0,1.12,.8);mk(n,SPHF,k,.2,.08,.12,0,.95,1.08);
  mk(n,SPHF,redEye,.17,.2,.17,.28,1.2,.9);mk(n,SPHF,redEye,.17,.2,.17,-.28,1.2,.9);
+ mk(n,SPHF,k,.42,.42,.5,0,1.08,.05);mk(n,SPHF,y,.3,.12,.3,0,1.42,.1);mk(n,SPHF,y,.18,.1,.14,.28,1.2,.3);mk(n,SPHF,y,.18,.1,.14,-.28,1.2,.3);mk(n,SPHF,k,.3,.28,.26,0,1.02,-.4);
+ mk(n,TCYLZ,k,.07,.07,.32,0,1.0,-.72);
+ const P0=new THREE.Group();P0.position.set(0,1.0,-.86);n.add(P0);
+ mk(P0,SPHF,y,.46,.44,.5,0,0,-.42);mk(P0,SPHF,k,.47,.42,.1,0,0,-.62);
+ const P1=new THREE.Group();P1.position.set(0,0,-.8);P0.add(P1);mk(P1,SPHF,y,.42,.4,.42,0,0,-.3);mk(P1,SPHF,k,.43,.38,.09,0,0,-.5);mk(P1,SPHF,k,.43,.39,.09,0,0,-.12);
+ const P2=new THREE.Group();P2.position.set(0,0,-.62);P1.add(P2);mk(P2,SPHF,y,.3,.28,.34,0,0,-.24);mk(P2,SPHF,k,.31,.27,.08,0,0,-.38);
+ const st=mk(P2,CONEZ,k,.13,.13,.55,0,0,-.66);st.rotation.y=Math.PI;
+ const ab=[P0,P1,P2];P0.rotation.x=-.95;P1.rotation.x=-1.05;P2.rotation.x=-1.05;
  for(const s of[-1,1])for(const f of[0,1]){const pv=new THREE.Group();pv.position.set(s*.25,1.45,f?-.1:.3);n.add(pv);mk(pv,BOX,wingMat,1.7,.03,.55,s*.85,0,0);wings.push({pv,s});}
- return{g,n,legs:[],wings};}
+ return{g,n,legs:[],wings,ab};}
 
 function pillArc(i){const R=2.25,A=.78,th=A-i*(2*A/6);return{th,y:.18+R*Math.cos(th)-R*Math.cos(A)+.22,z:R*Math.sin(th)};}
 function bPill(T){const g=new THREE.Group(),n=new THREE.Group();g.add(n);const a=mat(T.color),d=mat(0x4a4e5c),legs=[];
@@ -3719,7 +3780,7 @@ DET.mantis=(a,T)=>{const c=T.color,d=dark(c,.55),L=lt(c,.4);
 };
 DET.wasp=(a,T)=>{const c=T.color;
  a.n.add(cmesh('wasp',m=>{
-  m.add(SPHF,lt(c,.35),.3,.07,.4,0,1.5,-.9);m.add(SPHF,0x4a2a10,.32,.1,.4,0,1.5,0);
+  m.add(SPHF,0x4a2a10,.32,.1,.4,0,1.5,0);
   m.add(SPHF,0xe86a1a,.15,.12,.16,0,1.1,-.35);
   for(const s of[-1,1]){
    eyeD(m,s*.28,1.2,.9,.19);
@@ -3886,7 +3947,7 @@ function flyerAI(e,dt,dist,tdx,tdz){
  if(e.type==='wasp'||e.type==='ufo'){if(e.type==='ufo'&&e.ex.disc)e.ex.disc.rotation.y+=dt*4;
   let dx=tdx,dz=tdz,sp=e.speed;
   e.mt-=dt;e.sting=(e.sting===undefined?rnd(1,3):e.sting)-dt;
-  if(e.mode===0&&e.sting<=0&&dist>5&&dist<(e.type==='ufo'?48:36)&&!P.dead){e.sting=e.type==='ufo'?rnd(1.8,3.4):rnd(2.6,4.6);const uf=e.type==='ufo';shootPlasma(e.x,e.y-(uf?.5:0),e.z,P.x,1.3+P.alt*.9,P.z,uf?40:32,uf?0x6ae8ff:0xffd84a,uf?3:2,uf?.36:.26);if(limit('sting',120))tone(1400,900,.05,.05,'square');}
+  if(e.mode===0&&e.sting<=0&&dist>5&&dist<(e.type==='ufo'?48:36)&&!P.dead){e.sting=e.type==='ufo'?rnd(1.8,3.4):rnd(2.6,4.6);e.stA=.7;const uf=e.type==='ufo';shootPlasma(e.x,e.y-(uf?.5:0),e.z,P.x,1.3+P.alt*.9,P.z,uf?40:32,uf?0x6ae8ff:0xffd84a,uf?3:2,uf?.36:.26);if(limit('sting',120))tone(1400,900,.05,.05,'square');}
   if(e.mode===0){
    if(dist<14){const a=Math.atan2(tdx,tdz)+1.3*(e.ph>3?1:-1);dx=Math.sin(a);dz=Math.cos(a);}
    if(dist<16&&e.mt<=0&&e.atk<=0){e.mode=1;e.mt=1.4;}
@@ -3897,6 +3958,8 @@ function flyerAI(e,dt,dist,tdx,tdz){
   if(e.mode===1&&dist<2.4&&e.y<3.4+P.alt&&!P.dead&&e.atk<=0){e.atk=1.4;e.mode=2;e.mt=1.1;if(P.iframe<=0)hurt(T.dmg);}
   const fa=Math.atan2(P.x-e.x,P.z-e.z);let da=fa-e.face;while(da>Math.PI)da-=6.283;while(da<-Math.PI)da+=6.283;e.face+=da*Math.min(1,dt*8);
   for(const w of ex.wings)w.pv.rotation.z=w.s*Math.sin(e.t*55)*.6;
+  if(ex.ab){e.stA=Math.max(0,(e.stA||0)-dt);const want=e.mode===1?1:e.stA>0?.8:0;e.cu=(e.cu||0)+(want-(e.cu||0))*Math.min(1,dt*7);const c=e.cu,wb=Math.sin(e.t*8+e.ph)*.05*(1-c);
+   ex.ab[0].rotation.x=-.95-c*.18+wb;ex.ab[1].rotation.x=-1.05-c*.12+wb;ex.ab[2].rotation.x=-1.05-c*.1+wb*.5;ex.n.rotation.x=-.12-c*.35;}
  }else{
   const toD=tdx*e.ux+tdz*e.uz;
   if((dist>26&&toD<0)||dist>75){const a=Math.atan2(tdx,tdz)+rnd(-.25,.25);e.ux=Math.sin(a);e.uz=Math.cos(a);}
@@ -3920,7 +3983,7 @@ function animGround(e,dt,sw,sp){
   case 'grey':if(ex.gun)ex.gun.rotation.x=e.sh!==undefined&&e.sh>1.4?-.12:0;break;
   case 'mantis':for(const a of ex.arms)a.pv.rotation.x=e.lunge>0?(e.lunge/.25)*1.2-.3:-.5+Math.sin(t*2+a.s)*.08;break;
   case 'pillbug':ex.wk.visible=!e.ball;ex.ball.visible=e.ball;if(e.mode===2)ex.ball.rotation.x+=dt*20;break;
-  case 'centipede':ex.segs.forEach((s,i)=>{s.sg.position.x=Math.sin(t*6-i*.9)*.4*(.25+sw);s.sg.rotation.y=Math.cos(t*6-i*.9)*.22*(.25+sw);for(const l of s.l)l.pv.rotation.x=Math.sin(t*14+l.ph)*.6*(.3+sw);});break;
+  case 'centipede':{const A=.75+.55*Math.min(1,sw),w=t*(2.2+3*Math.min(1,sw));let px=0;ex.segs.forEach((s,i)=>{const ph=w-i*.72,am=A*(.55+i*.07),x=Math.sin(ph)*am;s.sg.position.x=x-Math.sin(w)*A*.55;s.sg.position.z=-i*.9;s.sg.rotation.y=Math.atan2(.72*am*Math.cos(ph),.9);s.sg.position.y=Math.max(0,Math.sin(ph*.5+i*.3))*.06;for(const l of s.l)l.pv.rotation.x=Math.sin(t*14+l.ph)*.6*(.3+sw);});break;}
   case 'snail':e.n.scale.z=1+Math.sin(t*3)*.05;break;
   case 'hopper':{const air=e.y>.05;for(const h of ex.hind)h.pv.rotation.x=air?-.7:.55;break;}
  }
@@ -4529,13 +4592,13 @@ function insRemote(){for(const a of allies){if(!a.hms)continue;for(const si in a
 insApply();
 
 /* ---------- 画面：設定の難易度・ステージ選択・兵舎 ---------- */
-function diffChips(id,onPick){
- const el=$(id);if(!el)return;el.innerHTML=DIFF.map((D,i)=>'<button type="button" class="dfc'+(i===DL?' on':'')+'" data-d="'+i+'" style="--dc:'+D.col+'"><i>'+'☠'.repeat(i)+(i?'':'☀')+'</i><b>'+D.n+'</b></button>').join('')+'<div class="dfDesc">'+DIFF[DL].s+'<br><small>持ち帰り（失敗時）：'+Math.round(DIFF[DL].keep*100)+'%　レア武器：'+['少ない','ふつう','やや多い','多い','とても多い'][DL]+'　最大ライフUP：+'+DIFF[DL].life+'</small></div>';
- for(const b of el.querySelectorAll('.dfc'))b.addEventListener('click',e=>{e.stopPropagation();setDL(+b.dataset.d);diffChips(id,onPick);if(onPick)onPick();});
+function diffChips(id,onPick,mode){
+ const el=$(id);if(!el)return;const CD=mode==='def'?SAVE.diff:DL;el.innerHTML=DIFF.map((D,i)=>'<button type="button" class="dfc'+(i===CD?' on':'')+'" data-d="'+i+'" style="--dc:'+D.col+'"><i>'+'☠'.repeat(i)+(i?'':'☀')+'</i><b>'+D.n+'</b></button>').join('')+'<div class="dfDesc">'+DIFF[CD].s+'<br><small>持ち帰り（失敗時）：'+Math.round(DIFF[CD].keep*100)+'%　レア武器：'+['少ない','ふつう','やや多い','多い','とても多い'][CD]+'　最大ライフUP：+'+DIFF[CD].life+'</small></div>';
+ for(const b of el.querySelectorAll('.dfc'))b.addEventListener('click',e=>{e.stopPropagation();if(mode==='def')setDL(+b.dataset.d);else setRunDL(+b.dataset.d);diffChips(id,onPick,mode);if(onPick)onPick();try{tone(660,880,.05,.07,'square');}catch(e){}});
 }
 let SSREC=false;
 function openSelect(){
- diffChips('ssDiff',openSelect);
+ if($('select').classList.contains('hide'))DL=SAVE.diff;diffChips('ssDiff',openSelect,'run');
  const d=DL;let h='';
  for(let n=1;n<=MAXST;n++){const ok=n<=SAVE.max+1,R=SAVE.rec[n]||{},e=R[d];
   let pips='';for(let k=0;k<5;k++){const q=R[k];pips+='<em style="background:'+(q&&(q.c||q.m)?DIFF[k].col:'rgba(255,255,255,.15)')+'">'+(q&&!q.c&&q.m?'👥':'')+'</em>';}
@@ -4625,17 +4688,21 @@ function kitParts(b,acc){
    kp(g,TCYLZ,K.dk,.095,.095,.62,0,.02,-1.32);kp(g,TCYLZ,acc,.1,.1,.04,0,.02,-1.6);break;
   case 'flame':kp(g,TCYL,K.rd,.11,.46,.11,.05,-.38,-.36);kp(g,TCYL,K.rd,.11,.46,.11,-.08,-.38,-.36).visible=false;kp(g,SPH,K.rd,.11,.07,.11,.05,-.15,-.36);
    kp(g,CONEZ,K.gy,.2,.2,.24,0,0,-1.86).rotation.x=Math.PI;kp(g,SPH,kGlow(0xff8a2a),.05,.05,.05,0,-.06,-1.95);kp(g,BOX,acc,.136,.035,.5,0,.07,-.6);kp(g,TCYLZ,K.dk,.025,.025,.6,.05,-.18,-.8);break;
-  case 'homing':kp(g,BOX,K.gn,.34,.28,.62,0,.3,-.62);for(let i=0;i<2;i++)for(let j=0;j<2;j++)kp(g,SPH,kGlow(0x6af0ff),.05,.05,.02,(i-.5)*.16,.3+(j-.5)*.13,-.94);
-   kp(g,BOX,acc,.35,.03,.63,0,.45,-.62);kp(g,BOX,K.dk,.1,.12,.2,0,.12,-.45);break;
+  case 'homing':{const L=new THREE.Group();L.position.set(.2,.44,-.28);g.add(L);g.userData.shoulder=true;
+   kp(L,BOX,K.gn,.36,.34,1.5,0,0,0);kp(L,BOX,K.dk,.4,.38,.12,0,0,-.78);kp(L,BOX,K.dk,.38,.36,.1,0,0,.74);
+   for(let i=0;i<2;i++)for(let j=0;j<2;j++){kp(L,TCYLZ,K.dk,.065,.065,.06,(i-.5)*.17,(j-.5)*.16,-.85);kp(L,SPH,kGlow(0x6af0ff),.05,.05,.02,(i-.5)*.17,(j-.5)*.16,-.88);}
+   kp(L,TCYLZ,K.gy,.12,.12,.12,0,0,.84);kp(L,SPH,kGlow(0xff9a4a),.07,.07,.02,0,0,.9);
+   kp(L,BOX,acc,.37,.035,1.3,0,.18,0);kp(L,BOX,K.dk,.12,.16,.36,-.24,.08,-.25);kp(L,TCYLZ,K.dk,.05,.05,.3,-.24,.12,-.5);kp(L,SPH,kGlow(0x9affc8),.04,.04,.02,-.24,.12,-.66);
+   kp(g,BOX,K.dk,.06,.42,.07,.08,.13,-.72);kp(g,BOX,K.dk,.06,.34,.07,.06,.1,-.2);break;}
  }
  return g;
 }
 /* ゲーム中：キャラクターの銃に系統パーツを付け替える */
-function kitApply(gunG,id){
+function kitApply(gunG,id){try{if(!gunG.userData.base)gunG.userData.base=gunG.children.filter(o=>o.isMesh&&(o.geometry===BOX||o.geometry===TCYLZ||(o.geometry===SPH&&!o.material.transparent)));}catch(e){}
  if(!gunG)return;const W=WEAPONS[id];if(!W)return;const key=W.b+':'+W.t;
  if(gunG.userData.kitKey===key)return;gunG.userData.kitKey=key;
  if(gunG.userData.kit){gunG.remove(gunG.userData.kit);gunG.userData.kit=null;}
- const k=kitParts(W.b,W.t>=0?KACC[W.t]:KACC0);k.traverse(o=>{if(o.isMesh)o.castShadow=true;});gunG.add(k);gunG.userData.kit=k;
+ const k=kitParts(W.b,W.t>=0?KACC[W.t]:KACC0);k.traverse(o=>{if(o.isMesh)o.castShadow=true;});gunG.add(k);gunG.userData.kit=k;for(const o of gunG.userData.base||[])o.visible=!k.userData.shoulder;
 }
 function kitSpin(){try{for(const gg of[gun,_plr.alt&&_plr.alt.gun]){const k=gg&&gg.userData.kit;if(k&&k.userData.spin)k.userData.spin.rotation.z+=.7;}}catch(e){}}
 function setWeapon(id){setWeapon_v71(id);try{kitApply(gun,P.weapon);if(_plr.alt)kitApply(_plr.alt.gun,P.weapon);}catch(e){}}
@@ -4647,18 +4714,24 @@ function wIcon(id){
   if(!WIR){const c=document.createElement('canvas');c.width=220;c.height=96;WIR={r:new THREE.WebGLRenderer({canvas:c,alpha:true,antialias:true,preserveDrawingBuffer:true}),sc:new THREE.Scene(),cam:new THREE.OrthographicCamera(-1.55,1.55,.68,-.68,.1,20)};
    WIR.r.setSize(220,96,false);WIR.r.outputEncoding=THREE.sRGBEncoding;WIR.sc.add(new THREE.AmbientLight(0xffffff,1.1));const d=new THREE.DirectionalLight(0xffffff,1.8);d.position.set(4,5,1);WIR.sc.add(d);
    WIR.cam.position.set(6,.4,-.9);WIR.cam.lookAt(0,-.02,-.9);}
-  const g=new THREE.Group();kitBase(g,KMAT.ic||(KMAT.ic=new THREE.MeshStandardMaterial({color:0x3a404c,roughness:.45,metalness:.55})));const acc=W.t>=0?KACC[W.t]:KACC0;g.add(kitParts(W.b,acc));
+  const g=new THREE.Group();if(W.b!=='homing')kitBase(g,KMAT.ic||(KMAT.ic=new THREE.MeshStandardMaterial({color:0x3a404c,roughness:.45,metalness:.55})));const acc=W.t>=0?KACC[W.t]:KACC0;g.add(kitParts(W.b,acc));
   const bb=new THREE.Box3().setFromObject(g),cz=(bb.min.z+bb.max.z)/2,cy=(bb.min.y+bb.max.y)/2,len=bb.max.z-bb.min.z;g.position.set(0,-cy,-cz-.9);const s=Math.min(1.2,2.9/len);g.scale.setScalar(s);g.position.y*=s;g.position.z=-.9-cz*s;
   WIR.sc.add(g);WIR.r.render(WIR.sc,WIR.cam);WICON[key]=WIR.r.domElement.toDataURL('image/png');WIR.sc.remove(g);
  }catch(e){WICON[key]='';}
  return WICON[key];
 }
 
-function openSettings(){openSettings_v71();diffChips('setDiff');}
-function updateTitleBtns(){updateTitleBtns_v71();const t=$('tDiff');if(t){const D=DIFF[DL];t.innerHTML='難易度 <b style="color:'+D.col+'">'+D.n+'</b>　階級 <b>'+RANKS[rankIdx()][0]+'</b>　最大ライフ <b>'+SAVE.mhp+'</b>';}}
+function openSettings(){openSettings_v71();diffChips('setDiff',null,'def');}
+function setRunDL(d){DL=Math.max(0,Math.min(4,d|0));}
+let DPN=1;
+function openDiffPick(n){DPN=n;DL=SAVE.diff;renderPick();$('dfPick').classList.remove('hide');}
+function renderPick(){diffChips('dpChips',renderPick,'run');$('dpInfo').innerHTML='STAGE '+DPN+'　'+stageName(DPN)+'　から出撃します'+(DL!==SAVE.diff?'<br><small>（標準の難易度「'+DIFF[SAVE.diff].n+'」は設定で変えられます）</small>':'');}
+function updateTitleBtns(){updateTitleBtns_v71();const t=$('tDiff');if(t){const D=DIFF[SAVE.diff];t.innerHTML='標準の難易度 <b style="color:'+D.col+'">'+D.n+'</b>　階級 <b>'+RANKS[rankIdx()][0]+'</b>　最大ライフ <b>'+SAVE.mhp+'</b>';}}
 function prgClearLine(g){if(!g)return'';const D=DF();return '<br><span style="color:'+D.col+'">難易度「'+D.n+'」'+(NET.on&&mpCount()>1?'　👥 みんなでプレイで記録':'')+'</span>　<span style="color:#ff9ae8">最大ライフ +'+g.hp+'（'+SAVE.mhp+'）</span>　<span style="color:#9ad8ff">武器 '+g.w+' 個を持ち帰り</span>';}
 function prgEndLine(win){const g=LASTF;LASTF=null;if(win||!g)return'';return '　｜　持ち帰り '+Math.round(DF().keep*100)+'%：最大ライフ +'+g.hp+'・武器 '+g.w+'/'+g.wt;}
 let LASTF=null;
+$('dpGo').addEventListener('click',e=>{e.stopPropagation();$('dfPick').classList.add('hide');startGame(DPN);});
+$('dpBack').addEventListener('click',e=>{e.stopPropagation();$('dfPick').classList.add('hide');DL=SAVE.diff;});
 $('ssRecBtn').addEventListener('click',e=>{e.stopPropagation();SSREC=!SSREC;openSelect();});
 $('ssBrk').addEventListener('click',e=>{e.stopPropagation();openBarracks('eq');});
 $('brkBtn').addEventListener('click',e=>{e.stopPropagation();openBarracks();});
@@ -6628,9 +6701,9 @@ function edgeTurn(dt){
  const f=v=>Math.abs(v)<.78?0:(Math.abs(v)-.78)/.22*Math.sign(v);
  P.yaw-=f(nx)*2.6*dt;P.pitch=clamp(P.pitch-f(ny)*1.4*dt,-.95,.7);
 }
-$('startBtn').addEventListener('click',()=>startGame(1));
+$('startBtn').addEventListener('click',()=>{if(NET.on&&!NET.host)return startGame(1);openDiffPick(1);});
 $('helpBtn').addEventListener('click',e=>{e.stopPropagation();$('title').classList.toggle('help');$('helpBtn').textContent=$('title').classList.contains('help')?'説明を閉じる':'操作説明';});
-$('contBtn').addEventListener('click',()=>startGame(Math.min(MAXST,SAVE.max+1)));
+$('contBtn').addEventListener('click',()=>{const n=Math.min(MAXST,SAVE.max+1);if(NET.on&&!NET.host)return startGame(n);openDiffPick(n);});
 $('selBtn').addEventListener('click',openSelect);
 $('ssGrid').addEventListener('click',e=>{const b=e.target.closest('button');if(b&&!b.disabled){if(SSREC)recPop(+b.dataset.n);else startGame(+b.dataset.n);}});
 $('ssClose').addEventListener('click',()=>$('select').classList.add('hide'));
@@ -7395,8 +7468,8 @@ function netVoteReset(){NET.myVote=0;NET.votes=[0,0,0,0];for(const c of NET.conn
 try{
  const onVote=e=>{const b=e.target.closest('button[data-v]');if(!b)return;e.stopPropagation();NET.myVote=+b.dataset.v;netSend({t:'vt',v:NET.myVote});netVoteUI();};
  $('stVote').addEventListener('click',onVote);$('endVote').addEventListener('click',onVote);
- $('mpGoCont').addEventListener('click',e=>{e.stopPropagation();$('mp').classList.add('hide');startGame(Math.min(MAXST,SAVE.max+1));});
- $('mpGoNew').addEventListener('click',e=>{e.stopPropagation();$('mp').classList.add('hide');startGame(1);});
+ $('mpGoCont').addEventListener('click',e=>{e.stopPropagation();$('mp').classList.add('hide');openDiffPick(Math.min(MAXST,SAVE.max+1));});
+ $('mpGoNew').addEventListener('click',e=>{e.stopPropagation();$('mp').classList.add('hide');openDiffPick(1);});
  $('mpGoSel').addEventListener('click',e=>{e.stopPropagation();$('mp').classList.add('hide');openSelect();});
  $('mpName').addEventListener('input',()=>{const v=netClean($('mpName').value);if(!NET.on||v===NET.name)return;NET.name=v;try{localStorage.setItem('seMpName',v);}catch(e){}
   clearTimeout(NET.nmT);NET.nmT=setTimeout(()=>{if(!NET.on)return;if(NET.host){NET.roster[0]=NET.name;netSendRoster();}else netSend({t:'nm',n:NET.name});},500);});
@@ -7468,7 +7541,7 @@ const VIEW_CATS=[
   ['電車（先頭車）',()=>vProp(10,1.5,5,{hp:220},(L,G)=>mdlTrainCar(L,G,0x2a78c8,true,false))],['電車（中間車）',()=>vProp(9.6,1.5,5,{hp:220},(L,G)=>mdlTrainCar(L,G,0xd8602a,false,false))],
   ['貨物船',()=>vProp(36,7,22,{hp:1500},(m,gm)=>mdlShip(m,gm,60))],['タグボート',()=>vProp(5,2.2,8,{hp:120},(m,gm)=>mdlTug(m,gm))],['港湾クレーン',()=>vProp(8,6.5,30,{hp:700},(m,gm)=>mdlCrane(m,gm,0xd8601a))]]},
  {id:'F',n:'設備',items:[
-  ['球形ガスタンク',()=>vProp(10,10,21,{hp:180,arm:1,boom:BOOM.gas},(m,gm)=>mdlGasSphere(m,gm,9))],['石油タンク',()=>vProp(6,6,10,{hp:140,arm:1,boom:BOOM.oil},(m,gm)=>mdlOilTank(m,gm,6,9))],
+  ['球形ガスタンク',()=>vProp(10,10,21,{hp:180,arm:1,boom:BOOM.gas,name:'gas'},(m,gm)=>mdlGasSphere(m,gm,9))],['石油タンク',()=>vProp(6,6,10,{hp:140,arm:1,boom:BOOM.oil},(m,gm)=>mdlOilTank(m,gm,6,9))],
   ['燃料タンク',()=>vProp(2.6,2.6,6.5,{hp:90,arm:1,boom:BOOM.fuel},(m,gm)=>mdlOilTank(m,gm,2.4,5.5))],['配管ラック',()=>vProp(9,1.2,6,{hp:90,nocol:true},(m)=>mdlPipe(m))],
   ['コンテナ',()=>vProp(6.3,1.3,8.1,{hp:120},(m)=>mdlContainers(m,3,PAL7))],['街灯',()=>vProp(.3,.3,7.2,{hp:15,nocol:true},(L,G)=>mdlLamp(L,G))],['柵',()=>vProp(13,.3,1.2,{hp:20,nocol:true},(L)=>mdlFence(L))],['ガードレール',()=>vProp(6,.3,1.2,{hp:18,nocol:true},(L)=>mdlGuard(L,12,1))],
   ['高速道路',()=>{const pb=new PB(detMat);buildHighway({o:'h',c:0,a:-60,b:60},pb,-44,44);pb.build(true);}],
