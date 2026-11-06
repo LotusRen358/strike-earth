@@ -2,6 +2,9 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>STRIKE EARTH ストライク・アース</title>
 <!--
@@ -644,6 +647,15 @@ body #bWeapon{right:calc(236px + env(safe-area-inset-right))!important;bottom:ca
 #verUp.new{background:#ffb84a;color:#1a1a1a;border-color:#ffd38a!important;animation:rgp .7s infinite alternate}
 #verMsg{font-style:normal;font-size:11px;color:#9ad8ff}#verMsg.new{color:#ffd070}
 .pVer{font-size:11px;opacity:.6;margin-top:6px}
+
+@media (orientation:landscape){#title:not(.help) #verBox{position:fixed;left:calc(24px + env(safe-area-inset-left));bottom:calc(16px + env(safe-area-inset-bottom));z-index:5}}
+@media (orientation:portrait){
+ #title:not(.help) h1.logo{margin-top:auto!important}
+ #title:not(.help) .cpy{margin-bottom:auto!important}
+ #title:not(.help){padding-top:max(28px,calc(env(safe-area-inset-top) + 16px))!important;padding-bottom:max(28px,calc(env(safe-area-inset-bottom) + 16px))!important;gap:2px}
+ #title:not(.help) h1.logo img{width:min(70vw,32vh,380px)!important}
+ #title:not(.help) h1.logo{margin-bottom:10px!important}
+}
 </style>
 </head>
 <body>
@@ -4776,7 +4788,7 @@ $('dpGo').addEventListener('click',e=>{e.stopPropagation();$('dfPick').classList
 $('dpBack').addEventListener('click',e=>{e.stopPropagation();$('dfPick').classList.add('hide');DL=SAVE.diff;});
 try{for(const[id,t]of[['bDash','ダッシュ'],['bRocket','ロケット'],['bTurret','砲台'],['bWeapon','武器'],['bExit','降りる']]){const el=$(id);if(el&&!el.querySelector('.cap')){const c=document.createElement('i');c.className='cap';c.textContent=t;el.appendChild(c);}}}catch(e){}
 /* ---------- バージョン表示と更新 ---------- */
-const GAME_VER='1.01';
+const GAME_VER='1.02';
 function verCmp(a,b){const x=String(a).split('.').map(Number),y=String(b).split('.').map(Number);for(let i=0;i<Math.max(x.length,y.length);i++){const d=(x[i]||0)-(y[i]||0);if(d)return d>0?1:-1;}return 0;}
 function hardReload(){try{saveGame();}catch(e){}const u=location.pathname+'?r='+Date.now()+location.hash;try{location.replace(u);}catch(e){location.reload();}}
 let VER_NEW=null;
@@ -4787,7 +4799,9 @@ function checkUpdate(manual){
  if(manual)msg.textContent='確認中…';
  try{fetch(location.pathname+'?vc='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{
    const m=t&&t.match(/const GAME_VER='([0-9.]+)'/);
-   if(m&&verCmp(m[1],GAME_VER)>0){VER_NEW=m[1];msg.textContent='新しい Ver '+m[1]+' があります';msg.classList.add('new');btn.classList.add('new');btn.textContent='更新する';if(manual)hardReload();}
+   if(m&&verCmp(m[1],GAME_VER)>0){VER_NEW=m[1];msg.textContent='新しい Ver '+m[1]+' があります';msg.classList.add('new');btn.classList.add('new');btn.textContent='更新する';
+    let tried='';try{tried=sessionStorage.getItem('seVerTry')||'';}catch(e){}
+    if(manual)hardReload();else if(state==='title'&&tried!==m[1]){try{sessionStorage.setItem('seVerTry',m[1]);}catch(e){}msg.textContent='Ver '+m[1]+' に更新しています…';setTimeout(hardReload,900);}}
    else{msg.classList.remove('new');btn.classList.remove('new');msg.textContent=manual?'最新です':'';if(manual)setTimeout(hardReload,500);}
   }).catch(()=>{if(manual)hardReload();});}catch(e){if(manual)hardReload();}
 }
@@ -4795,6 +4809,8 @@ for(const el of document.querySelectorAll('.verNo'))el.textContent=GAME_VER;
 try{document.title=document.title.replace(/\s*Ver[ .0-9]*$/,'')+' Ver '+GAME_VER;}catch(e){}
 $('verUp').addEventListener('click',e=>{e.stopPropagation();checkUpdate(true);});
 setTimeout(()=>checkUpdate(false),2500);
+addEventListener('pageshow',e=>{if(e.persisted)setTimeout(()=>checkUpdate(false),600);});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(()=>checkUpdate(false),800);});
 $('ssRecBtn').addEventListener('click',e=>{e.stopPropagation();SSREC=!SSREC;openSelect();});
 $('ssBrk').addEventListener('click',e=>{e.stopPropagation();openBarracks('eq');});
 $('brkBtn').addEventListener('click',e=>{e.stopPropagation();openBarracks();});
