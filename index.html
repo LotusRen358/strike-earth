@@ -3138,7 +3138,7 @@ const VOICE_P={ALPHA:[.75,1.0],BRAVO:[1.25,1.15],CHARLIE:[1.7,1.2],DELTA:[.9,.85
 function voiceInit(){try{if(!window.speechSynthesis)return;const pick=()=>{const v=speechSynthesis.getVoices();JAV=v.filter(x=>/ja/i.test(x.lang));};pick();speechSynthesis.onvoiceschanged=pick;const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u);}catch(e){}}
 function speak(a,txt){
  try{if(!window.speechSynthesis||VOL.voice<=.01||muted)return;const now=performance.now();if(now<VT||speechSynthesis.speaking)return;VT=now+1600;
-  const u=new SpeechSynthesisUtterance(txt.replace(/[！!…。、]/g,' '));u.lang='ja-JP';const p=VOICE_P[a.n]||[1,1];u.pitch=p[0];u.rate=p[1];u.volume=VOL.voice;
+  const u=new SpeechSynthesisUtterance(yomi(txt).replace(/[！!…。、]/g,' '));u.lang='ja-JP';const p=VOICE_P[a.n]||[1,1];u.pitch=p[0];u.rate=p[1];u.volume=VOL.voice;
   if(JAV&&JAV.length)u.voice=JAV[(allies.indexOf(a)+0)%JAV.length];speechSynthesis.speak(u);}catch(e){}
 }
 /* gamepad */
@@ -5443,7 +5443,7 @@ $('trExit').addEventListener('click',e=>{e.stopPropagation();endTraining();});
 const TRV={on:true,fold:false};try{TRV.on=localStorage.getItem('seTrVoice')!=='0';TRV.fold=localStorage.getItem('seTrFold')==='1';}catch(e){}
 function trSay(t,q){try{if(!TRV.on||!window.speechSynthesis||muted)return;if(!q)speechSynthesis.cancel();
  const txt=String(t).replace(/[（(]PC[：:][^）)]*[）)]/g,'').replace(/【([^】]*)】/g,'$1。').replace(/[「」『』]/g,'').replace(/（[^）]*）/g,'').replace(/前方/g,'ぜんぽう').replace(/[1１]つ/g,'ひとつ').replace(/[2２]つ/g,'ふたつ').replace(/[3３]つ/g,'みっつ').replace(/[4４]つ/g,'よっつ').replace(/[5５]つ/g,'いつつ');
- const u=new SpeechSynthesisUtterance(txt);u.lang='ja-JP';u.rate=1.08;u.pitch=.82;u.volume=Math.max(.35,Math.min(1,(VOL&&VOL.voice)||1));
+ const u=new SpeechSynthesisUtterance(yomi(txt));u.lang='ja-JP';u.rate=1.08;u.pitch=.82;u.volume=Math.max(.35,Math.min(1,(VOL&&VOL.voice)||1));
  if(JAV&&JAV.length){const m=JAV.find(v=>/otoya|male|ichiro|keita|daichi|男/i.test(v.name))||JAV[0];u.voice=m;}speechSynthesis.speak(u);}catch(e){}}
 function trUI(){$('trVoice').textContent=TRV.on?'🔊':'🔇';$('trVoice').title=TRV.on?'読み上げ：オン':'読み上げ：オフ';$('trFold').textContent=TRV.fold?'▼ 表示':'▲ 隠す';$('trHud').classList.toggle('fold',TRV.fold);}
 trUI();
@@ -5544,8 +5544,11 @@ $('bdPrev').addEventListener('click',e=>{e.stopPropagation();openBdView((BDVI+BA
 $('bdNext').addEventListener('click',e=>{e.stopPropagation();openBdView((BDVI+1)%BADGES.length);});
 $('bdClose').addEventListener('click',e=>{e.stopPropagation();$('bdView').classList.add('hide');});
 $('bdCoin').addEventListener('click',e=>{e.stopPropagation();const c=$('bdCoin');c.classList.toggle('fast');});
+/* ---- v1.16 : 読み上げ用の読み仮名辞書（画面の文字は変えない） ---- */
+const YOMI=[["満タン", "まんタン"], ["前方", "ぜんぽう"], ["一体排除", "いったいはいじょ"], ["何体目", "なんたいめ"], ["何体", "なんたい"], ["三体", "さんたい"], ["十八番", "おはこ"], ["眉間", "みけん"], ["殻", "から"], ["鎌", "かま"], ["懐", "ふところ"], ["遮蔽物", "しゃへいぶつ"], ["怯む", "ひるむ"], ["瓦礫", "がれき"], ["轢か", "ひか"], ["眩しい", "まぶしい"], ["縁起", "えんぎ"], ["鈍る", "にぶる"], ["膝", "ひざ"], ["直伝", "じきでん"], ["お土産", "おみやげ"], ["土産", "みやげ"], ["弾幕", "だんまく"], ["全弾", "ぜんだん"], ["弾切れ", "たまぎれ"], ["弾", "たま"], ["腕前", "うでまえ"], ["手応え", "てごたえ"], ["一味", "ひとあじ"], ["上等", "じょうとう"], ["大盛り", "おおもり"], ["大物", "おおもの"], ["本物", "ほんもの"], ["四本足", "よんほんあし"], ["中ボス", "ちゅうボス"], ["酔い止め", "よいどめ"], ["新人", "しんじん"], ["今日", "きょう"], ["昨日", "きのう"], ["一息", "ひといき"], ["一匹", "いっぴき"], ["一撃", "いちげき"], ["一掃", "いっそう"], ["一歩", "いっぽ"], ["一度", "いちど"], ["二度", "にど"], ["指一本", "ゆびいっぽん"], ["百人力", "ひゃくにんりき"], ["三杯", "さんばい"], ["出番", "でばん"], ["手強い", "てごわい"], ["見張", "みは"], ["見習", "みなら"], ["空中", "くうちゅう"], ["空", "そら"], ["敵影", "てきえい"], ["大群", "たいぐん"], ["衛星砲", "えいせいほう"], ["巨大種", "きょだいしゅ"], ["戦術的撤退", "せんじゅつてきてったい"], ["耳栓", "みみせん"], ["修理代", "しゅうりだい"], ["焼き肉", "やきにく"], ["腹減", "はらへ"], ["腹", "はら"], ["奴", "やつ"], ["母さん", "かあさん"], ["上手に", "じょうずに"], ["今行き", "いまいき"], ["何持", "なにも"], ["何も", "なにも"], ["何が", "なにが"], ["何か", "なにか"], ["何して", "なにして"], ["何すん", "なにすん"], ["何だろう", "なんだろう"], ["何の", "なんの"], ["右半分", "みぎはんぶん"], ["右下", "みぎした"], ["奥の", "おくの"], ["爆発型", "ばくはつがた"], ["大型", "おおがた"], ["小型", "こがた"], ["仇", "かたき"], ["火力", "かりょく"], ["灯り", "あかり"], ["徹しろ", "てっしろ"], ["踏ん張", "ふんば"], ["生きて", "いきて"], ["最大ライフUP", "さいだいライフアップ"], ["Rキー", "アールキー"], ["UFO", "ユーフォー"], ["OK", "オーケー"], ["ALPHA", "アルファ"], ["BRAVO", "ブラボー"], ["CHARLIE", "チャーリー"]];
+function yomi(t){t=String(t);for(const p of YOMI)if(t.indexOf(p[0])>=0)t=t.split(p[0]).join(p[1]);return t;}
 /* ---------- バージョン表示と更新 ---------- */
-const GAME_VER='1.15';
+const GAME_VER='1.16';
 function verCmp(a,b){const x=String(a).split('.').map(Number),y=String(b).split('.').map(Number);for(let i=0;i<Math.max(x.length,y.length);i++){const d=(x[i]||0)-(y[i]||0);if(d)return d>0?1:-1;}return 0;}
 function hardReload(){try{saveGame();}catch(e){}const u=location.pathname+'?r='+Date.now()+location.hash;try{location.replace(u);}catch(e){location.reload();}}
 let VER_NEW=null;
