@@ -782,6 +782,30 @@ body.training #topC,body.training #items,body.training #combo{display:none!impor
 body.inveh #touch .tb .ic{fill:none!important;stroke:#ffe2b8!important;stroke-width:3.2!important;stroke-linecap:round;stroke-linejoin:round}
 body.inveh #touch .tb .ic .f{fill:#ffe2b8!important;stroke:none!important}
 body.inveh #touch .tb .cap{display:none}
+
+/* v1.09 戦闘ボタン：アイコンのみ・重ならない配置 */
+body.touch #touch .tb{zoom:1!important}
+#touch .tb .cap{display:none!important}
+#touch .tb .ic{transform:none!important}
+#touch #bFire{right:calc(26px + env(safe-area-inset-right))!important;bottom:calc(26px + env(safe-area-inset-bottom))!important;width:88px!important;height:88px!important}
+#touch #bBoost{right:calc(134px + env(safe-area-inset-right))!important;bottom:calc(34px + env(safe-area-inset-bottom))!important;width:64px!important;height:64px!important}
+#touch #bDash{right:calc(118px + env(safe-area-inset-right))!important;bottom:calc(114px + env(safe-area-inset-bottom))!important;width:56px!important;height:56px!important}
+#touch #bRocket{right:calc(49px + env(safe-area-inset-right))!important;bottom:calc(139px + env(safe-area-inset-bottom))!important;width:54px!important;height:54px!important}
+#touch #bStrike{right:calc(8px + env(safe-area-inset-right))!important;bottom:calc(202px + env(safe-area-inset-bottom))!important;width:56px!important;height:56px!important}
+#touch #bWeapon{right:calc(205px + env(safe-area-inset-right))!important;bottom:calc(105px + env(safe-area-inset-bottom))!important;width:50px!important;height:50px!important}
+#touch #bTurret{right:calc(218px + env(safe-area-inset-right))!important;bottom:calc(38px + env(safe-area-inset-bottom))!important;width:48px!important;height:48px!important}
+#touch #bExit{right:calc(195px + env(safe-area-inset-right))!important;bottom:calc(175px + env(safe-area-inset-bottom))!important;width:50px!important;height:50px!important}
+#touch #bWeapon .sub{bottom:auto!important;top:-17px!important;font-size:9.5px!important}
+#touch .tb .ic{width:56%!important;height:56%!important}
+#touch #bFire .ic{width:50%!important;height:50%!important}
+#touch #bBoost .ic{width:64%!important;height:64%!important}
+#touch .tb .bdg{top:-5px!important;right:-5px!important}
+#touch .tb .pct{top:-9px!important;right:-9px!important}
+/* 教官パネル */
+.trTop .trT{pointer-events:auto;margin-left:6px;font-size:12px;padding:3px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.1);color:#fff;cursor:pointer}
+.trTop span{margin-left:auto}
+#trHud.fold #trMsg,#trHud.fold .trBtns{display:none}
+#trHud.fold{width:auto}#trHud.fold .trBox{padding:4px 8px}
 </style>
 </head>
 <body>
@@ -815,7 +839,7 @@ body.inveh #touch .tb .cap{display:none}
   <div id="zoneL"><div id="stickHint"><i></i></div><div id="stickBase"><div id="stickKnob"></div></div></div>
   <div id="zoneR"></div>
   <div class="tb" id="bFire"><svg class="ic" viewBox="0 0 48 48"><circle class="l" cx="24" cy="24" r="12.5" style="stroke-width:3.4"/><circle cx="24" cy="24" r="4"/><path class="l" d="M24 3.5v9M24 35.5v9M3.5 24h9M35.5 24h9" style="stroke-width:3.4"/></svg><svg class="fg" viewBox="0 0 100 100"><g><circle class="ft" cx="50" cy="50" r="46" transform="rotate(110 50 50)" stroke-dasharray="112.72 289.03"/><circle class="fa fb" cx="50" cy="50" r="46" transform="rotate(110 50 50)" stroke-dasharray="0 289.03"/></g><g transform="translate(100,0) scale(-1,1)"><circle class="ft" cx="50" cy="50" r="46" transform="rotate(110 50 50)" stroke-dasharray="112.72 289.03"/><circle class="fa fs" cx="50" cy="50" r="46" transform="rotate(110 50 50)" stroke-dasharray="0 289.03"/></g><text x="9" y="92" class="fl">B</text><text x="85" y="92" class="fl fls">S</text><circle class="fgap" cx="50" cy="50" r="46" transform="rotate(110 50 50)"/></svg></div>
-  <div class="tb" id="bRocket"><svg class="ic" viewBox="0 0 48 48"><path fill-rule="evenodd" d="M24 3.5c6.5 5 8.5 12.5 8.5 19.5v9h-17v-9c0-7 2-14.5 8.5-19.5zM24 15a3.6 3.6 0 1 0 0 7.2A3.6 3.6 0 1 0 24 15z"/><path d="M15.5 25l-6 8.5v5l6-3.2zM32.5 25l6 8.5v5l-6-3.2z"/><path class="fl" d="M19 34h10l-5 10.5z"/></svg><em class="bdg" id="tRk">5</em></div>
+  <div class="tb" id="bRocket"><svg class="ic" viewBox="0 0 48 48"><g transform="rotate(-18 24 24)"><path d="M8 20h29v7.5H8z"/><path d="M2.5 18h6.5v11.5H2.5z"/><path d="M36 17.5h6v12.5h-6z"/><path class="fl" d="M42 20l5 3.75-5 3.75z"/><path d="M17 27h4.5l-1.5 9h-4.5zM26 27h4.5l-1.2 6.5h-4.5z"/><path d="M22.5 14h6v6h-6z"/><path d="M11 27.5h4v3h-4z"/></g></svg><em class="bdg" id="tRk">5</em></div>
   <div class="tb" id="bStrike"><svg class="tr st" viewBox="0 0 100 100"><circle class="t0" cx="50" cy="50" r="46"/><circle class="t1" cx="50" cy="50" r="46"/></svg><svg class="ic" viewBox="0 0 48 48"><rect x="19" y="7" width="10" height="9" rx="1.5"/><rect x="4" y="9" width="12.5" height="5" rx="1"/><rect x="31.5" y="9" width="12.5" height="5" rx="1"/><path d="M16.5 11.5h2.5M29 11.5h2.5" class="l"/><path class="bm" d="M21 17h6l7 24H14z"/><ellipse class="l" cx="24" cy="42" rx="11" ry="3"/></svg><em class="pct" id="tSt">0%</em></div>
   <div class="tb" id="bDash"><svg class="ic" viewBox="0 0 48 48"><circle cx="30" cy="8.5" r="4.6"/><path class="p" d="M27.5 16L21.5 27M27 17l5.5 5 5-2.5M26.5 17l-6 1.5-3.5-3.5M21.5 27l7.5 4 .5 9M21.5 27l-4.5 7.5-7.5.5"/><path class="l dim" d="M2.5 16h8M1.5 23h7M3.5 30h6"/></svg></div>
   <div class="tb" id="bBoost"><svg class="tr bo" viewBox="0 0 100 100"><circle class="t0" cx="50" cy="50" r="46"/><circle class="t1" cx="50" cy="50" r="46"/></svg><em class="pct" id="tBo">100</em><svg class="ic" viewBox="0 0 48 48"><circle cx="24" cy="8.5" r="4.6"/><rect x="17.5" y="15" width="13" height="12" rx="3" class="dim2"/><path class="p" d="M24 16v11.5M24 18l-7 5M24 18l7 5M24 27.5l-4 8M24 27.5l4 8"/><path class="fl" d="M17.5 38.5h4.6L19.8 47zM25.9 38.5h4.6L28.2 47z"/><path class="l dim" d="M7 33V19M4 23l3-4 3 4M41 33V19M38 23l3-4 3 4"/></svg></div>
@@ -1083,7 +1107,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 </div>
 <div class="ov hide" id="keysPop"><button type="button" class="backPill" id="kpBack">‹ 戻る</button><h1 class="scrH">操作一覧</h1><div id="kpBody"></div><button class="btn sb" id="kpClose">閉じる</button></div>
 <div class="ov hide" id="trWp"><button type="button" class="backPill" id="twBack">‹ 戻る</button><h1 class="scrH">試し撃ちする武器</h1><p class="scrSub">選んだ武器が、いま持っている武器と入れ替わります（訓練の中だけ）。</p><div id="twList"></div><button class="btn sb" id="twClose">閉じる</button></div>
-<div id="trHud"><div class="trBox"><div class="trTop"><img id="trAva" alt=""><b>教官</b><span id="trStep"></span></div><p id="trMsg"></p>
+<div id="trHud"><div class="trBox"><div class="trTop"><img id="trAva" alt=""><b>教官</b><span id="trStep"></span><button type="button" id="trVoice" class="trT"></button><button type="button" id="trFold" class="trT"></button></div><p id="trMsg"></p>
  <div class="trBtns"><button type="button" id="trSkip">スキップ</button><button type="button" id="trWpn">武器を選ぶ</button><button type="button" id="trKeys">操作一覧</button><button type="button" id="trExit">‹ 基地へ戻る</button></div></div></div>
 
 <div class="ov hide" id="dfPick"><h1 style="font-size:clamp(24px,5vw,40px)">難易度を選んで出撃</h1><div id="dpChips" class="dfRow"></div><p id="dpInfo" style="text-align:center;font-size:14px;margin:6px 0 8px"></p><div id="dpLoad"></div><div class="ssTools"><button class="btn" id="dpGo">出撃する</button><button class="btn sb" id="dpEq">装備を変える</button><button class="btn sb" id="dpBack">戻る</button></div></div>
@@ -5137,7 +5161,7 @@ function bsFrame(dt){
 function bsLoop(raw){try{netTick(raw);}catch(e){}if(!document.querySelector('.ov:not(.hide):not(#base)')){BS.raf=1;bsFrame(raw);}else BS.raf=0;}
 if(window.__TEST__){window.__bsFrame=bsFrame;window.__BS=BS;window.__bsFree=bsFree;}
 
-function openBase(){BASE.on=true;buildBaseMap();
+function openBase(){BASE.on=true;buildBaseMap();try{fx.save();fx.setTransform(1,0,0,1,0,0);fx.clearRect(0,0,fxc.width,fxc.height);fx.restore();}catch(e){}
  const rk=rankIdx(),D=DIFF[SAVE.diff];
  $('bsInfo').innerHTML='<span><img src="'+RIMG[rk]+'" alt=""> 階級 <b>'+RANKS[rk][0]+'</b></span><span>最大ライフ <b>'+SAVE.mhp+'</b></span><span>標準の難易度 <b style="color:'+D.col+'">'+D.n+'</b></span>'+(NET.on?'<span class="mpb">'+(NET.host?'ホスト中':'参加中')+'：みんなでプレイ</span>':'');
  $('title').classList.add('hide');$('base').classList.remove('hide');try{$('bsMap')._fit();}catch(e){}
@@ -5187,6 +5211,17 @@ function bDummy(T){const g=new THREE.Group(),n=new THREE.Group();g.add(n);
  mk(n,SPH,rd,.4,.46,.02,0,2.62,.05);mk(n,BOX,rd,.78,.85,.02,0,1.82,.05);mk(n,SPH,bl,.11,.13,.02,-.15,2.66,.065);mk(n,SPH,bl,.11,.13,.02,.15,2.66,.065);
  mk(n,TCYLZ,wh,.26,.26,.015,0,1.85,.07);mk(n,TCYLZ,rd,.17,.17,.02,0,1.85,.075);mk(n,TCYLZ,wh,.08,.08,.025,0,1.85,.08);
  return{g,n,legs:[]};}
+function bDummyV(v){return function(T){const a=bDummy(T),n=a.n;n.children.slice(6).forEach(c=>n.remove(c));
+ const rd=mat(0xc23a2a),bk=mat(0x262228),wh=mat(0xf2ede0),Z=.05;
+ const E=(x,y,sx,sy,m)=>mk(n,SPH,m||rd,sx,sy,.02,x,y,Z),B=(x,y,w,h,r,m)=>{const o=mk(n,BOX,m||rd,w,h,.02,x,y,Z);o.rotation.z=r||0;return o;};
+ if(v===0){E(0,2.72,.44,.52);B(0,1.95,.42,.75);B(-.32,2.0,.1,.62,.25);B(.32,2.0,.1,.62,-.25);B(-.12,1.4,.12,.5);B(.12,1.4,.12,.5);const e1=E(-.15,2.72,.13,.07,bk);e1.rotation.z=.45;const e2=E(.15,2.72,.13,.07,bk);e2.rotation.z=-.45;}
+ else if(v===1){E(.36,2.0,.4,.27);E(-.04,2.06,.2,.16);E(-.38,2.18,.21,.19);for(const [x,s] of[[-.12,1],[0,1],[.12,1]]){B(x-.1,1.75,.05,.42,.5*s);B(x+.1,1.75,.05,.42,-.5*s);}B(-.5,2.45,.04,.35,.6);B(-.4,2.48,.04,.35,.2);E(-.42,2.2,.05,.05,bk);}
+ else if(v===2){E(0,2.25,.34,.3);E(0,2.66,.19,.17);for(let i=0;i<4;i++){const y=2.45-i*.14,r=.6-i*.35;B(-.42,y,.5,.05,r);B(.42,y,.5,.05,-r);B(-.66,y-.25+i*.02,.05,.4,-.3+i*.12);B(.66,y-.25+i*.02,.05,.4,.3-i*.12);}E(-.07,2.7,.04,.04,bk);E(.07,2.7,.04,.04,bk);}
+ else if(v===3){B(0,2.15,.13,.9,.08);E(.04,1.55,.16,.38);const h=E(0,2.78,.2,.15);E(-.12,2.8,.07,.07,bk);E(.12,2.8,.07,.07,bk);B(-.22,2.5,.08,.42,.9);B(-.42,2.72,.07,.38,-.25);B(.22,2.5,.08,.42,-.9);B(.42,2.72,.07,.38,.25);B(-.2,1.6,.05,.55,.4);B(.2,1.6,.05,.55,-.4);}
+ else if(v===4){E(0,1.85,.3,.42);for(const y of[1.7,1.88,2.06])B(0,y,.5,.06,0,bk);E(0,2.42,.2,.18);E(0,2.72,.2,.18);E(-.42,2.55,.36,.16,wh).rotation.z=-.4;E(.42,2.55,.36,.16,wh).rotation.z=.4;E(-.08,2.76,.06,.06,bk);E(.08,2.76,.06,.06,bk);const st=B(0,1.36,.06,.24);}
+ else{B(0,2.72,.5,.4);B(0,1.98,.62,.82);B(-.42,1.95,.14,.66);B(.42,1.95,.14,.66);B(-.14,1.35,.16,.45);B(.14,1.35,.16,.45);B(0,3.0,.04,.2);E(0,3.1,.06,.06);B(0,2.72,.34,.1,0,bk);}
+ mk(n,TCYLZ,wh,.17,.17,.015,0,2.0,.075);mk(n,TCYLZ,rd,.11,.11,.02,0,2.0,.08);mk(n,TCYLZ,wh,.05,.05,.025,0,2.0,.085);
+ return a;};}
 TYPES.dummy={n:'訓練用パネル',hp:45,speed:0,sc:1,color:0xc9a46a,dmg:0,score:10,r:.9,hy:1.6,b:bDummy,rc:'#ffd070',dummy:1};
 TYPES.dummyL={n:'大型訓練パネル',hp:520,speed:0,sc:2.3,color:0xc9a46a,dmg:0,score:50,r:2.1,hy:1.6,b:bDummy,rc:'#ffb04a',dummy:1,big:1};
 /* ---- 訓練場（スタジアムのような屋外訓練場） ---- */
@@ -5215,7 +5250,8 @@ function buildTrainGround(){
  const rg=new THREE.Mesh(new THREE.RingGeometry(1.7,2.3,40),new THREE.MeshBasicMaterial({color:0xffd24a,transparent:true,opacity:.9,side:THREE.DoubleSide,toneMapped:false}));rg.rotation.x=-Math.PI/2;rg.position.set(0,.08,8);rg.visible=false;g.add(rg);TRAIN.ring=rg;
  const bm=new THREE.Mesh(TCYL,new THREE.MeshBasicMaterial({color:0xffd24a,transparent:true,opacity:.18,depthWrite:false,toneMapped:false}));bm.scale.set(1.6,14,1.6);bm.position.set(0,7,8);bm.visible=false;g.add(bm);TRAIN.beam=bm;
 }
-function trSpawn(x,z,big){const e=spawnEnemy(big?'dummyL':'dummy',x,z);return e;}
+for(let v=0;v<6;v++){TYPES['dummy'+v]=Object.assign({},TYPES.dummy,{b:bDummyV(v)});TYPES['dummyL'+v]=Object.assign({},TYPES.dummyL,{b:bDummyV(v)});}
+function trSpawn(x,z,big){const e=spawnEnemy((big?'dummyL':'dummy')+Math.floor(Math.random()*6),x,z);return e;}
 function trAlive(e){return !!(e&&!e.dying&&e.hp>0&&enemies.includes(e));}
 function trClearDummies(){for(const e of enemies.slice())if(e.T&&e.T.dummy){e.hp=0;scene.remove(e.g);}enemies=enemies.filter(e=>!(e.T&&e.T.dummy));}
 function trRow(n,z,w){const out=[];for(let i=0;i<n;i++){const x=n===1?0:-w/2+i*(w/(n-1));out.push(trSpawn(x,z+(i%2)*2.5));}return out;}
@@ -5239,11 +5275,15 @@ function trStep(k){
  const S=TSTEPS[TRAIN.step];if(S&&S.e)try{S.e();}catch(e){}
  TRAIN.step=k;TRAIN.st=0;TRAIN.ok=0;const N=TSTEPS[k];if(!N)return;
  if(N.fin&&!SST.tut){SST.tut=1;try{badgeCheck();saveGame();}catch(e){}}
- $('trMsg').textContent=N.m;$('trMsg').classList.remove('ok');$('trStep').textContent=(k+1)+' / '+TSTEPS.length;
+ $('trMsg').textContent=N.m;$('trMsg').classList.remove('ok');$('trStep').textContent=(k+1)+' / '+TSTEPS.length;trSay(N.m);
  try{if(N.i)N.i();}catch(e){console.warn(e);}
 }
+function trPillars(){if(!TRAIN.pil){TRAIN.pil=[];const g=new THREE.CylinderGeometry(.55,.55,26,10,1,true),m=new THREE.MeshBasicMaterial({color:0xffd23a,transparent:true,opacity:.22,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide});
+  for(let i=0;i<14;i++){const p=new THREE.Mesh(g,m);p.visible=false;scene.add(p);TRAIN.pil.push(p);}TRAIN.pilM=m;}
+ let k=0;for(const e of enemies){if(k>=TRAIN.pil.length)break;if(e.dying||!e.T.dummy)continue;const p=TRAIN.pil[k++];p.visible=true;p.position.set(e.x,13,e.z);p.scale.set(e.sc,1,e.sc);}
+ for(;k<TRAIN.pil.length;k++)TRAIN.pil[k].visible=false;TRAIN.pilM.opacity=.16+.1*Math.sin(TRAIN.t*5);}
 function trainTick(dt){
- if(!TRAIN.on)return;TRAIN.t+=dt;
+ if(!TRAIN.on)return;TRAIN.t+=dt;try{trPillars();}catch(e){}
  if(P.hp<P.maxhp)P.hp=P.maxhp;P.dead=false;
  {let d=P.yaw-TRAIN.ly;while(d>Math.PI)d-=Math.PI*2;while(d<-Math.PI)d+=Math.PI*2;TRAIN.yawSum+=Math.abs(d);TRAIN.ly=P.yaw;}
  if(P.rlT&&P.rlT[P.weapon]>0)TRAIN.rl=true;if(P.dash>0)TRAIN.dashed=true;
@@ -5254,7 +5294,7 @@ function trainTick(dt){
   if(S.fin)return;
   if(TRAIN.ok>0){TRAIN.ok-=dt;if(TRAIN.ok<=0)trStep(TRAIN.step+1);return;}
   let done=false;try{done=S.auto?TRAIN.st>=S.auto:S.d();}catch(e){}
-  if(done){TRAIN.ok=S.auto?.01:1.1;if(!S.auto){$('trMsg').textContent='よし！ その調子だ。';$('trMsg').classList.add('ok');try{tone(660,1320,.18,.12,'triangle');}catch(e){}}}
+  if(done){TRAIN.ok=S.auto?.01:1.1;if(!S.auto){$('trMsg').textContent='よし！ その調子だ。';trSay('よし、その調子だ');$('trMsg').classList.add('ok');try{tone(660,1320,.18,.12,'triangle');}catch(e){}}}
  }else{
   for(const sl of TRAIN.slots){if(trAlive(sl.e))continue;sl.t-=dt;if(sl.t<=0){sl.e=trSpawn(sl.x,sl.z,sl.big);sl.t=2.5;}}
   $('trStep').textContent='撃破 '+(TRAIN.kills-TRAIN.k0);
@@ -5266,7 +5306,7 @@ function startTraining(mode){
  for(const id of['title','end','pause','stage','select'])$(id).classList.add('hide');
  try{$('bMute').style.display='block';}catch(e){}
  TRAIN.on=true;TRAIN.mode=mode;TRAIN.kills=0;TRAIN.k0=0;TRAIN.t=0;TRAIN.step=-1;TRAIN.slots=[];TRAIN.dashed=false;TRAIN.rl=false;TRAIN.strk=false;
- WR.visible=false;buildings.length=0;delayed=[];try{smokeReset();}catch(e){}for(const c of chests){if(c.g)c.g.visible=false;c.x=c.z=99999;}buildTrainGround();worldTick.push(trainTick);
+ WR.visible=false;buildings.length=0;GRID_OK=false;BGRID=new Map();BIGL=[];SEA=[];COASTZ=[];delayed=[];try{smokeReset();}catch(e){}for(const c of chests){if(c.g)c.g.visible=false;c.x=c.z=99999;}buildTrainGround();worldTick.push(trainTick);
  Object.assign(P,{x:0,z:30,yaw:0,pitch:.06,vx:0,vz:0,hp:P.maxhp});
  if(P.load.length<2){const id=P.load.includes('shotgun0')?'rifle0':'shotgun0';P.load.push(id);P.ammo[id]=wStat(id).mag;P.rlT[id]=0;}
  setWeapon(P.load[0]);
@@ -5274,7 +5314,7 @@ function startTraining(mode){
  try{$('trAva').src=RIMG[13];}catch(e){}
  $('trSkip').style.display=mode==='tut'?'':'none';$('pTrSkip').style.display=mode==='tut'?'':'none';
  if(mode==='tut')trStep(0);
- else{$('trMsg').textContent='射撃訓練：好きな武器でパネルを撃とう。倒したパネルは数秒で立ち上がる。「武器を選ぶ」で試す武器を変えられる。';$('trMsg').classList.remove('ok');
+ else{$('trMsg').textContent='射撃訓練：好きな武器でパネルを撃とう。倒したパネルは数秒で立ち上がる。「武器を選ぶ」で試す武器を変えられる。';$('trMsg').classList.remove('ok');trSay($('trMsg').textContent);
   for(const [x,z] of[[-14,-12],[0,-14],[14,-12],[-22,-26],[-7,-28],[7,-28],[22,-26],[-15,-42],[0,-44],[15,-42]])TRAIN.slots.push({x,z,big:false,e:null,t:.2});
   TRAIN.slots.push({x:0,z:-62,big:true,e:null,t:.4});}
  lockWanted=true;try{requestLock();}catch(e){}
@@ -5282,12 +5322,22 @@ function startTraining(mode){
 function trainCleanup(){
  TRAIN.on=false;document.body.classList.remove('training');try{$('pTrain').style.display='none';}catch(e){}
  if(TRAIN.g){scene.remove(TRAIN.g);TRAIN.g=null;}
+ if(TRAIN.pil){for(const p of TRAIN.pil)scene.remove(p);TRAIN.pil=null;}try{speechSynthesis.cancel();}catch(e){}
  for(const e of enemies)scene.remove(e.g);enemies=[];for(const p of pickups)scene.remove(p.m);pickups=[];
  for(const a of allies)if(a.g&&!a.remote)a.g.visible=true;for(const c of chests)if(c.g)c.g.visible=true;
  P.gain={hp:0,w:[]};P.sess={};WR.visible=true;try{buildWorld(0);}catch(e){console.warn(e);}
 }
 function endTraining(){if(!TRAIN.on)return;paused=false;$('pause').classList.add('hide');toTitle();}
 $('trExit').addEventListener('click',e=>{e.stopPropagation();endTraining();});
+const TRV={on:true,fold:false};try{TRV.on=localStorage.getItem('seTrVoice')!=='0';TRV.fold=localStorage.getItem('seTrFold')==='1';}catch(e){}
+function trSay(t){try{if(!TRV.on||!window.speechSynthesis||muted)return;speechSynthesis.cancel();
+ const txt=String(t).replace(/[（(]PC[：:][^）)]*[）)]/g,'').replace(/【([^】]*)】/g,'$1。').replace(/[「」『』]/g,'').replace(/（[^）]*）/g,'');
+ const u=new SpeechSynthesisUtterance(txt);u.lang='ja-JP';u.rate=1.08;u.pitch=.82;u.volume=Math.max(.35,Math.min(1,(VOL&&VOL.voice)||1));
+ if(JAV&&JAV.length){const m=JAV.find(v=>/otoya|male|ichiro|keita|daichi|男/i.test(v.name))||JAV[0];u.voice=m;}speechSynthesis.speak(u);}catch(e){}}
+function trUI(){$('trVoice').textContent=TRV.on?'🔊':'🔇';$('trVoice').title=TRV.on?'読み上げ：オン':'読み上げ：オフ';$('trFold').textContent=TRV.fold?'▼ 表示':'▲ 隠す';$('trHud').classList.toggle('fold',TRV.fold);}
+trUI();
+$('trVoice').addEventListener('click',e=>{e.stopPropagation();TRV.on=!TRV.on;try{localStorage.setItem('seTrVoice',TRV.on?'1':'0');}catch(err){}trUI();if(TRV.on)trSay($('trMsg').textContent);else try{speechSynthesis.cancel();}catch(err){}});
+$('trFold').addEventListener('click',e=>{e.stopPropagation();TRV.fold=!TRV.fold;try{localStorage.setItem('seTrFold',TRV.fold?'1':'0');}catch(err){}trUI();});
 $('pTrBack').addEventListener('click',e=>{e.stopPropagation();endTraining();});
 $('pTitleBtn').addEventListener('click',e=>{if(TRAIN.on){e.stopImmediatePropagation();e.preventDefault();endTraining();}},true);
 $('trSkip').addEventListener('click',e=>{e.stopPropagation();if(TRAIN.mode==='tut'&&TSTEPS[TRAIN.step+1])trStep(TRAIN.step+1);});
@@ -5317,7 +5367,7 @@ function openBoxes(){const R=BOXR;BOXR=null;if(!R||!R.items.length)return;
  $('boClose').onclick=e=>{e.stopPropagation();$('boxOpen').classList.add('hide');try{if(state==='clear'&&$('stInfo'))0;}catch(err){}};
  $('boxOpen').classList.remove('hide');}
 /* ---------- バージョン表示と更新 ---------- */
-const GAME_VER='1.08';
+const GAME_VER='1.09';
 function verCmp(a,b){const x=String(a).split('.').map(Number),y=String(b).split('.').map(Number);for(let i=0;i<Math.max(x.length,y.length);i++){const d=(x[i]||0)-(y[i]||0);if(d)return d>0?1:-1;}return 0;}
 function hardReload(){try{saveGame();}catch(e){}const u=location.pathname+'?r='+Date.now()+location.hash;try{location.replace(u);}catch(e){location.reload();}}
 let VER_NEW=null;
@@ -7134,12 +7184,17 @@ function edgeArrow(c,D){
 }
 function drawLabels(){
  camera.updateMatrixWorld();
+ if(TRAIN.on){const z=isTouch?.75:1,bl=.65+.35*Math.sin(performance.now()/160);let best=null,bd=1e9,vis=0;
+  for(const e of enemies){if(e.dying||!e.T.dummy)continue;const p=scr(e.x,3.7*e.sc,e.z),d=Math.hypot(P.x-e.x,P.z-e.z);
+   if(!p||p[0]<30||p[0]>fxW-30||p[1]<60||p[1]>fxH-60){if(d<bd){bd=d;best=e;}continue;}
+   vis++;fx.globalAlpha=bl;lbl('▼',p[0],p[1],Math.round((e.T.big?34:24)*z),'#ffd23a');fx.globalAlpha=1;}
+  if(best&&!vis)edgeArrow(best,{n:'標的',css:'#ffd23a'});}
  if(EX.rev&&!EX.done){const D={n:'脱出ポイント',css:'#5dff8a'},p=scr(EX.x,9,EX.z),d=Math.hypot(P.x-EX.x,P.z-EX.z);
   if(!p||p[0]<30||p[0]>fxW-30||p[1]<60||p[1]>fxH-60)edgeArrow(EX,D);else{const z=isTouch?.7:1;lbl('▼ 脱出ポイント',p[0],p[1],Math.round(20*z),'#5dff8a');lbl(EX.ready?'輸送機待機中 '+Math.round(d)+'m':'敵を殲滅せよ '+Math.round(d)+'m',p[0],p[1]+22*z,Math.round(14*z),'#fff');}}
  if(HUNT.show){const D={n:'残敵',css:'#ff5a4a'},z=isTouch?.7:1,bl=.75+.25*Math.sin(performance.now()/150);
   for(const e of enemies){if(e.dying)continue;const p=scr(e.x,(e.y||0)+e.hy+2.2,e.z),d=Math.hypot(P.x-e.x,P.z-e.z);
    if(!p||p[0]<30||p[0]>fxW-30||p[1]<60||p[1]>fxH-60)edgeArrow(e,D);else{fx.globalAlpha=bl;lbl('▼ 残敵',p[0],p[1],Math.round(18*z),'#ff5a4a');fx.globalAlpha=1;lbl(Math.round(d)+'m',p[0],p[1]+18*z,Math.round(12*z),'#fff');}}}
- for(const c of chests){
+ for(const c of (TRAIN.on?[]:chests)){
   if(c.state==='use')continue;
   const D=VDEF[c.type],p=scr(c.x,3.4,c.z),d=Math.hypot(P.x-c.x,P.z-c.z);
   if(!p||p[0]<30||p[0]>fxW-30||p[1]<60||p[1]>fxH-60){if(c.state==='ready')edgeArrow(c,D);continue;}
@@ -8143,7 +8198,7 @@ function vEnemy(k){const T=TYPES[k],a=T.b(T);if(DET[k])DET[k](a,T);mergeKids(a.g
 function vGrp(g){cast(g);vAdd(g);}
 const VIEW_CATS=[
  {id:'H',n:'人物',items:[['主人公',()=>vTrooper(0xff7a1a,HERO_PAL)]].concat(ALLY.map(d=>['味方 '+d.n,()=>vTrooper(d.col)]))},
- {id:'E',n:'敵',items:Object.keys(TYPES).map(k=>[TYPES[k].n,()=>vEnemy(k)]).concat([['母艦（UFO）',()=>{const b=makeBoss();b.g.position.y=6;vAdd(b.g);}]])},
+ {id:'E',n:'敵',items:Object.keys(TYPES).filter(k=>!TYPES[k].dummy).map(k=>[TYPES[k].n,()=>vEnemy(k)]).concat([['母艦（UFO）',()=>{const b=makeBoss();b.g.position.y=6;vAdd(b.g);}]])},
  {id:'V',n:'乗り物',items:[['戦車',()=>vGrp(makeTank().g)],['ヘリ',()=>vGrp(makeHeli().g)],['ロボ',()=>vGrp(makeMech().g)],['輸送機',()=>{TRN.g.visible=true;TRN.g.position.set(0,1.4,0);TRN.g.rotation.set(0,0,0);for(const e of TRN.engs)e.e.rotation.z=0;TRN.ramp.rotation.z=.42;VW.trn=true;}],['自動砲台',()=>vGrp(makeTurretModel().g)],['宝箱',()=>vGrp(makeChest(0xffc040).g)]]},
  {id:'B',n:'建物',items:[
   ['ビル（低層）',()=>makeBuilding(0,0,14,rnd(8,12))],['ビル（中層）',()=>makeBuilding(0,0,15,rnd(20,26))],['ビル（高層）',()=>makeBuilding(0,0,17,rnd(38,46))],
