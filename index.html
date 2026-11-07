@@ -5014,11 +5014,11 @@ function bsBuild(){
   pts.forEach((p,i)=>{o.position.set(p[0],2.6*p[2]+4*p[2],p[1]);o.scale.setScalar(p[2]);o.rotation.y=p[3];o.updateMatrix();C.setMatrixAt(i,o.matrix);o.position.y=1.3*p[2];o.updateMatrix();Tm.setMatrixAt(i,o.matrix);});
   C.castShadow=true;sc.add(C,Tm);
   /* 道路（ゲートから外へ） */
-  const rd=new THREE.Mesh(new THREE.PlaneGeometry(12,240),M(0x8d8f8c));rd.rotation.x=-Math.PI/2;rd.position.set(0,.04,166);rd.receiveShadow=true;sc.add(rd);}
+  const rd=new THREE.Mesh(new THREE.PlaneGeometry(12,240),M(0x8d8f8c));rd.rotation.x=-Math.PI/2;rd.position.set(0,.2,166);rd.receiveShadow=true;sc.add(rd);}
  /* 基地の敷地（広場） */
  const X0=-56,X1=56,Z0=-54,Z1=48;
- {const pd=new THREE.Mesh(new THREE.PlaneGeometry(X1-X0,Z1-Z0),M(0xc9c8bf));pd.rotation.x=-Math.PI/2;pd.position.set(0,.06,(Z0+Z1)/2);pd.receiveShadow=true;sc.add(pd);
-  const ln=(w,d,x,z,c)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(w,d),M(c||0xf2f0e6));m.rotation.x=-Math.PI/2;m.position.set(x,.09,z);m.receiveShadow=true;sc.add(m);};
+ {const pd=new THREE.Mesh(new THREE.PlaneGeometry(X1-X0,Z1-Z0),M(0xc9c8bf));pd.rotation.x=-Math.PI/2;pd.position.set(0,.25,(Z0+Z1)/2);pd.receiveShadow=true;sc.add(pd);
+  const ln=(w,d,x,z,c)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(w,d),M(c||0xf2f0e6));m.rotation.x=-Math.PI/2;m.position.set(x,.45,z);m.receiveShadow=true;sc.add(m);};
   ln(4,36,0,30,0xb8b7ae);ln(.5,96,-20,-4);ln(.5,96,20,-4);for(let z=-48;z<46;z+=6)ln(.35,2.6,0,z,0xffd23a);
   ln(70,.5,0,8);ln(.5,30,-24,-12,0xffd23a);ln(.5,30,28,-12,0xffd23a);}
  /* 塀・壁 */
@@ -5043,7 +5043,7 @@ function bsBuild(){
   box(b,w,h,d,0,0,0,o.c||0xd9dcd8);box(b,w+.5,.6,d+.5,0,h,0,o.rc||0x7f8a92);
   const fl=Math.max(1,Math.floor((h-1)/3.4));
   for(let f=0;f<fl;f++){const y=1.4+f*3.4;box(b,w-1.6,1.1,.12,0,y,d/2+.02,0x2f4352,{ns:1});box(b,.12,1.1,d-1.6,w/2+.02,y,0,0x2f4352,{ns:1});box(b,.12,1.1,d-1.6,-w/2-.02,y,0,0x2f4352,{ns:1});
-   for(let k=-w/2+2;k<w/2-1;k+=Math.max(3,w/5))box(b,.9,.22,.14,k,y+1.4,d/2+.04,0x7ff3ff,{b:1,ns:1});}
+   for(let k=-w/2+2;k<w/2-1;k+=Math.max(3,w/5))box(b,.9,.22,.14,k,y+1.4,d/2+.12,0x7ff3ff,{b:1,ns:1});}
   box(b,w-.4,.5,.2,0,h-.9,d/2+.03,o.st||0x5f7380,{ns:1});
   for(let i=0;i<(o.ac||2);i++)box(b,1.6,1,1.4,-w/2+2+i*2.6,h+.6,-d/2+2,0x9aa3a6);
   return b;};
@@ -5053,20 +5053,20 @@ function bsBuild(){
   const arc=new THREE.CylinderGeometry(R,R,D,18,1,false,-Math.PI/2,Math.PI);const am=new THREE.Mesh(arc,M(0xc3c9cc));am.rotation.x=-Math.PI/2;am.scale.x=W2/(2*R);am.position.set(hx,2,hz);am.castShadow=am.receiveShadow=true;g.add(am);
   box(g,W2,2,D,hx,0,hz,0xb5bcbf);
   for(let i=-3;i<=3;i++){const rb=new THREE.Mesh(new THREE.TorusGeometry(R+.15,.22,4,18,Math.PI),M(0x7f8a92));rb.scale.x=W2/(2*R);rb.position.set(hx,2,hz+i*3.4);g.add(rb);}
-  const dr=new THREE.Mesh(new THREE.CircleGeometry(R-.6,18,0,Math.PI),M(0x1c252e));dr.scale.x=W2/(2*R)*.92;dr.position.set(hx,2,hz+D/2+.05);g.add(dr);box(g,W2*.86,2,.2,hx,0,hz+D/2+.05,0x1c252e,{ns:1});
-  for(let i=0;i<8;i++)box(g,1.6,.5,.25,hx-W2/2+2+i*3.7,0,hz+D/2+.2,i%2?0x1c1c1c:0xffc21a,{ns:1});
+  const dr=new THREE.Mesh(new THREE.CircleGeometry(R-.6,18,0,Math.PI),M(0x1c252e));dr.scale.x=W2/(2*R)*.92;dr.position.set(hx,2,hz+D/2+.3);g.add(dr);box(g,W2*.86,2,.2,hx,0,hz+D/2+.35,0x1c252e,{ns:1});
+  for(let i=0;i<8;i++)box(g,1.6,.5,.25,hx-W2/2+2+i*3.7,0,hz+D/2+.5,i%2?0x1c1c1c:0xffc21a,{ns:1});
   box(g,8,2.2,.3,hx,13.8,hz+D/2-.2,0xffc21a,{ns:1});
   /* エプロン・機体 */
-  const ap=new THREE.Mesh(new THREE.PlaneGeometry(52,34),M(0xa9aca6));ap.rotation.x=-Math.PI/2;ap.position.set(hx+2,.08,hz+D/2+15);ap.receiveShadow=true;g.add(ap);
+  const ap=new THREE.Mesh(new THREE.PlaneGeometry(52,34),M(0xa9aca6));ap.rotation.x=-Math.PI/2;ap.position.set(hx+2,.35,hz+D/2+15);ap.receiveShadow=true;g.add(ap);
   try{const tr=makeTransport();scene.remove(tr.g);tr.g.visible=true;tr.g.position.set(hx+4,1.55,hz+D/2+15);tr.g.traverse(o=>{if(o.isMesh)o.castShadow=true;});g.add(tr.g);BS.anim.push((t,dt)=>{for(const e of tr.engs)e.pr.rotation.x+=dt*4;});}catch(e){console.warn(e);}
   const jet=new THREE.Group();jet.position.set(-26,0,-42);jet.rotation.y=.35;jet.scale.setScalar(.8);g.add(jet);
   box(jet,2.4,2.2,11,0,1.6,0,0x6f7c86);box(jet,2,1.2,3,0,3.3,-2.5,0x9ad8ff,{b:1});box(jet,13,.35,3.6,0,2.4,.8,0x5d6a74);box(jet,.3,3,2.4,0,3.8,4.6,0x5d6a74);box(jet,5,.3,1.6,0,3.2,4.8,0x5d6a74);
   for(const s of[-4.6,4.6]){const e=new THREE.Mesh(new THREE.CylinderGeometry(.9,.9,3,10),M(0x47525a));e.rotation.x=Math.PI/2;e.position.set(s,2.4,.8);e.castShadow=true;jet.add(e);}
   box(jet,.3,1.6,.3,0,0,-3.5,0x333333,{ns:1});box(jet,.3,1.6,.3,-1.4,0,2,0x333333,{ns:1});box(jet,.3,1.6,.3,1.4,0,2,0x333333,{ns:1});
   /* ヘリポート */
-  const hp=new THREE.Mesh(new THREE.CircleGeometry(7,28),M(0x8b8e8a));hp.rotation.x=-Math.PI/2;hp.position.set(36,.1,-38);hp.receiveShadow=true;g.add(hp);
-  const hr=new THREE.Mesh(new THREE.RingGeometry(5.6,6.2,28),M(0xffd23a));hr.rotation.x=-Math.PI/2;hr.position.set(36,.12,-38);g.add(hr);
-  box(g,.7,.05,5,34.4,.1,-38,0xffffff,{ns:1});box(g,.7,.05,5,37.6,.1,-38,0xffffff,{ns:1});box(g,3.2,.05,.7,36,.1,-38,0xffffff,{ns:1});}
+  const hp=new THREE.Mesh(new THREE.CircleGeometry(7,28),M(0x8b8e8a));hp.rotation.x=-Math.PI/2;hp.position.set(36,.35,-38);hp.receiveShadow=true;g.add(hp);
+  const hr=new THREE.Mesh(new THREE.RingGeometry(5.6,6.2,28),M(0xffd23a));hr.rotation.x=-Math.PI/2;hr.position.set(36,.5,-38);g.add(hr);
+  box(g,.7,.05,5,34.4,.5,-38,0xffffff,{ns:1});box(g,.7,.05,5,37.6,.5,-38,0xffffff,{ns:1});box(g,3.2,.05,.7,36,.5,-38,0xffffff,{ns:1});}
  /* 兵舎 */
  {const g=fac('brk');block(g,-37,-6,15,30,10.5,{c:0xe1e2dc,st:0x3b6b8f,ac:3});block(g,-25,-20,10,12,7,{c:0xd6d9d4,ac:1});
   const fp=new THREE.Group();fp.position.set(-26,0,6);g.add(fp);box(fp,.25,14,.25,0,0,0,0xdddddd,{ns:1});const fl=box(fp,3.6,2.2,.08,1.8,11.6,0,0x2e66c9,{ns:1});box(fp,1.6,1,.1,1,12.2,.02,0xffffff,{ns:1});BS.anim.push(t=>{fl.rotation.y=Math.sin(t*3)*.18;});
@@ -5082,8 +5082,8 @@ function bsBuild(){
   for(let i=0;i<2;i++){const tk=new THREE.Mesh(new THREE.CylinderGeometry(3,3,7,16),M(0xeeeeea));tk.position.set(44+i*7.4,3.5,-40);tk.castShadow=tk.receiveShadow=true;g.add(tk);box(g,6.2,.35,.35,44+i*7.4,3.4,-36.9,0x2e66c9,{ns:1});}}
  /* 訓練所：射撃場 */
  {const g=fac('trn');const cx=0,cz=27,w=36,d=24;
-  const gd=new THREE.Mesh(new THREE.PlaneGeometry(w,d),M(0xb79d70));gd.rotation.x=-Math.PI/2;gd.position.set(cx,.1,cz);gd.receiveShadow=true;g.add(gd);
-  for(let i=-1;i<=1;i++){const l=new THREE.Mesh(new THREE.PlaneGeometry(.35,d-2),M(0xf1ead8));l.rotation.x=-Math.PI/2;l.position.set(cx+i*9,.12,cz);g.add(l);}
+  const gd=new THREE.Mesh(new THREE.PlaneGeometry(w,d),M(0xb79d70));gd.rotation.x=-Math.PI/2;gd.position.set(cx,.35,cz);gd.receiveShadow=true;g.add(gd);
+  for(let i=-1;i<=1;i++){const l=new THREE.Mesh(new THREE.PlaneGeometry(.35,d-2),M(0xf1ead8));l.rotation.x=-Math.PI/2;l.position.set(cx+i*9,.5,cz);g.add(l);}
   for(let x=-w/2;x<=w/2;x+=3){box(g,.25,1.4,.25,cx+x,0,cz-d/2,0x6b4a2e,{ns:1});box(g,.25,1.4,.25,cx+x,0,cz+d/2,0x6b4a2e,{ns:1});}
   for(let z=-d/2;z<=d/2;z+=3){box(g,.25,1.4,.25,cx-w/2,0,cz+z,0x6b4a2e,{ns:1});box(g,.25,1.4,.25,cx+w/2,0,cz+z,0x6b4a2e,{ns:1});}
   box(g,w,.18,.12,cx,1.1,cz-d/2,0xd8c9a0,{ns:1});box(g,w,.18,.12,cx,1.1,cz+d/2,0xd8c9a0,{ns:1});box(g,.12,.18,d,cx-w/2,1.1,cz,0xd8c9a0,{ns:1});box(g,.12,.18,d,cx+w/2,1.1,cz,0xd8c9a0,{ns:1});
@@ -5105,20 +5105,49 @@ function bsBuild(){
   truck(-22,8,.2,0x6c7d3a);truck(26,8,-2.6,0x6c7d3a);
   for(const p of[[-10,40],[10,40],[-30,14],[28,-32]])for(let i=0;i<4;i++)box(g,1.6,.7,.9,p[0]+i*1.7,0,p[1],0xa69062);
   for(const p of[[-22,36],[22,36],[-50,-20],[50,-20]]){box(g,3,1,3,p[0],0,p[1],0xa8aaa2);const tr=new THREE.Mesh(flat(new THREE.ConeGeometry(1.8,4,6,1)),M(0x4e8a45));tr.position.set(p[0],3,p[1]);tr.castShadow=true;g.add(tr);}}
- /* 基地のまわりを徘徊するムシ */
- try{const pool=['ant','ant','mantis','pillbug','spider','hopper','snail','giant'],n=2+(Math.random()<.5?1:0);BS.bugs=[];
-  for(let i=0;i<n;i++){const k=pool[Math.floor(Math.random()*pool.length)],T=TYPES[k],a=T.b(T);if(DET[k])DET[k](a,T);a.g.scale.setScalar(T.sc*(k==='giant'?1.6:2.6));a.g.rotation.order='YXZ';
-   a.g.traverse(o=>{if(o.isMesh)o.castShadow=true;});sc.add(a.g);const p=bsOut();const b={g:a.g,legs:a.legs||[],x:p[0],z:p[1],f:Math.random()*6.28,tg:bsOut(),sp:(T.speed>8?6:4)*(k==='snail'?.4:1)*(k==='giant'?.9:1),w:0,ph:Math.random()*6};a.g.position.set(b.x,0,b.z);BS.bugs.push(b);}
-  BS.anim.push((t,dt)=>{for(const b of BS.bugs){if(b.w>0){b.w-=dt;}else{const dx=b.tg[0]-b.x,dz=b.tg[1]-b.z,d=Math.hypot(dx,dz);
-     if(d<4){b.tg=bsOut();b.w=Math.random()<.5?1+Math.random()*3:0;}else{const fa=Math.atan2(dx,dz);let df=fa-b.f;df=Math.atan2(Math.sin(df),Math.cos(df));b.f+=Math.max(-dt*1.6,Math.min(dt*1.6,df));
-      const v=b.sp*dt;let nx=b.x+Math.sin(b.f)*v,nz=b.z+Math.cos(b.f)*v;if(bsIn(nx,nz)){b.tg=bsOut();}else{b.x=nx;b.z=nz;}}}
-    b.g.position.set(b.x,0,b.z);b.g.rotation.y=b.f;const mv=b.w>0?0:1;b.ph+=dt*b.sp*1.8*mv;for(const l of b.legs)if(l.pv)l.pv.rotation.x=Math.sin(b.ph+(l.ph||0))*.55*mv;}});
+ /* 基地のまわりを徘徊するムシ（壁はよけて歩き、ときどき監視塔が撃つ） */
+ try{BS.bugs=[];BS.shots=[];BS.q=[];BS.nShot=0;BS.nKill=0;BS.fireT=3+Math.random()*4;const n=2+(Math.random()<.5?1:0);for(let i=0;i<n;i++)bsBug(bsOut());
+  const tm=new THREE.MeshBasicMaterial({color:0xffe48a,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}),fm=new THREE.MeshBasicMaterial({color:0xffa040,transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false,fog:false});
+  for(let i=0;i<6;i++){const tr=new THREE.Mesh(BX,tm);tr.visible=false;sc.add(tr);const fl=new THREE.Mesh(new THREE.SphereGeometry(1,8,6),fm);fl.visible=false;sc.add(fl);BS.shots.push({tr,fl,t:0});}
+  BS.anim.push((t,dt)=>bsBugTick(dt));
  }catch(e){console.warn('bugs',e);}
  /* 画面に収める点 */
  for(const x of[X0-3,X1+3])for(const z of[Z0-3,Z1+6])for(const y of[0,4.5])BS.fit.push(new THREE.Vector3(x,y,z));
  for(const f of BSFAC)BS.fit.push(new THREE.Vector3(f.at[0],f.at[1]+2,f.at[2]));
 }
-function bsIn(x,z){return Math.abs(x)<64&&z>-62&&z<56;}
+function bsIn(x,z){return Math.abs(x)<66&&z>-64&&z<58;}
+const BSTW=[[-55,-53],[55,-53],[-55,47],[55,47]];
+function bsBug(p){const pool=['ant','ant','mantis','pillbug','spider','hopper','snail','giant'],k=pool[Math.floor(Math.random()*pool.length)],T=TYPES[k],a=T.b(T);if(DET[k])DET[k](a,T);
+ const sc=T.sc*(k==='giant'?1.6:2.6);a.g.scale.setScalar(sc);a.g.rotation.order='YXZ';a.g.traverse(o=>{if(o.isMesh)o.castShadow=true;});BS.sc.add(a.g);
+ const b={g:a.g,legs:a.legs||[],x:p[0],z:p[1],f:Math.random()*6.28,tg:bsOutNear(p[0],p[1]),sp:(T.speed>8?6:4)*(k==='snail'?.4:1)*(k==='giant'?.9:1),w:0,ph:Math.random()*6,dead:0,hit:0,sc,rd:k==='giant'?7:4};
+ a.g.position.set(b.x,0,b.z);BS.bugs.push(b);return b;}
+function bsOutNear(x,z){const a0=Math.atan2(x,z+3);for(let i=0;i<30;i++){const a=a0+(Math.random()<.5?-1:1)*(.35+Math.random()*.9),rx=78+Math.random()*34,rz=72+Math.random()*30,px=Math.sin(a)*rx,pz=Math.cos(a)*rz-3;if(!bsIn(px,pz)&&!(Math.abs(px)<10&&pz>50))return[px,pz];}return bsOut();}
+function bsBugTick(dt){
+ for(let i=BS.bugs.length-1;i>=0;i--){const b=BS.bugs[i];
+  if(b.dead){b.dead+=dt;const k=Math.min(1,b.dead/.5);b.g.rotation.z=k*Math.PI*.95;b.g.position.y=k<1?Math.sin(k*Math.PI)*1.5:-(Math.max(0,b.dead-3)*1.2);
+   if(b.dead>5){BS.sc.remove(b.g);BS.bugs.splice(i,1);BS.q.push({t:2+Math.random()*4,fn:()=>{if(BS.bugs.length<3)bsBug(bsOut());}});}continue;}
+  if(b.flee>0){b.flee-=dt;if(b.flee<=0)b.flee=0;}
+  if(b.hit>0){b.hit-=dt;b.g.position.y=Math.random()*.25;}else b.g.position.y=0;
+  if(b.w>0){b.w-=dt;}else{const dx=b.tg[0]-b.x,dz=b.tg[1]-b.z,d=Math.hypot(dx,dz);
+   if(d<4){b.tg=bsOutNear(b.x,b.z);b.w=Math.random()<.45?1+Math.random()*3:0;}
+   else{let fa=Math.atan2(dx,dz);const v=b.sp*dt*(b.flee?2.2:1),lx=b.x+Math.sin(fa)*b.rd*1.5,lz=b.z+Math.cos(fa)*b.rd*1.5;
+    if(bsIn(lx,lz)){const cx=b.x,cz=b.z+3;let tx=cz,tz=-cx;if(tx*dx+tz*dz<0){tx=-tx;tz=-tz;}fa=Math.atan2(tx,tz);}
+    let df=fa-b.f;df=Math.atan2(Math.sin(df),Math.cos(df));b.f+=Math.max(-dt*2.4,Math.min(dt*2.4,df));
+    const nx=b.x+Math.sin(b.f)*v,nz=b.z+Math.cos(b.f)*v;
+    if(bsIn(nx,nz)){b.f+=dt*3;b.tg=bsOutNear(b.x,b.z);}else{b.x=nx;b.z=nz;}
+    if(Math.hypot(b.x,b.z)>230){b.tg=bsOutNear(b.x*.5,b.z*.5);}}}
+  b.g.position.x=b.x;b.g.position.z=b.z;b.g.rotation.y=b.f;const mv=b.w>0?0:1;b.ph+=dt*b.sp*1.8*mv*(b.flee?2:1);for(const l of b.legs)if(l.pv)l.pv.rotation.x=Math.sin(b.ph+(l.ph||0))*.55*mv;}
+ /* 監視塔からの射撃 */
+ BS.fireT-=dt;if(BS.fireT<=0){BS.fireT=5+Math.random()*7;const live=BS.bugs.filter(b=>!b.dead);if(live.length){const b=live[Math.floor(Math.random()*live.length)];
+   let tw=BSTW[0],bd=1e9;for(const w of BSTW){const d=Math.hypot(w[0]-b.x,w[1]-b.z);if(d<bd){bd=d;tw=w;}}
+   const n=4+Math.floor(Math.random()*4),kill=Math.random()<.55;for(let k=0;k<n;k++)BS.q.push({t:k*.14,fn:()=>bsShoot(tw,b,k===n-1&&kill)});if(!kill)BS.q.push({t:n*.14,fn:()=>{b.flee=3;b.tg=bsOutNear(b.x*1.4,b.z*1.4);}});}}
+ for(let i=BS.q.length-1;i>=0;i--){BS.q[i].t-=dt;if(BS.q[i].t<=0){const f=BS.q[i].fn;BS.q.splice(i,1);try{f();}catch(e){}}}
+ for(const s of BS.shots){if(s.t>0){s.t-=dt;const k=Math.max(0,s.t/.12);s.tr.material.opacity=k;s.fl.scale.setScalar(.6+(1-k)*1.6);s.fl.material.opacity=k*.9;if(s.t<=0){s.tr.visible=s.fl.visible=false;}}}
+}
+function bsShoot(tw,b,kill){if(!BS.sc||b.dead)return;const s=BS.shots.find(q=>q.t<=0)||BS.shots[0];
+ const a=new THREE.Vector3(tw[0],13.6,tw[1]),c=new THREE.Vector3(b.x+(Math.random()-.5)*2,1.2*b.sc/2.6,b.z+(Math.random()-.5)*2),L=a.distanceTo(c);
+ s.tr.position.copy(a).lerp(c,.5);s.tr.lookAt(c);s.tr.scale.set(.18,.18,L);s.tr.visible=true;s.fl.position.copy(c);s.fl.visible=true;s.t=.12;
+ b.hit=.25;BS.nShot++;if(kill){b.dead=.001;b.w=0;BS.nKill++;}}
 function bsOut(){for(let i=0;i<40;i++){const x=(Math.random()*2-1)*110,z=-100+Math.random()*190;if(!bsIn(x,z)&&!(Math.abs(x)<9&&z>50))return[x,z];}return[80,0];}
 function buildBaseMap(){
  const el=$('bsMap');if(el.dataset.ok)return;el.dataset.ok=1;
@@ -5145,11 +5174,11 @@ function bsFrame(dt){
  const u=Math.max(.46,Math.min(.95,Math.min(r.r-r.l,(r.b-r.t)*1.7)/1000*1.02));if(Math.abs(u-BS.u)>.01){BS.u=u;$('bsMap').style.setProperty('--u',u+'px');}
  const lift=46*u;r.t+=lift;
  const elv=(por?54:37)*Math.PI/180,az=((por?-22:-14)+Math.sin(BS.t*.1)*3+BS.daz)*Math.PI/180;
- c.fov=por?44:34;c.aspect=W/H;c.setViewOffset(W,H,W/2-(r.l+r.r)/2,H/2-(r.t+r.b)/2,W,H);
+ c.fov=por?44:34;c.aspect=W/H;c.near=Math.max(4,(BS.lastD||200)*.35);c.far=(BS.lastD||200)+3600;c.setViewOffset(W,H,W/2-(r.l+r.r)/2,H/2-(r.t+r.b)/2,W,H);
  const T=BS.T,v=BS.v,ce=Math.cos(elv),se=Math.sin(elv);
  const place=d=>{c.position.set(T.x+d*ce*Math.sin(az),T.y+d*se,T.z+d*ce*Math.cos(az));c.lookAt(T);c.updateMatrixWorld();};
  const fits=()=>{for(const p of BS.fit){v.copy(p).project(c);const x=(v.x+1)/2*W,y=(1-v.y)/2*H;if(v.z>1||x<r.l||x>r.r||y<r.t||y>r.b)return false;}return true;};
- let lo=40,hi=760;for(let i=0;i<16;i++){const d=(lo+hi)/2;place(d);if(fits())hi=d;else lo=d;}place(hi);
+ let lo=40,hi=760;for(let i=0;i<16;i++){const d=(lo+hi)/2;place(d);if(fits())hi=d;else lo=d;}place(hi);BS.lastD=hi;
  for(const f of BS.anim)f(BS.t,dt);
  const bl=(BS.t%1.2)<.6;for(const b of BS.blink)b.visible=bl;
  const ex=renderer.toneMappingExposure,au=renderer.shadowMap.autoUpdate;
@@ -5367,7 +5396,7 @@ function openBoxes(){const R=BOXR;BOXR=null;if(!R||!R.items.length)return;
  $('boClose').onclick=e=>{e.stopPropagation();$('boxOpen').classList.add('hide');try{if(state==='clear'&&$('stInfo'))0;}catch(err){}};
  $('boxOpen').classList.remove('hide');}
 /* ---------- バージョン表示と更新 ---------- */
-const GAME_VER='1.09';
+const GAME_VER='1.10';
 function verCmp(a,b){const x=String(a).split('.').map(Number),y=String(b).split('.').map(Number);for(let i=0;i<Math.max(x.length,y.length);i++){const d=(x[i]||0)-(y[i]||0);if(d)return d>0?1:-1;}return 0;}
 function hardReload(){try{saveGame();}catch(e){}const u=location.pathname+'?r='+Date.now()+location.hash;try{location.replace(u);}catch(e){location.reload();}}
 let VER_NEW=null;
