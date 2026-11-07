@@ -815,6 +815,22 @@ body.trHL #touch .tb:not(.trhl){opacity:.2!important;filter:grayscale(1)}
 @keyframes trBob{from{margin-top:0}to{margin-top:-8px}}
 #stickHint.trhl{opacity:1!important;display:block!important;filter:drop-shadow(0 0 10px #ffd23a) drop-shadow(0 0 18px #ffd23a);animation:trPulseO 1.1s ease-in-out infinite}
 @keyframes trPulseO{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+
+/* v1.12 */
+#brk{z-index:60!important}
+#mpMe{margin:10px auto 4px;width:min(94vw,640px);display:flex;flex-direction:column;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px 12px;box-sizing:border-box}
+.mpMeRow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.mpMeRow.col{flex-direction:column;align-items:stretch}
+.mpMeL{font-size:12px;font-weight:800;color:#ffd070;min-width:6em;text-align:left}.mpMeL small{font-weight:600;color:#cfd8e6;font-size:10.5px}
+#mpCols{display:flex;gap:7px;flex-wrap:wrap}
+.mpCol{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.35);background:var(--pc);cursor:pointer;padding:0;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25)}
+.mpCol.on{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.35),0 0 12px var(--pc)}
+.mpCol.tk{opacity:.22;cursor:not-allowed}
+.mpLoad{display:flex;gap:6px;flex-wrap:wrap;flex:1 1 200px;min-width:0}
+.mpW{display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:3px 8px 3px 4px;font-size:11px;white-space:nowrap}.mpW img{width:40px;height:24px;object-fit:contain}
+.dvN{font-style:normal;font-size:10px;font-weight:900;color:#cfd8e6;opacity:.75}.dvN.y{color:#ffd23a;opacity:1}
+.dfc.on .dvN{color:#ffd23a;opacity:1}
+#stDiffBox{width:min(94vw,640px);margin:8px auto 4px}
+.stDiffH{font-size:12px;font-weight:800;color:#ffd070;margin-bottom:4px}
 </style>
 </head>
 <body>
@@ -870,8 +886,8 @@ body.trHL #touch .tb:not(.trhl){opacity:.2!important;filter:grayscale(1)}
     <span><b>P</b> 一時停止</span><span><b>M</b> 音のオン・オフ</span><span><b>コントローラー</b> 下の「コントローラー操作」を参照</span>
     <span><b>1〜8 / ホイール / F</b> 武器切替</span><span>光の柱＝武器ドロップ</span>
     <span><b>G</b> 砲台を投げて設置</span><span><b>X</b> 乗り物から降りる</span>
-    <span>宝箱（街のどこか）＝戦車・ヘリ・ロボ</span><span>制限時間つき／時間が経つと別の場所に復活</span>
-    <span>緑＝回復　ピンク♥＝最大ライフUP</span><span>橙＝ロケット補給　色つき＝武器</span>
+    <span>宝箱（街のどこか）＝茶色：戦車・青：ヘリ・紫：ロボ</span><span>制限時間つき／時間が経つと別の場所に復活</span>
+    <span>緑＝回復　ピンク♥＝最大ライフUP</span><span>黄＝武器ボックス　ロケットは時間で回復</span>
   </div>
   <div class="keys t">
     <span><b>左側ドラッグ</b> 移動</span><span><b>右側ドラッグ</b> 視点</span>
@@ -879,8 +895,8 @@ body.trHL #touch .tb:not(.trhl){opacity:.2!important;filter:grayscale(1)}
     <span><b>STRIKE</b> 衛星砲</span><span><b>ダッシュ</b> 無敵回避</span><span><b>ブースト</b> 長押しで上昇・ビルの屋上へ</span>
     <span><b>武器切替</b> 拾った武器へ</span><span>光の柱＝武器ドロップ</span>
     <span><b>砲台</b> 投げて自動砲台を設置</span><span><b>降車</b> 乗り物から降りる</span><span><b>乗り物中</b> ボタンが専用技に変化（ロボ：叩きつけ・ジャンプ・ミサイル／戦車：突撃・拡散砲／ヘリ：高度・爆撃）</span><span><b>Ⅱ</b> 一時停止</span><span><b>ロックオンミサイル</b> 正面の敵を最大6体自動ロック→射撃で一斉発射</span><span>コントローラー操作中は画面のボタンが消え、触れると戻ります</span>
-    <span>宝箱（街のどこか）＝戦車・ヘリ・ロボ</span><span>時間制限あり／時間で別の場所に復活</span>
-    <span>緑＝回復　ピンク♥＝最大ライフUP</span><span>橙＝ロケット補給　色つき＝武器</span>
+    <span>宝箱（街のどこか）＝茶色：戦車・青：ヘリ・紫：ロボ</span><span>時間制限あり／時間で別の場所に復活</span>
+    <span>緑＝回復　ピンク♥＝最大ライフUP</span><span>黄＝武器ボックス　ロケットは時間で回復</span>
   </div>
   <div class="keys">
     <span><b>コントローラー操作</b>（PlayStation／Xbox 共通の標準配置）</span>
@@ -921,6 +937,11 @@ body.trHL #touch .tb:not(.trhl){opacity:.2!important;filter:grayscale(1)}
    <div class="mpRoomGrid">
     <div class="mpCodeBox"><div class="mpCodeL">ルームコード</div><div id="mpCodeBig">----</div><div class="mpCodeH" id="mpCodeH">このコードを仲間に伝えてください</div></div>
     <div><div class="mpCodeL">メンバー（この色で全員の画面に表示されます）</div><div id="mpList"></div></div>
+   </div>
+   <div id="mpMe">
+    <div class="mpMeRow"><span class="mpMeL">あなたの色</span><div id="mpCols"></div></div>
+    <div class="mpMeRow"><span class="mpMeL">装備</span><div id="mpLoad" class="mpLoad"></div><button class="btn sb" id="mpEq" type="button">装備を変える</button></div>
+    <div class="mpMeRow col"><span class="mpMeL">希望する難易度　<small>出撃のたびに多数決（同数のときはホストの希望）</small></span><div id="mpDv" class="dfRow"></div></div>
    </div>
    <div id="mpGoBox">
     <div class="mpStep"><span class="mpNo">3</span><span id="mpMsg">仲間がそろったら出撃！</span></div>
@@ -1082,6 +1103,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   <div class="stat" id="stInfo"></div>
   <div class="stat" id="stNew" style="color:#9affc8;font-size:13px"></div>
   <div id="stSave"><i></i><span>オートセーブ中です…</span></div>
+  <div id="stDiffBox"><div class="stDiffH" id="stDiffH">次のステージの難易度</div><div id="stDiff" class="dfRow"></div></div>
   <div id="stBtns"><button class="btn" id="stNext">次のステージへ</button>
   <button class="btn sb" id="stTitleBtn">タイトルへ</button></div>
   <div id="stWait" class="mpOnly">ホストの操作を待っています…</div>
@@ -4637,7 +4659,7 @@ for(const k in WEAPONS)delete WEAPONS[k];
 WEAPONS.std={id:'std',b:'rifle',t:-1,name:'SR-0 スタンダード',rate:.09,dm:.9,mag:36,rl:1.6,ac:1.1,col:WTY.rifle.col,css:'#c8d0d8',gun:WTY.rifle.gun};
 for(const b in WTY){const B=WTY[b];for(let t=0;t<5;t++){const T=TIER[t],id=b+t;
  WEAPONS[id]={id,b,t,name:B.pf+'-'+TNO[t]+' '+B.nm[t],rate:B.rate*T.rt,dm:T.dm,mag:Math.max(2,Math.round(B.mag*T.mg)),rl:B.rl*T.rl,ac:T.ac,col:B.col,css:B.css,gun:B.gun};}}
-WEAPONS.box={id:'box',b:'box',t:-1,name:'ボックス（中身はランダム）',rate:1,dm:1,mag:1,rl:1,ac:1,col:0xffc83a,css:'#ffc83a',gun:0x22242c};
+WEAPONS.box={id:'box',b:'box',t:-1,name:'ボックス（中身はランダム）',rate:1,dm:1,mag:1,rl:1,ac:1,col:0xffe83a,css:'#ffe83a',gun:0x22242c};
 const WALL=Object.keys(WEAPONS).filter(k=>k!=='box');
 let WDM=1;
 function lvTier(L){return Math.max(0,Math.min(4,Math.floor((L-1)/20)));}
@@ -4969,14 +4991,14 @@ function wIcon(id){
 function openSettings(){openSettings_v71();diffChips('setDiff',null,'def');}
 function setRunDL(d){DL=Math.max(0,Math.min(4,d|0));}
 let DPN=1;
-function openDiffPick(n){DPN=n;DL=SAVE.diff;renderPick();$('dfPick').classList.remove('hide');}
-function renderPick(){diffChips('dpChips',renderPick,'run');try{$('dpLoad').innerHTML=loadRows();}catch(e){}$('dpInfo').innerHTML='STAGE '+DPN+'　'+stageName(DPN)+'　から出撃します'+(DL!==SAVE.diff?'<br><small>（標準の難易度「'+DIFF[SAVE.diff].n+'」は設定で変えられます）</small>':'');}
+function openDiffPick(n){DPN=n;DL=(NET.on&&NET.host&&NET.dvs&&NET.dvs[0]!=null)?NET.dvs[0]:SAVE.diff;renderPick();$('dfPick').classList.remove('hide');}
+function renderPick(){diffChips('dpChips',renderPick,'run');try{$('dpLoad').innerHTML=loadRows();}catch(e){}$('dpInfo').innerHTML='STAGE '+DPN+'　'+stageName(DPN)+'　から出撃します'+(DL!==SAVE.diff?'<br><small>（標準の難易度「'+DIFF[SAVE.diff].n+'」は設定で変えられます）</small>':'')+(NET.on&&NET.host&&netCount()>1?'<br><small>仲間の希望：'+netDvSummary()+'　→ 出撃時に多数決（あなたの選択も1票）</small>':'');}
 function updateTitleBtns(){updateTitleBtns_v71();const t=$('tDiff');if(t){const D=DIFF[SAVE.diff];t.innerHTML='標準の難易度 <b style="color:'+D.col+'">'+D.n+'</b>　階級 <b>'+RANKS[rankIdx()][0]+'</b>　最大ライフ <b>'+SAVE.mhp+'</b>';}}
 let BOXR=null;
 function prgClearLine(g){if(!g)return'';const D=DF();return '<br><span style="color:'+D.col+'">難易度「'+D.n+'」'+(NET.on&&mpCount()>1?'　👥 みんなでプレイで記録':'')+'</span>　<span style="color:#ff9ae8">最大ライフ +'+g.hp+'（'+SAVE.mhp+'）</span>　<span style="color:#9ad8ff">武器ボックス '+g.w+' 個を持ち帰り</span>';}
 function prgEndLine(win){const g=LASTF;LASTF=null;if(win||!g)return'';return '　｜　持ち帰り '+Math.round(DF().keep*100)+'%：最大ライフ +'+g.hp+'・武器 '+g.w+'/'+g.wt;}
 let LASTF=null;
-$('dpGo').addEventListener('click',e=>{e.stopPropagation();$('dfPick').classList.add('hide');startGame(DPN);});
+$('dpGo').addEventListener('click',e=>{e.stopPropagation();$('dfPick').classList.add('hide');if(NET.on&&NET.host&&netCount()>1){NET.dvs[0]=DL;const d0=DL,d=netDiffDecide();setRunDL(d);if(d!==d0)toast('多数決で難易度「'+DIFF[d].n+'」に決まりました','#ffd070');}startGame(DPN);});
 $('dpBack').addEventListener('click',e=>{e.stopPropagation();$('dfPick').classList.add('hide');DL=SAVE.diff;});
 try{for(const[id,t]of[['bDash','ダッシュ'],['bBoost','ブースト'],['bStrike','ストライク'],['bRocket','ロケット'],['bTurret','砲台'],['bWeapon','武器'],['bExit','降りる']]){const el=$(id);if(el&&!el.querySelector('.cap')){const c=document.createElement('i');c.className='cap';c.textContent=t;el.appendChild(c);}}}catch(e){}
 /* ===== v1.04 : 基地（ハブ）・出撃・訓練所 ===== */
@@ -5310,7 +5332,7 @@ const TSTEPS=[
  {m:'【アイテム】前方に落ちている「回復」「最大ライフUP」「武器ボックス」を拾え。光の柱が目印だ。',i(){TRAIN.items=[];for(const [t,x] of[['med',-6],['max',0],['wpn',6]]){const n0=pickups.length;dropPickup(t,x,-4);if(pickups.length>n0)TRAIN.items.push(pickups[pickups.length-1]);}},d:()=>TRAIN.items.every(p=>!pickups.includes(p))},
  {m:'【ロケット】ロケットボタン（PC：右クリック / E）で、奥の大型パネルを破壊せよ。爆発でまとめて倒せる。',i(){TRAIN.big=trSpawn(0,-50,true);},d:()=>!trAlive(TRAIN.big)},
  {m:'【砲台】砲台ボタン（PC：G）で、自動で撃ってくれる砲台を投げて設置せよ。',i(){TRAIN.tur0=P.tur;},d:()=>P.tur<TRAIN.tur0},
- {m:'【衛星ストライク】ゲージを満タンにしておいた。衛星ボタン（PC：Q）で、パネルの群れを一掃せよ。',i(){P.gauge=100;TRAIN.strk=false;trRow(7,-34,30);},d:()=>TRAIN.strk},
+ {m:'【衛星ストライク】砲台を片付けて、ゲージを満タンにしておいた。パネルの群れが出たら、衛星ボタン（PC：Q）で一掃せよ。',i(){TRAIN.strk=false;P.gauge=0;for(const c of caps)scene.remove(c.m);caps.length=0;for(const t of turrets)t.life=0;TRAIN.rowT=1.2;},d:()=>TRAIN.strk&&TRAIN.rowT<0},
  {m:'訓練完了！ よくやった。「射撃訓練」では、持っている武器を自由に試し撃ちできる。基地へ戻るには右下（PC：一時停止メニュー）の「基地へ戻る」だ。',fin:1}
 ];
 const TSHL=[null,'stickHint',null,'bFire','bWeapon','bFire','bBoost','bDash',null,'bRocket','bTurret','bStrike',null];
@@ -5329,6 +5351,7 @@ function trPillars(){if(!TRAIN.pil){TRAIN.pil=[];const g=new THREE.CylinderGeome
  for(;k<TRAIN.pil.length;k++)TRAIN.pil[k].visible=false;TRAIN.pilM.opacity=.16+.1*Math.sin(TRAIN.t*5);}
 function trainTick(dt){
  if(!TRAIN.on)return;TRAIN.t+=dt;try{trPillars();}catch(e){}
+ if(TRAIN.rowT>0&&!turrets.length&&!caps.length){TRAIN.rowT-=dt;if(TRAIN.rowT<=0){TRAIN.rowT=-1;P.gauge=100;trRow(7,-34,30);toast('標的が出現！ 衛星ストライクで一掃せよ','#ffd23a');}}
  if(P.hp<P.maxhp)P.hp=P.maxhp;P.dead=false;
  {let d=P.yaw-TRAIN.ly;while(d>Math.PI)d-=Math.PI*2;while(d<-Math.PI)d+=Math.PI*2;TRAIN.yawSum+=Math.abs(d);TRAIN.ly=P.yaw;}
  if(P.rlT&&P.rlT[P.weapon]>0)TRAIN.rl=true;if(P.dash>0)TRAIN.dashed=true;
@@ -5377,7 +5400,7 @@ function endTraining(){if(!TRAIN.on)return;paused=false;$('pause').classList.add
 $('trExit').addEventListener('click',e=>{e.stopPropagation();endTraining();});
 const TRV={on:true,fold:false};try{TRV.on=localStorage.getItem('seTrVoice')!=='0';TRV.fold=localStorage.getItem('seTrFold')==='1';}catch(e){}
 function trSay(t,q){try{if(!TRV.on||!window.speechSynthesis||muted)return;if(!q)speechSynthesis.cancel();
- const txt=String(t).replace(/[（(]PC[：:][^）)]*[）)]/g,'').replace(/【([^】]*)】/g,'$1。').replace(/[「」『』]/g,'').replace(/（[^）]*）/g,'').replace(/前方/g,'ぜんぽう');
+ const txt=String(t).replace(/[（(]PC[：:][^）)]*[）)]/g,'').replace(/【([^】]*)】/g,'$1。').replace(/[「」『』]/g,'').replace(/（[^）]*）/g,'').replace(/前方/g,'ぜんぽう').replace(/[1１]つ/g,'ひとつ').replace(/[2２]つ/g,'ふたつ').replace(/[3３]つ/g,'みっつ').replace(/[4４]つ/g,'よっつ').replace(/[5５]つ/g,'いつつ');
  const u=new SpeechSynthesisUtterance(txt);u.lang='ja-JP';u.rate=1.08;u.pitch=.82;u.volume=Math.max(.35,Math.min(1,(VOL&&VOL.voice)||1));
  if(JAV&&JAV.length){const m=JAV.find(v=>/otoya|male|ichiro|keita|daichi|男/i.test(v.name))||JAV[0];u.voice=m;}speechSynthesis.speak(u);}catch(e){}}
 function trUI(){$('trVoice').textContent=TRV.on?'🔊':'🔇';$('trVoice').title=TRV.on?'読み上げ：オン':'読み上げ：オフ';$('trFold').textContent=TRV.fold?'▼ 表示':'▲ 隠す';$('trHud').classList.toggle('fold',TRV.fold);}
@@ -5412,8 +5435,37 @@ function openBoxes(){const R=BOXR;BOXR=null;if(!R||!R.items.length)return;
  $('boGo').onclick=e=>{e.stopPropagation();if(busy)return;busy=true;cards.filter(c=>!c.classList.contains('op')).forEach((c,k)=>setTimeout(()=>flip(c),k*220));};
  $('boClose').onclick=e=>{e.stopPropagation();$('boxOpen').classList.add('hide');try{if(state==='clear'&&$('stInfo'))0;}catch(err){}};
  $('boxOpen').classList.remove('hide');}
+/* ---- v1.12 : 色・難易度の希望（みんなでプレイ）／ステージごとの難易度 ---- */
+const PAL=[0xffffff,0xff4ab4,0x8aff3a,0xffa41a,0x4ad8ff,0xffe14a,0xb07aff,0xff4a4a],PALC=PAL.map(c=>'#'+c.toString(16).padStart(6,'0')),PALN=['ホワイト','ピンク','ライム','オレンジ','シアン','イエロー','パープル','レッド'];
+NET.pcs=[0,1,2,3];NET.dvs=[null,null,null,null];
+function myColPref(){try{const v=localStorage.getItem('seCol');return v==null?null:Math.max(0,Math.min(7,v|0));}catch(e){return null;}}
+function netApplyCols(){const P0=PCOL.slice();
+ for(let i=0;i<4;i++){const k=(NET.pcs&&NET.pcs[i]!=null)?NET.pcs[i]:i;PCOL[i]=PAL[k];PCSS[i]=PALC[k];PNAME[i]=PALN[k];}
+ for(let i=0;i<4;i++)if(P0[i]!==PCOL[i]){for(const a of allies){if(a.hms&&a.hms[i]){if(a.g===a.hms[i].g){a.g.visible=false;}scene.remove(a.hms[i].g);delete a.hms[i];a.sk=null;}}}
+ try{_plr.altS=-1;}catch(e){}}
+function netDiffDecide(){const cnt=[0,0,0,0,0];for(let i=0;i<4;i++){const v=NET.dvs[i];if((i===0||NET.roster[i])&&v!=null)cnt[v]++;}
+ const hv=NET.dvs[0]!=null?NET.dvs[0]:DL,mx=Math.max(...cnt);if(mx===0)return hv;const tied=[0,1,2,3,4].filter(d=>cnt[d]===mx);
+ if(tied.length===1)return tied[0];if(tied.includes(hv))return hv;return tied.sort((a,b)=>Math.abs(a-hv)-Math.abs(b-hv))[0];}
+function netDvSummary(){const a=[];for(let i=1;i<4;i++){if(!NET.roster[i])continue;const v=NET.dvs[i];a.push(NET.roster[i]+'＝'+(v==null?'未選択':DIFF[v].n));}return a.join('・')||'なし';}
+function myVote(i){if(!NET.on){setRunDL(i);}else if(NET.host){NET.dvs[0]=i;netSendRoster();}else{NET.dvs[NET.slot]=i;netSend({t:'dv',v:i});}
+ try{tone(660,880,.05,.07,'square');}catch(e){}try{mpMeUI();}catch(e){}try{stDiffUI();}catch(e){}}
+function dvChips(id){const el=$(id);if(!el)return;const mine=NET.on?(NET.dvs[NET.slot]!=null?NET.dvs[NET.slot]:(NET.host?DL:null)):DL;
+ const cnt=[0,0,0,0,0];if(NET.on)for(let i=0;i<4;i++){const v=NET.dvs[i];if((i===0||NET.roster[i])&&v!=null)cnt[v]++;}
+ el.innerHTML=DIFF.map((D,i)=>'<button type="button" class="dfc'+(i===mine?' on':'')+'" data-d="'+i+'" style="--dc:'+D.col+'"><b>'+D.n+'</b><i class="pp">'+[0,1,2,3,4].map(k=>'<u class="'+(k<=i?'y':'')+'"></u>').join('')+'</i>'+(NET.on&&netCount()>1?'<em class="dvN'+(cnt[i]?' y':'')+'">'+cnt[i]+'票</em>':'')+'</button>').join('');
+ for(const b of el.querySelectorAll('.dfc'))b.addEventListener('click',e=>{e.stopPropagation();myVote(+b.dataset.d);});}
+function stDiffUI(){const bx=$('stDiffBox');if(!bx)return;const last=wave>=WAVES.length;bx.style.display=last?'none':'';if(last)return;
+ $('stDiffH').textContent=NET.on&&netCount()>1?'次のステージの難易度（希望を投票・多数決／同数はホストが決定）':'次のステージの難易度';dvChips('stDiff');}
+function mpMeUI(){const box=$('mpMe');if(!box)return;const inRoom=NET.on&&(NET.host?!!NET.code:NET.slot>0);box.style.display=inRoom?'':'none';if(!inRoom)return;
+ const me=NET.slot||0,mine=NET.pcs[me];
+ $('mpCols').innerHTML=PAL.map((c,k)=>{const taken=NET.pcs.some((v,i)=>i!==me&&(i===0||NET.roster[i])&&v===k);return '<button type="button" class="mpCol'+(k===mine?' on':'')+(taken?' tk':'')+'" data-k="'+k+'" title="'+PALN[k]+'" style="--pc:'+PALC[k]+'"'+(taken?' disabled':'')+'></button>';}).join('');
+ for(const b of $('mpCols').querySelectorAll('.mpCol'))b.addEventListener('click',e=>{e.stopPropagation();const k=+b.dataset.k;try{localStorage.setItem('seCol',String(k));}catch(err){}
+  if(NET.host){NET.pcs[0]=k;netApplyCols();netSendRoster();}else{NET.pcs[me]=k;netApplyCols();netSend({t:'pc',v:k});mpMeUI();}});
+ try{const L=(SAVE.load||['std']).filter(id=>WEAPONS[id]&&wOwned(id)).slice(0,3);$('mpLoad').innerHTML=L.map(id=>{const W=WEAPONS[id];return '<span class="mpW"><img alt="" src="'+wIcon(id)+'"><b style="color:'+(W.t>=0?TCOL[W.t]:'#ddd')+'">'+wLabel(id)+'</b></span>';}).join('');}catch(e){}dvChips('mpDv');}
+if(window.__TEST__){window.__NET=NET;window.__DL=()=>DL;}
+$('mpEq').addEventListener('click',e=>{e.stopPropagation();openBarracks('eq');});
+$('brkClose').addEventListener('click',()=>{try{mpMeUI();}catch(e){}});
 /* ---------- バージョン表示と更新 ---------- */
-const GAME_VER='1.11';
+const GAME_VER='1.14';
 function verCmp(a,b){const x=String(a).split('.').map(Number),y=String(b).split('.').map(Number);for(let i=0;i<Math.max(x.length,y.length);i++){const d=(x[i]||0)-(y[i]||0);if(d)return d>0?1:-1;}return 0;}
 function hardReload(){try{saveGame();}catch(e){}const u=location.pathname+'?r='+Date.now()+location.hash;try{location.replace(u);}catch(e){location.reload();}}
 let VER_NEW=null;
@@ -5689,7 +5741,7 @@ function dropWeapon_v71(x,z,id){
 }
 function dropPickup(type,x,z,wid,life,field){
  if(NET.on&&!NET.host&&!NET.pk)return;
- if(type==='wpn')wid='box';
+ x=clamp(x,-BOUND+10,BOUND-10);z=clamp(z,-BOUND+10,BOUND-10);if(type==='wpn')wid='box';
  const grp=new THREE.Group(),box=new THREE.Group();
  const col=type==='wpn'?WEAPONS[wid].col:ITEMCOL[type];
  const B=c=>new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:.75,roughness:.4,metalness:.2});
@@ -5706,8 +5758,9 @@ function dropPickup(type,x,z,wid,life,field){
  const pil=new THREE.Mesh(new THREE.CylinderGeometry(.4,.4,28,8,1,true),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.3,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));pil.position.y=14;grp.add(pil);
  const rg=new THREE.Mesh(new THREE.RingGeometry(1.3,1.8,24),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.8,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));rg.rotation.x=-Math.PI/2;rg.position.y=.08;grp.add(rg);
  box.position.y=1.5;grp.add(box);grp.position.set(x,0,z);scene.add(grp);
- const pk={m:grp,box,type,wid,x,z,t:0,life:life||(type==='wpn'?35:14),field:!!field,nid:++NET.t};pickups.push(pk);
- if(NET.host)netSendAll({t:'pu',i:pk.nid,ty:type,x:r1(x),z:r1(z),w:wid||0,l:Math.round(pk.life),f:field?1:0});
+ if(pickups.length>=70){let fi=-1,fd=-1;for(let k=0;k<pickups.length;k++){const q=pickups[k];if(q.field)continue;const dd=Math.hypot(q.x-P.x,q.z-P.z);if(dd>fd){fd=dd;fi=k;}}if(fi>=0&&fd>60){scene.remove(pickups[fi].m);pickups.splice(fi,1);}}
+ const pk={m:grp,box,type,wid,x,z,t:0,life:Infinity,field:!!field,nid:++NET.t};pickups.push(pk);
+ if(NET.host)netSendAll({t:'pu',i:pk.nid,ty:type,x:r1(x),z:r1(z),w:wid||0,l:0,f:field?1:0});
  return pk;
 }
 function updatePickups(dt){
@@ -5921,7 +5974,7 @@ function showStageClear(){
  const nw=nx?Object.keys(nx.c).filter(k=>!prev.has(k)).map(k=>TYPES[k].n):[];
  $('stNew').textContent=nx?(nx.boss?'次のステージ：母艦（UFO）襲来！':(nw.length?'次のステージ新登場：'+nw.join('・'):'次のステージ：さらに激しい戦い')+(nx.mid?'　中ボス出現':'')):'';
  $('stNext').textContent='STAGE '+(n+1)+' へ出撃';
- $('stage').classList.remove('hide');$('hud').style.display='none';setTimeout(()=>{try{if(state==='clear')openBoxes();}catch(e){}},900);
+ $('stage').classList.remove('hide');$('hud').style.display='none';try{stDiffUI();}catch(e){}setTimeout(()=>{try{if(state==='clear')openBoxes();}catch(e){}},900);
  try{const sv=$('stSave'),bt=$('stBtns');if(sv&&sv.classList&&sv.lastChild){sv.classList.remove('done');sv.lastChild.textContent='オートセーブ中です…';bt.classList.add('wait');
   setTimeout(()=>{try{saveGame();}catch(e){}sv.classList.add('done');sv.lastChild.textContent='オートセーブ完了（STAGE '+n+' まで記録しました）';bt.classList.remove('wait');},1300);}}catch(e){}
  if(document.exitPointerLock)try{document.exitPointerLock();}catch(e){}lockWanted=false;
@@ -5930,6 +5983,7 @@ function showStageClear(){
 function nextStage(){
  if(state!=='clear')return;
  if(NET.on&&!NET.host&&!NET.rx)return;
+ if(NET.host&&netCount()>1){const d0=DL,d=netDiffDecide();setRunDL(d);if(d!==d0)toast('多数決で次のステージは「'+DIFF[d].n+'」になりました','#ffd070');}
  if(NET.host)netHostStart(wave+1,true);
  NET.overSent=false;NET.rezT=0;
  $('stage').classList.add('hide');
@@ -6570,9 +6624,9 @@ function tickTurretStock(dt){
 
 /* ---- vehicles ---- */
 const VDEF={
- tank:{n:'戦車',css:'#9aca6a',time:42,hp:520,speed:9,r:2.5,red:.45,cam:{h:3.6,d:11,side:.8}},
- heli:{n:'ヘリ',css:'#7ab8ff',time:36,hp:340,speed:17,r:2.4,red:.6,cam:{h:3.2,d:14,side:.8}},
- mech:{n:'ロボ',css:'#ff8a5a',time:48,hp:900,speed:11,r:3.4,red:.3,cam:{h:10,d:20,side:1.6}}
+ tank:{n:'戦車',css:'#b0743a',time:42,hp:520,speed:9,r:2.5,red:.45,cam:{h:3.6,d:11,side:.8}},
+ heli:{n:'ヘリ',css:'#5a86ff',time:36,hp:340,speed:17,r:2.4,red:.6,cam:{h:3.2,d:14,side:.8}},
+ mech:{n:'ロボ',css:'#b07aff',time:48,hp:900,speed:11,r:3.4,red:.3,cam:{h:10,d:20,side:1.6}}
 };
 const COOL=26;
 let veh=null;
@@ -6838,7 +6892,7 @@ function fireVehicle(dt){
 const chests=[];
 const CHEST_HOME=[{type:'tank',x:-14,z:-6},{type:'heli',x:14,z:-6},{type:'mech',x:0,z:-20}];
 function makeChest(col){
- const g=new THREE.Group(),Wd=sm(0x6a3a1e,.8,.1),Gd=sm(0xe8b830,.35,.8),Dk=sm(0x2a2218,.7,.3);
+ const g=new THREE.Group(),Wd=sm(new THREE.Color(col).multiplyScalar(.62).getHex(),.7,.15),Gd=sm(0xe8b830,.35,.8),Dk=sm(0x2a2218,.7,.3);
  const glow=new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:.9,roughness:.4});
  mk(g,BOX,Wd,2.0,.9,1.3,0,.45,0);
  for(const x of[-.8,.8])mk(g,BOX,Gd,.14,.95,1.36,x,.46,0);
@@ -6855,8 +6909,9 @@ function makeChest(col){
 }
 for(const h of CHEST_HOME){
  const css=VDEF[h.type].css,col=parseInt(css.slice(1),16),m=makeChest(col);cast(m.g);
+ let mini=null;try{mini=(h.type==='tank'?makeTank:h.type==='heli'?makeHeli:makeMech)().g;mini.scale.setScalar(h.type==='tank'?.2:h.type==='heli'?.15:.12);mini.position.y=1.9;m.g.add(mini);m.core.scale.setScalar(.01);}catch(e){console.warn(e);}
  m.g.position.set(h.x,0,h.z);m.g.visible=false;scene.add(m.g);
- chests.push({type:h.type,x:h.x,z:h.z,g:m.g,lid:m.lid,pil:m.pil,core:m.core,base:m.base,col,state:'ready',cd:0,cdMax:1,open:0,t:rnd(0,6)});
+ chests.push({type:h.type,x:h.x,z:h.z,g:m.g,lid:m.lid,pil:m.pil,core:m.core,base:m.base,col,mini,state:'ready',cd:0,cdMax:1,open:0,t:rnd(0,6)});
 }
 function updateChests(dt){
  const now=performance.now();
@@ -6864,12 +6919,12 @@ function updateChests(dt){
   c.t+=dt;
   if(c.state==='cool'){
    c.cd-=dt;
-   c.pil.visible=false;c.core.visible=false;c.base.visible=true;c.base.material.opacity=.15;c.lid.rotation.x=0;c.g.scale.setScalar(.85);
+   c.pil.visible=false;c.core.visible=false;if(c.mini)c.mini.visible=false;c.base.visible=true;c.base.material.opacity=.15;c.lid.rotation.x=0;c.g.scale.setScalar(.85);
    if(c.cd<=0&&!(NET.on&&!NET.host)){c.state='ready';placeChest(c);c.g.scale.setScalar(1);ring(c.x,0,c.z,6,.5);for(let k=0;k<16;k++)emit(c.x,1,c.z,rnd(-5,5),rnd(2,9),rnd(-5,5),c.col,.35,.7,8,true);toast(VDEF[c.type].n+' の宝箱が復活！',VDEF[c.type].css);tone(500,1500,.3,.2,'sine');}
   }else if(c.state==='ready'){
    c.g.visible=true;c.g.scale.setScalar(1);c.pil.visible=true;c.core.visible=true;c.base.visible=true;
    c.pil.material.opacity=.2+.1*Math.sin(c.t*4);c.base.material.opacity=.5+.3*Math.sin(c.t*5);
-   c.g.rotation.y=Math.sin(c.t*.8)*.12;c.core.scale.set(.7+.1*Math.sin(c.t*6),.5,.5);
+   c.g.rotation.y=Math.sin(c.t*.8)*.12;if(c.mini){c.mini.visible=true;c.mini.rotation.y=c.t*1.6;c.mini.position.y=1.95+Math.sin(c.t*2.2)*.15;c.core.scale.setScalar(.01);}else c.core.scale.set(.7+.1*Math.sin(c.t*6),.5,.5);
    c.lid.rotation.x=c.open>0?(1-Math.max(0,c.open)/.45)*1.9:.04+Math.max(0,Math.sin(c.t*2.5))*.06;
    if(c.open>0){
     c.open-=dt;
@@ -6901,7 +6956,7 @@ function updateFires(dt){
 }
 
 /* ---- random placement / field items ---- */
-const ITEMCOL={med:0x5dff8a,rkt:0xffa83a,max:0xff3ad0},ITEMCSS={med:'#5dff8a',rkt:'#ffa83a',max:'#ff6ae0'};
+const ITEMCOL={med:0x4dff7a,rkt:0xff4a3a,max:0xff4ad8},ITEMCSS={med:'#4dff7a',rkt:'#ff6a5a',max:'#ff6ae0'};
 const ITEMNAME={med:'＋回復',rkt:'ロケット補給',max:'♥最大ライフUP'};
 function randStreet(minD,avoid){
  for(let i=0;i<80;i++){
@@ -6915,7 +6970,7 @@ function randStreet(minD,avoid){
 function placeChest(c){const p=randStreet(34,chests.filter(k=>k!==c));c.x=p.x;c.z=p.z;c.g.position.set(p.x,0,p.z);}
 let fieldT=0;
 function spawnFieldItem_v71(){
- const r=Math.random(),type=r<.36?'med':r<.66?'wpn':(r<.8&&P.maxhp<200)?'max':'rkt',p=randStreet(14);
+ const r=Math.random(),type=r<.45?'med':r<.8?'wpn':(P.maxhp<200)?'max':'med',p=randStreet(14);
  dropPickup(type,p.x,p.z,undefined,70,true);
 }
 function updateFieldItems(dt){
@@ -7733,7 +7788,7 @@ function netSendAll(d,ex){
  if(!NET.host){if(!NET.rx)netSend(d);return;}
  for(const c of NET.conns)if(c!==ex&&c.open&&c.slot&&!c.pend)try{c.send(d);}catch(e){}
 }
-function netSendRoster(){if(!NET.host)return;netRosterExtra();const m={t:'r',r:NET.roster,ids:NET.ids,vo:NET.vos};for(const c of NET.conns)if(c.open&&c.slot)try{c.send(m);}catch(e){}netRoomUI();}
+function netSendRoster(){if(!NET.host)return;netRosterExtra();const m={t:'r',r:NET.roster,ids:NET.ids,vo:NET.vos,pc:NET.pcs,dv:NET.dvs};for(const c of NET.conns)if(c.open&&c.slot)try{c.send(m);}catch(e){}netRoomUI();}
 /* ---------- 画面 ---------- */
 function netStat(msg,err){const el=$('mpStat');if(!el)return;el.textContent=msg||'';el.classList.toggle('err',!!err);}
 function netCount(){return 1+NET.roster.slice(1).filter(Boolean).length;}
@@ -7751,6 +7806,7 @@ function netRoomUI(){
   if(i===NET.slot)d.classList.add('me');L.appendChild(d);}
  $('mpMsg').textContent=NET.host?'仲間がそろったら出撃！（全員が同じステージで始まります）':'ホストの出撃を待っています。始まると自動で画面が切り替わります。';
  {const n=Math.min(MAXST,SAVE.max+1),b=$('mpGoCont');if(b)b.textContent=SAVE.max>0?'続きから出撃（STAGE '+n+'）':'STAGE 1 で出撃';const nb=$('mpGoNew');if(nb)nb.style.display=SAVE.max>0?'':'none';}
+ try{mpMeUI();}catch(e){}
  {const h=$('mpCodeH');if(h)h.textContent=NET.host?'このコードを仲間に伝えてください':'この部屋に参加中です';}
  netVoteUI();
  const b=$('mpBadge');if(b)b.textContent='部屋 '+NET.code+'　'+netCount()+'人で協力プレイ中'+(NET.host?'（あなたがホスト）':'（ホストの出撃待ち）');
@@ -7761,7 +7817,7 @@ function netWaitMsg(){netOpenPanel('ホストの出撃を待っています。�
 function netHost(retry){
  netReset();
  const code=String(1000+Math.floor(Math.random()*9000));
- Object.assign(NET,{on:true,host:true,slot:0,code,roster:[NET.name,null,null,null]});
+ Object.assign(NET,{on:true,host:true,slot:0,code,roster:[NET.name,null,null,null]});NET.pcs=[myColPref()||0,1,2,3];if(NET.pcs[0]>=1&&NET.pcs[0]<=3)NET.pcs[NET.pcs[0]]=0;NET.dvs=[SAVE.diff,null,null,null];netApplyCols();
  netStat('部屋を作っています…');netRoomUI();
  if(netUseBC()){
   const ch=new BroadcastChannel('se-'+code);NET.bc=ch;
@@ -7797,7 +7853,7 @@ function netOnHost(c,d){
    if(c.slot)return;
    let sl=0;for(let i=1;i<4;i++)if(!NET.roster[i]){sl=i;break;}
    if(!sl){try{c.send({t:'full'});}catch(e){}setTimeout(()=>{try{c.close();}catch(e){}},500);return;}
-   c.slot=sl;c.name=netClean(d.n);NET.roster[sl]=c.name;c.pend=netPlaying()||state==='clear';
+   c.slot=sl;c.name=netClean(d.n);{const used=NET.pcs.filter((v,i)=>i!==sl&&NET.roster[i]);if(used.includes(NET.pcs[sl]))NET.pcs[sl]=[0,1,2,3,4,5,6,7].find(k=>!used.includes(k));NET.dvs[sl]=null;netApplyCols();}NET.roster[sl]=c.name;c.pend=netPlaying()||state==='clear';
    c.send({t:'wel',s:sl,r:NET.roster,code:NET.code,pend:c.pend?1:0});
    netSendRoster();
    if(state!=='title')toast(c.name+' が参加しました（次のステージから一緒に戦います）','#8affc0');
@@ -7819,6 +7875,8 @@ case 'bt':if(!c.pend&&boss&&boss.tur&&boss.tur[d.i|0])hitTurret(boss.tur[d.i|0],
   case 'vo':c.vo=d.v?1:0;netSendRoster();break;
   case 'vt':c.vt=+d.v||0;netVotesAll();if(state!=='play')toast((c.name||'仲間')+'：'+(c.vt===1?'続けたい':c.vt===2?'やめたい':'休憩したい'),PCSS[c.slot]);break;
   case 'ins':if(c.slot){NET.ins[c.slot]=d.v;netSendInsAll();}break;
+  case 'pc':{const k=d.v|0;if(c.slot&&k>=0&&k<PAL.length&&!NET.pcs.some((v,i)=>i!==c.slot&&NET.roster[i]&&v===k)){NET.pcs[c.slot]=k;netApplyCols();}netSendRoster();break;}
+  case 'dv':{const v=d.v|0;if(c.slot&&v>=0&&v<5){NET.dvs[c.slot]=v;netSendRoster();try{stDiffUI();}catch(e){}}break;}
   case 'nm':c.name=netClean(d.n);NET.roster[c.slot]=c.name;const a2=allies[c.slot-1];if(a2&&a2.remote===c.slot)a2.hn=c.name;netSendRoster();break;
  }
 }
@@ -7834,7 +7892,7 @@ function netHostStart(n,isNext){
 function netDrop(c){
  const i=NET.conns.indexOf(c);if(i>=0)NET.conns.splice(i,1);
  if(!c.slot)return;
- NET.roster[c.slot]=null;for(const ch of chests)if(ch.state==='use'&&ch.ru===c.slot){ch.state='cool';ch.cd=ch.cdMax=COOL;ch.g.visible=true;ch.ru=0;}
+ NET.roster[c.slot]=null;NET.dvs[c.slot]=null;for(const ch of chests)if(ch.state==='use'&&ch.ru===c.slot){ch.state='cool';ch.cd=ch.cdMax=COOL;ch.g.visible=true;ch.ru=0;}
  const a=allies[c.slot-1];
  if(a&&a.remote===c.slot){a.remote=0;a.hn='';a.net=null;a.down=false;a.hp=a.maxhp;a.rez=0;if(a.vm){scene.remove(a.vm.g);a.vm=null;}netSkin(a);a.g.visible=true;
   if(state==='play'){const sy=Math.sin(P.yaw),cy=Math.cos(P.yaw);a.x=P.x+cy*a.ox+sy*a.oz;a.z=P.z-sy*a.ox+cy*a.oz;collide(a,.7);}}
@@ -7850,7 +7908,7 @@ function netOutro(){
 /* ---------- 参加する（参加者） ---------- */
 function netJoin(code){
  netReset();
- Object.assign(NET,{on:true,host:false,slot:0,code});
+ Object.assign(NET,{on:true,host:false,slot:0,code});NET.pcs=[0,1,2,3];NET.dvs=[null,null,null,null];netApplyCols();
  netStat('部屋を探しています…');netRoomUI();
  const to=setTimeout(()=>{if(NET.on&&!NET.host&&!NET.slot&&NET.code===code)netFail('部屋が見つかりませんでした。ルームコードと、ホストが部屋を開いたままかを確認してください。');},14000);
  if(netUseBC()){
@@ -7878,12 +7936,12 @@ function netRx(fn){NET.rx=true;try{fn();}finally{NET.rx=false;}}
 function netOnClient(d){
  if(!d||!d.t)return;
  switch(d.t){
-  case 'wel':NET.slot=d.s;NET.roster=d.r;netRoomUI();netAttachCalls();
+  case 'wel':NET.slot=d.s;NET.roster=d.r;netRoomUI();netAttachCalls();netSend({t:'dv',v:SAVE.diff});{const pc=myColPref();if(pc!=null)netSend({t:'pc',v:pc});}
    netStat(d.pend?'参加しました。ホストはプレイ中なので、次のステージから一緒に戦います。':'参加しました。ホストの出撃を待っています。');break;
   case 'full':netFail('この部屋は満員です（最大4人）。');break;
   case 'vts':NET.votes=d.v||[];netVoteUI();break;
   case 'insr':NET.ins=d.v||NET.ins;insRemote();break;
-  case 'r':NET.roster=d.r;NET.ids=d.ids||[];NET.vos=d.vo||[];netRoomUI();netVoiceSync();break;
+  case 'r':NET.roster=d.r;NET.ids=d.ids||[];NET.vos=d.vo||[];if(d.pc)NET.pcs=d.pc;if(d.dv)NET.dvs=d.dv;netApplyCols();try{stDiffUI();}catch(e){}netRoomUI();netVoiceSync();break;
   case 'start':NET.dl=d.d;try{netSendIns();}catch(e){}NET.myVote=0;NET.votes=[];$('mp').classList.add('hide');netRx(()=>startGame(d.n));break;
   case 'next':NET.dl=d.d;NET.myVote=0;NET.votes=[];
    if(state==='clear')netRx(()=>nextStage());
@@ -8119,9 +8177,9 @@ try{
 
 /* ---------- v58 : プレイヤー色・目立つ表示・追従・意思表示 ---------- */
 const PCOL=[0xffffff,0xff4ab4,0x8aff3a,0xffa41a],PCSS=['#ffffff','#ff4ab4','#8aff3a','#ffa41a'],PNAME=['ホワイト','ピンク','ライム','オレンジ'];
-function trooperFor(si,gm){const col=PCOL[si]||0xffffff;return si===0?makeTrooper(0xff7a1a,gm||sm(0x22242c,.4,.7),{OL:0xe9edf2,OD:0xc2cad4,GM:0x353d4a,TAN:0x8fa0b4}):makeTrooper(col,gm||sm(0x22242c,.4,.7),{OL:col,OD:darkC(col,.62),GM:0x2a2d36,TAN:0xe6ecf2});}
-function ownSkin(){const want=(NET.on&&NET.slot>0)?NET.slot:0;
- if(_plr.altS!==want){if(_plr.alt){pm.remove(_plr.alt.g);_plr.alt=null;}if(want){const t=trooperFor(want,matK);cast(t.g);t.g.position.set(0,0,0);pm.add(t.g);_plr.alt=t;}for(const c of _plr.base)c.visible=!want;_plr.altS=want;}
+function trooperFor(si,gm){const col=PCOL[si]||0xffffff;return si===0&&!(NET.pcs&&NET.pcs[0]>0)?makeTrooper(0xff7a1a,gm||sm(0x22242c,.4,.7),{OL:0xe9edf2,OD:0xc2cad4,GM:0x353d4a,TAN:0x8fa0b4}):makeTrooper(col,gm||sm(0x22242c,.4,.7),{OL:col,OD:darkC(col,.62),GM:0x2a2d36,TAN:0xe6ecf2});}
+function ownSkin(){const want=(NET.on&&NET.slot>0)?NET.slot:(NET.on&&NET.pcs&&NET.pcs[0]>0?4:0);
+ if(_plr.altS!==want){if(_plr.alt){pm.remove(_plr.alt.g);_plr.alt=null;}if(want){const t=trooperFor(want===4?0:want,matK);cast(t.g);t.g.position.set(0,0,0);pm.add(t.g);_plr.alt=t;}for(const c of _plr.base)c.visible=!want;_plr.altS=want;}
  const t=_plr.alt;if(!t)return;t.legL.rotation.copy(legL.rotation);t.legL.position.copy(legL.position);t.legR.rotation.copy(legR.rotation);t.legR.position.copy(legR.position);t.gun.rotation.copy(gun.rotation);t.gun.position.copy(gun.position);if(_plr.fl&&t.fl)t.fl.visible=_plr.fl.visible;}
 const _rgGeo=new THREE.RingGeometry(1.0,1.3,40),_bmGeo=new THREE.CylinderGeometry(.16,.16,14,8,1,true);
 function darkC(c,k){const r=(c>>16)&255,g=(c>>8)&255,b=c&255;return (Math.round(r*k)<<16)|(Math.round(g*k)<<8)|Math.round(b*k);}
