@@ -13446,6 +13446,74 @@ if(window.__TEST__)window.GWGAP=()=>{if(typeof GWS==='undefined'||!GWS)return 'n
   if(!cov(x,z,false)){if(!run)rs=[x|0,z|0];run++;}else{if(run>1)gaps.push(rs.concat([run,cov(rs[0],rs[1],true)?'deadcov':'nocov']));run=0;}}}
  const G=(typeof GWGATE!=='undefined'&&GWGATE)?[GWGATE.x|0,GWGATE.z|0]:null;return {cnt,gaps,G,mega:M.length};};
 if(window.__TEST__)window.GWPTS=()=>GWS?GWS.filter(p=>Math.abs(p[0])<BOUND&&Math.abs(p[1])<BOUND).map(p=>[p[0],p[1],terrH(p[0],p[1])]):null;
+if(window.__TEST__)window.__SPT=(N)=>{let fb=0,ds=[];for(let i=0;i<N;i++){const p=spawnPos();if(p.x===-BOUND+4&&p.z===-BOUND+4)fb++;else ds.push(Math.hypot(p.x-P.x,p.z-P.z));}return {fb,rate:(fb/N*100).toFixed(1)+'%'};};
+
+/* ===================== v1.99 バランス調整・出現・オンライン ===================== */
+
+/* ---------- 1. 武器：★（区分）で威力・装弾数・リロード・連射が決まる元の方式に戻す ----------
+   v1.34 の「★5 Lv99 で威力6.5倍・同時ロック20発」をやめ、★ごとの差（TIER）を主にする。
+   レベルは同じ★の中での小さな上積み（威力 最大+12%、装弾 +8%、リロード -5%）だけ */
+const W99_LOCK=[3,4,5,6,8],W99_HDM=[1,.95,.9,.85,.8];
+{const _ws=wStat;wStat=function(id){const W=WEAPONS[id];if(!W||W.t<0||!WTY[W.b])return _ws(id);
+ const B=WTY[W.b],T=TIER[Math.max(0,W.t)],Q=WSP[W.b]||{},t=Math.max(0,W.t),R=LVR[t];
+ const L=Math.max(1,Math.min(99,wLv(id)||R[0])),f=Math.max(0,Math.min(1,(L-R[0])/Math.max(1,R[1]-R[0])));
+ const hm=W.b==='homing',dq=hm?W99_HDM[t]:(Q.dm?Q.dm[t]:1);
+ const s={dmg:B.dmg*T.dm*dq*(1+.12*f),mag:Math.max(2,Math.round(B.mag*T.mg*(1+.08*f))),rl:B.rl*T.rl*(1-.05*f),rate:B.rate*T.rt*(1-.03*f),ac:T.ac,lv:L,t};
+ if(Q.pel)s.pel=Q.pel[t];if(Q.R)s.R=Q.R[t];if(Q.rng)s.rng=Q.rng[t];if(hm){s.lock=W99_LOCK[t];s.lt=Q.lt?Q.lt[t]:.1;}return s;};}
+
+/* ---------- 2. 敵の数：重いときに敵を大きく減らさない（見た目の軽量化を先に効かせる） ---------- */
+/* 負荷の自動調整で敵を減らす割合を小さく（旧：最大4割減 → 最大2割減） */
+GOVC=[1,.95,.88,.8];
+/* スマホは基本の出現数を引き上げる（画質 低／中／高 で 0.4/0.5/0.58 → 0.55/0.65/0.74 相当） */
+{const _gk=GOVK,TB=[1.38,1.3,1.28];GOVK=function(){return _gk()*(isTouch?TB[Math.max(0,Math.min(2,GQ))]:1);};}
+/* 重いときは、崩れた建物の物理破片の数を先に減らす（スマホ：最大70 → 段階に応じて45/30） */
+{const TRIM=[999,60,45,30];const trimTorb=()=>{try{if(!isTouch||!GOV||!GOV.lv||typeof TORB==='undefined')return;const mx=TRIM[GOV.lv];
+  if(TORB.length>mx){const old=TORB.splice(0,TORB.length-mx);for(const b of old){WR.remove(b.g);b.g.traverse(o=>{if(o.geometry)o.geometry.dispose();});}}}catch(e){}};
+ const _bw=buildWorld0;buildWorld0=function(){const r=_bw.apply(this,arguments);try{worldTick.push(trimTorb);}catch(e){}return r;};}
+/* 出現位置：建物の中ばかりで決まらないとき、地図の隅に出すのをやめ、近くの空いた場所に出す */
+{const _sp=spawnPos;spawnPos=function(){const p=_sp();if(!(p.x===-BOUND+4&&p.z===-BOUND+4))return p;
+ for(let i=0;i<40;i++){const a=Math.random()*6.283,d=rnd(34,120),x=clamp(P.x+Math.cos(a)*d,-BOUND+3,BOUND-3),z=clamp(P.z+Math.sin(a)*d,-BOUND+3,BOUND-3);
+  if(Math.hypot(x-P.x,z-P.z)<30)continue;if(!insideBuilding(x,z,1.2))return{x,z};}
+ const a=Math.random()*6.283;return{x:clamp(P.x+Math.cos(a)*60,-BOUND+3,BOUND-3),z:clamp(P.z+Math.sin(a)*60,-BOUND+3,BOUND-3)};};}
+
+/* 難易度に応じて、1面あたりの敵の総数も増やす（激戦 +14%・惨劇 +26%・地獄 +36%。平穏・戦場はそのまま） */
+function W99_MULT(){try{return Math.max(1,1+(DF().cap-1)*.8);}catch(e){return 1;}}
+{const _bq=buildWaveQueue;buildWaveQueue=function(n,k){const q=_bq(n,k),m=W99_MULT();if(m>1&&q.length){const add=Math.round(q.length*(m-1)),sm=q.filter(t=>TYPES[t]&&!TYPES[t].big);
+  for(let i=0;i<add;i++){const t=sm.length?sm[Math.floor(Math.random()*sm.length)]:q[0];q.splice(Math.floor(Math.random()*(q.length+1)),0,t);}}return q;};}
+{const _sw=startWave;startWave=function(n){const r=_sw.apply(this,arguments);try{const m=W99_MULT(),W=WAVES[n-1];if(m>1&&W&&W.w)STAGE_TOTAL=W.w.reduce((a,b)=>a+b+Math.round(b*(m-1)),0);}catch(e){}return r;};}
+
+/* ---------- 2b. 国の登場演出（国旗・国名）：画面上のステージ番号ではなく、街の元の番号で判定する ----------
+   v1.63 の並び替え後も見える番号で判定していたため、67面でエジプト、68面でスペイン…と別の国の旗と名前が出ていた */
+ctTitle=function(n){try{const C=CT_BY[SLOT(n)];if(!C)return;const el=$('ctT');el.querySelector('.cf').style.backgroundImage='url('+flagCv(C.fl,240,160).toDataURL()+')';
+ el.querySelector('.cst').textContent='STAGE '+n+'　｜　WORLD OPERATION';el.querySelector('.cn').textContent=C.co;el.querySelector('.ce').textContent=C.en;el.querySelector('.cy').innerHTML=C.city+'<small>'+C.cen+'</small>';
+ el.classList.remove('on');void el.offsetWidth;el.classList.add('on');}catch(e){}};
+{const _sw=startWave;startWave=function(n){const r=_sw.apply(this,arguments);try{CTT.pend=CT_BY[SLOT(n)]?n:0;}catch(e){}return r;};}
+if(window.__TEST__)window.__CTT=()=>{const o=[];for(let n=1;n<=MAXST;n++){const C=CT_BY[SLOT(n)];if(C)o.push(n+':'+C.co+'/'+C.city+'='+stageName(n));}return o;};
+
+/* ---------- 3. オンライン：携帯回線（docomo 等）でもつながるよう、中継サーバー（TURN）を設定 ----------
+   ・同じWi-Fiなら端末どうしが直接つながるが、携帯回線どうし・回線が違う場合は中継が必要
+   ・ポート80/443・TCP・TLS（暗号化）の中継を用意し、携帯回線や会社のネットワークでも通りやすくする
+   ・NET_METERED に Metered（metered.ca）の無料アカウントの アプリ名 と APIキー を入れると、そちらを優先して使う */
+var NET_METERED={app:'',key:''};
+var NET_ICE=[
+ {urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},
+ {urls:['turn:eu-0.turn.peerjs.com:3478','turn:us-0.turn.peerjs.com:3478'],username:'peerjs',credential:'peerjsp'}];
+async function netIcePrep(){
+ /* Metered のAPIキーがあれば、正式な中継サーバー一覧を取得 */
+ if(NET_METERED.app&&NET_METERED.key){try{const r=await fetch('https://'+NET_METERED.app+'.metered.live/api/v1/turn/credentials?apiKey='+encodeURIComponent(NET_METERED.key));
+  if(r.ok){const a=await r.json();if(Array.isArray(a)&&a.length){NET_ICE=a.concat(NET_ICE);NET_ICE._src='metered';return;}}}catch(e){}}
+ /* なければ Open Relay の共有の入口（24時間有効の合言葉を端末で作る） */
+ try{if(!(window.crypto&&crypto.subtle))return;const user=String(Math.floor(Date.now()/1000)+86400),enc=new TextEncoder();
+  const k=await crypto.subtle.importKey('raw',enc.encode('openrelayprojectsecret'),{name:'HMAC',hash:'SHA-1'},false,['sign']);
+  const sig=await crypto.subtle.sign('HMAC',k,enc.encode(user)),cred=btoa(String.fromCharCode(...new Uint8Array(sig))),H='staticauth.openrelay.metered.ca';
+  NET_ICE=[{urls:'stun:'+H+':80'},{urls:['turn:'+H+':80','turn:'+H+':80?transport=tcp','turn:'+H+':443','turns:'+H+':443?transport=tcp'],username:user,credential:cred}].concat(NET_ICE);NET_ICE._src='openrelay';}catch(e){}}
+try{netIcePrep();}catch(e){}
+/* PeerJS を作るときに、必ず上の中継サーバー一覧を渡す */
+(function(){try{if(typeof peerjs==='undefined'||!peerjs.Peer||peerjs.Peer._ice)return;const P0=peerjs.Peer;
+ const NP=function(id,opt){if(id&&typeof id==='object'&&opt===undefined){opt=id;id=undefined;}opt=Object.assign({},opt||{});
+  opt.config=Object.assign({},opt.config||{},{iceServers:NET_ICE.slice(),iceCandidatePoolSize:2});return id===undefined?new P0(opt):new P0(id,opt);};
+ NP.prototype=P0.prototype;NP._ice=1;Object.keys(P0).forEach(k=>{try{NP[k]=P0[k];}catch(e){}});peerjs.Peer=NP;}catch(e){console.warn('ice',e);}})();
+if(window.__TEST__)window.__W99={ice:()=>({src:NET_ICE._src||'default',n:NET_ICE.length,urls:NET_ICE.map(s=>[].concat(s.urls).join(' '))}),ws:id=>wStat(id),spt:N=>{let c=0;for(let i=0;i<N;i++){const p=spawnPos();if(p.x===-BOUND+4&&p.z===-BOUND+4)c++;}return c;},setDL:d=>setDL(d),govk:()=>GOVK(),mult:()=>W99_MULT(),total:()=>STAGE_TOTAL,ql:()=>queue.length};
 
 if(window.__TEST__)window.__nk={KJ,kjSpawn,KJAI,nkDemoTick,nkBomberModel,NK,nkOffer,nkClaim,nkStart,nkRun,nkBest,nkFrame,scene,get WR(){return WR},get chests(){return chests},get webs(){return webs}};
 /* ---------- バージョン表示と更新 ---------- */
