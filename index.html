@@ -13565,6 +13565,13 @@ function netIceTest(){return new Promise(res=>{let pc;const R={host:0,srflx:0,re
 if(window.__TEST__)window.__ICET=()=>netIceTest();
 if(window.__TEST__)window.__CFSET=u=>{NET_CF_URL=u;NET_ICE_T=0;return netIceFresh().then(()=>({src:NET_ICE._src||'default',n:NET_ICE.length}));};
 
+/* ---------- 4. 前のステージの「全ての敵の排除を確認」が、次のステージ開始時にもう一度出る不具合（v2.00a） ----------
+   表示が終わっても目印（on）が残り、結果画面のあと画面が再表示されたときに演出が最初から再生されていた。
+   演出が終わったら目印を外し、ステージ開始時にも念のため外す */
+(function(){try{['hqOrd','kjT','streak'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('animationend',()=>el.classList.remove('on'));});}catch(e){}})();
+{const _sw2=startWave;startWave=function(){try{['hqOrd','kjT'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('on');});}catch(e){}return _sw2.apply(this,arguments);};}
+if(window.__TEST__)window.__ACT=()=>['hqOrd','kjT'].map(id=>{const el=document.getElementById(id);return id+':'+(el?el.className:'-');}).join(',');
+
 if(window.__TEST__)window.__nk={KJ,kjSpawn,KJAI,nkDemoTick,nkBomberModel,NK,nkOffer,nkClaim,nkStart,nkRun,nkBest,nkFrame,scene,get WR(){return WR},get chests(){return chests},get webs(){return webs}};
 /* ---------- バージョン表示と更新 ---------- */
 const GAME_VER='1.94';
