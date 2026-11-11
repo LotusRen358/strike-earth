@@ -13494,26 +13494,76 @@ if(window.__TEST__)window.__CTT=()=>{const o=[];for(let n=1;n<=MAXST;n++){const 
    ・同じWi-Fiなら端末どうしが直接つながるが、携帯回線どうし・回線が違う場合は中継が必要
    ・ポート80/443・TCP・TLS（暗号化）の中継を用意し、携帯回線や会社のネットワークでも通りやすくする
    ・NET_METERED に Metered（metered.ca）の無料アカウントの アプリ名 と APIキー を入れると、そちらを優先して使う */
-var NET_METERED={app:'',key:''};
-var NET_ICE=[
- {urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},
- {urls:['turn:eu-0.turn.peerjs.com:3478','turn:us-0.turn.peerjs.com:3478'],username:'peerjs',credential:'peerjsp'}];
+var NET_METERED={app:'strike-earth',key:'baf422583e35968a91e9ac33547b7988a1f0'};
+/* 2026-11-12 中継は Cloudflare の TURN（無料枠 1,000GB）に切り替え。
+   秘密の鍵はゲームに書かず、Cloudflare Workers の小さなプログラム（cf_turn_worker.js）が3時間有効の通行証を発行する。
+   NET_CF_URL にその Workers の住所（https://〜.workers.dev）を入れると使われる */
+var NET_CF_URL='';
+var NET_ICE_BASE=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}];
+var NET_ICE=NET_ICE_BASE.slice();
+/* 2026-11-12 実回線で確認：PeerJS 標準の中継（eu-0/us-0.turn.peerjs.com）は住所が存在せず、Open Relay の共有の入口も応答なし */
+var NET_ICE_T=0,NET_ICE_P=null;
+function netIceNorm(a){const o=[];(Array.isArray(a)?a:[a]).forEach(s=>{if(!s||!s.urls)return;const u=[].concat(s.urls).filter(x=>!/:53(\?|$)/.test(x));if(u.length)o.push(Object.assign({},s,{urls:u}));});return o;}
 async function netIcePrep(){
- /* Metered のAPIキーがあれば、正式な中継サーバー一覧を取得 */
+ if(NET_CF_URL){try{const r=await fetch(NET_CF_URL,{cache:'no-store'});if(r.ok){const tx=await r.text();const j=JSON.parse(tx);const a=netIceNorm(j&&j.iceServers);
+   if(a.length){NET_ICE=a.concat(NET_ICE_BASE);NET_ICE._src='cloudflare';NET_ICE_T=Date.now();return;}}}catch(e){}}
  if(NET_METERED.app&&NET_METERED.key){try{const r=await fetch('https://'+NET_METERED.app+'.metered.live/api/v1/turn/credentials?apiKey='+encodeURIComponent(NET_METERED.key));
-  if(r.ok){const a=await r.json();if(Array.isArray(a)&&a.length){NET_ICE=a.concat(NET_ICE);NET_ICE._src='metered';return;}}}catch(e){}}
- /* なければ Open Relay の共有の入口（24時間有効の合言葉を端末で作る） */
- try{if(!(window.crypto&&crypto.subtle))return;const user=String(Math.floor(Date.now()/1000)+86400),enc=new TextEncoder();
-  const k=await crypto.subtle.importKey('raw',enc.encode('openrelayprojectsecret'),{name:'HMAC',hash:'SHA-1'},false,['sign']);
-  const sig=await crypto.subtle.sign('HMAC',k,enc.encode(user)),cred=btoa(String.fromCharCode(...new Uint8Array(sig))),H='staticauth.openrelay.metered.ca';
-  NET_ICE=[{urls:'stun:'+H+':80'},{urls:['turn:'+H+':80','turn:'+H+':80?transport=tcp','turn:'+H+':443','turns:'+H+':443?transport=tcp'],username:user,credential:cred}].concat(NET_ICE);NET_ICE._src='openrelay';}catch(e){}}
-try{netIcePrep();}catch(e){}
+  if(r.ok){const a=await r.json();if(Array.isArray(a)&&a.length){NET_ICE=a.concat(NET_ICE_BASE);NET_ICE._src='metered';NET_ICE_T=Date.now();}}}catch(e){}}}
+/* 通行証は3時間で切れるので、2時間以上たっていたら部屋を作る／入る直前に取り直す（最大6秒待つ） */
+function netIceFresh(){if(!(NET_CF_URL||NET_METERED.key))return Promise.resolve();
+ if(NET_ICE_T&&Date.now()-NET_ICE_T<2*3600e3)return Promise.resolve();
+ if(!NET_ICE_P)NET_ICE_P=netIcePrep().finally(()=>{NET_ICE_P=null;});
+ return Promise.race([NET_ICE_P,new Promise(r=>setTimeout(r,6000))]);}
+try{netIceFresh();}catch(e){}
 /* PeerJS を作るときに、必ず上の中継サーバー一覧を渡す */
 (function(){try{if(typeof peerjs==='undefined'||!peerjs.Peer||peerjs.Peer._ice)return;const P0=peerjs.Peer;
  const NP=function(id,opt){if(id&&typeof id==='object'&&opt===undefined){opt=id;id=undefined;}opt=Object.assign({},opt||{});
   opt.config=Object.assign({},opt.config||{},{iceServers:NET_ICE.slice(),iceCandidatePoolSize:2});return id===undefined?new P0(opt):new P0(id,opt);};
  NP.prototype=P0.prototype;NP._ice=1;Object.keys(P0).forEach(k=>{try{NP[k]=P0[k];}catch(e){}});peerjs.Peer=NP;}catch(e){console.warn('ice',e);}})();
 if(window.__TEST__)window.__W99={ice:()=>({src:NET_ICE._src||'default',n:NET_ICE.length,urls:NET_ICE.map(s=>[].concat(s.urls).join(' '))}),ws:id=>wStat(id),spt:N=>{let c=0;for(let i=0;i<N;i++){const p=spawnPos();if(p.x===-BOUND+4&&p.z===-BOUND+4)c++;}return c;},setDL:d=>setDL(d),govk:()=>GOVK(),mult:()=>W99_MULT(),total:()=>STAGE_TOTAL,ql:()=>queue.length};
+
+/* ---------- 3b. オンライン：つながらない原因が分かるように（待ち時間の延長・状態の表示・通信テスト） ---------- */
+/* 中継サーバー経由は、直接つながる時より準備に時間がかかるため、待ち時間を 14秒 → 30秒 に。
+   つながらなかった時は、どの段階で止まったか（部屋の確認・通信路の確立）を表示する */
+function netIceInfo(pc){try{if(!pc)return'';const s=pc.iceConnectionState||'-',g=pc.iceGatheringState||'-';return '（通信路：'+({new:'準備前',checking:'確認中',connected:'接続',completed:'接続',failed:'失敗',disconnected:'切断',closed:'終了'}[s]||s)+'・候補集め：'+({new:'前',gathering:'中',complete:'完了'}[g]||g)+'）';}catch(e){return'';}}
+netJoin=function(code){
+ netReset();Object.assign(NET,{on:true,host:false,slot:0,code});netStat('部屋を探しています…');netRoomUI();
+ let found=false;
+ const to=setTimeout(()=>{if(!(NET.on&&!NET.host&&!NET.slot&&NET.code===code))return;const pc=NET.hc&&NET.hc.peerConnection;
+  netFail(found?'部屋は見つかりましたが、通信路をつなげませんでした'+netIceInfo(pc)+'。下の「つながらないときは」→「通信テスト」で、この端末から中継サーバーが使えるか確認してください。':'部屋が見つかりませんでした。ルームコードと、ホストが部屋を開いたままか（ホストの画面を閉じたり別のアプリに切り替えたりしていないか）を確認してください。');},30000);
+ if(netUseBC()){const id='c'+Math.random().toString(36).slice(2,8),ch=new BroadcastChannel('se-'+code);NET.bc=ch;NET.id=id;const c=mkConnBC(ch,id,'host');NET.hc=c;netClientConn(c);
+  ch.onmessage=ev=>{const m=ev.data;if(!m||m.to!==id)return;if(m.bye){c.open=false;c.emit('close');return;}c.emit('data',m.d);};ch.postMessage({f:id,to:'host',hello:1});setTimeout(()=>c.send({t:'hi',n:NET.name}),60);return;}
+ if(typeof peerjs==='undefined'||!peerjs.Peer){clearTimeout(to);netFail('通信の部品を読み込めませんでした。ページを再読み込みしてください。');return;}
+ let p;try{p=new peerjs.Peer({debug:0});}catch(e){clearTimeout(to);netFail('この端末・ブラウザでは通信を始められませんでした。');return;}
+ NET.peer=p;
+ p.on('open',()=>{if(NET.peer!==p)return;const c=p.connect(NET_PFX+code,{reliable:true,serialization:'json'});NET.hc=c;netClientConn(c);
+  /* 相手から応答（通信路の準備）が始まったら「部屋は見つかった」とみなす */
+  const watch=setInterval(()=>{const pc=c.peerConnection;if(!pc)return;if(pc.remoteDescription){found=true;netStat('部屋が見つかりました。通信路をつないでいます…（携帯回線では中継サーバー経由のため、20秒ほどかかることがあります）');clearInterval(watch);}},300);
+  setTimeout(()=>clearInterval(watch),31000);
+  c.on('open',()=>{clearInterval(watch);c.send({t:'hi',n:NET.name});});});
+ p.on('disconnected',()=>{if(NET.peer===p&&NET.on)try{p.reconnect();}catch(e){}});
+ p.on('error',err=>{if(NET.peer!==p)return;const t=err&&err.type;if(NET.slot&&(t==='network'||t==='server-error'||t==='socket-error'||t==='socket-closed'))return;
+  clearTimeout(to);netFail(t==='peer-unavailable'?'部屋が見つかりませんでした。ルームコードを確認してください（ホストが画面を閉じたり、別のアプリに切り替えたりすると部屋が消えます）。':'接続できませんでした（'+(t||'不明')+'）。電波の良い場所で、もう一度お試しください。');});
+};
+{const _h=netHost,_j=netJoin;
+ netHost=function(){const a=arguments;if(netUseBC()||(NET_ICE_T&&Date.now()-NET_ICE_T<2*3600e3)||!(NET_CF_URL||NET_METERED.key))return _h.apply(this,a);
+  netStat('中継サーバーを準備しています…');netIceFresh().then(()=>_h.apply(this,a));};
+ netJoin=function(){const a=arguments;if(netUseBC()||(NET_ICE_T&&Date.now()-NET_ICE_T<2*3600e3)||!(NET_CF_URL||NET_METERED.key))return _j.apply(this,a);
+  netStat('中継サーバーを準備しています…');netIceFresh().then(()=>_j.apply(this,a));};}
+/* 通信テスト：この端末から、直接接続用（STUN）と中継（TURN）の候補が取れるかを調べる */
+function netIceTest(){return new Promise(res=>{let pc;const R={host:0,srflx:0,relay:0,rp:new Set()};try{pc=new RTCPeerConnection({iceServers:NET_ICE.slice()});}catch(e){res({err:String(e)});return;}
+ pc.onicecandidate=e=>{if(!e.candidate||!e.candidate.candidate)return;const c=e.candidate.candidate,m=/ typ (\w+)/.exec(c),t=m?m[1]:'';if(R[t]!==undefined)R[t]++;if(t==='relay'){const pr=/ (udp|tcp) /i.exec(c);R.rp.add(pr?pr[1].toLowerCase():'?');}};
+ const fin=()=>{try{pc.close();}catch(e){}R.rp=[...R.rp];res(R);};pc.onicegatheringstatechange=()=>{if(pc.iceGatheringState==='complete')fin();};
+ try{pc.createDataChannel('t');pc.createOffer().then(o=>pc.setLocalDescription(o)).catch(()=>fin());}catch(e){fin();}setTimeout(fin,12000);});}
+(function(){try{const nt=document.querySelector('details.mpNote');if(!nt)return;const d=document.createElement('div');d.className='mpIceT';
+ d.innerHTML='<button class="btn sb" id="mpIceB" type="button">通信テスト</button><div id="mpIceR" style="margin-top:6px;line-height:1.6"></div>';nt.appendChild(d);
+ const st=document.createElement('style');st.textContent='.mpIceT{margin-top:8px}.mpIceT .ok{color:#8affc0;font-weight:700}.mpIceT .ng{color:#ff9a8a;font-weight:700}';(document.head||document.body).appendChild(st);
+ document.getElementById('mpIceB').addEventListener('click',async e=>{e.stopPropagation();const r=document.getElementById('mpIceR');r.textContent='調べています…（最大12秒）';await netIceFresh();const R=await netIceTest();
+  if(R.err){r.innerHTML='<span class="ng">この端末では通信の仕組みが使えません</span>';return;}
+  r.innerHTML='直接接続の準備（STUN）：'+(R.srflx?'<span class="ok">使える</span>':'<span class="ng">使えない</span>')+'<br>中継サーバー（TURN）：'+(R.relay?'<span class="ok">使える（'+R.rp.join('・')+'）</span>':'<span class="ng">使えない</span>')+
+   '<br><small>中継：'+({cloudflare:'設定済み（Cloudflare）',metered:'設定済み（Open Relay）'}[NET_ICE._src]||'未設定')+'</small>'+(R.relay?'':'<br>中継が使えないと、携帯回線と別のネットワークの間はつながりません。結果を開発者にお知らせください。');});}catch(e){}})();
+if(window.__TEST__)window.__ICET=()=>netIceTest();
+if(window.__TEST__)window.__CFSET=u=>{NET_CF_URL=u;NET_ICE_T=0;return netIceFresh().then(()=>({src:NET_ICE._src||'default',n:NET_ICE.length}));};
 
 if(window.__TEST__)window.__nk={KJ,kjSpawn,KJAI,nkDemoTick,nkBomberModel,NK,nkOffer,nkClaim,nkStart,nkRun,nkBest,nkFrame,scene,get WR(){return WR},get chests(){return chests},get webs(){return webs}};
 /* ---------- バージョン表示と更新 ---------- */
