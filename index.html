@@ -5902,13 +5902,13 @@ function nkCloudF(F,dt){
  if(!F.mini&&T<3&&sr<NK_R*1.15){for(let k=0;k<6;k++){const a=Math.random()*6.283;emit(F.x+Math.cos(a)*sr,rnd(.5,3),F.z+Math.sin(a)*sr,Math.cos(a)*rnd(6,18),rnd(2,7),Math.sin(a)*rnd(6,18),Math.random()<.5?0x9a8a76:0x6e625a,rnd(1.6,3.6),rnd(1.2,2.2),2,false);}}
  // キノコ雲
  const cy=26+170*(1-Math.exp(-T/3.6)),cr=14+50*(1-Math.exp(-T/3.2)),tube=cr*.55,stR=7+7*(1-Math.exp(-T/3)),fire=Math.exp(-T/3.4);
- const fade=T>70?Math.max(0,1-(T-70)/30):1;F.cm.opacity=fade;F.cm.emissive.setRGB(.95*fire+.06,.42*fire+.025,.07*fire);
+ const fade=T>35?Math.max(0,1-(T-35)/15):1;F.cm.opacity=fade;F.cm.emissive.setRGB(.95*fire+.06,.42*fire+.025,.07*fire);
  _nkSm.setRGB(.5,.46,.43);let n=0;
  for(const q of F.P2){let x,y,z,sz,heat=0;
   if(q.k===0){const h=q.h;y=h*cy;const rr=stR*(1-.3*h)*(.4+q.r*.8);x=Math.cos(q.a+T*.3)*rr;z=Math.sin(q.a+T*.3)*rr;sz=(stR*.9+3)*q.s*(1+h*.4);heat=1-h;}
   else if(q.k===1){const ph=q.b+T*.9,R2=cr+Math.cos(ph)*tube*.8;x=Math.cos(q.a)*R2;z=Math.sin(q.a)*R2;y=cy+Math.sin(ph)*tube*.6;sz=tube*.55*q.s;heat=Math.max(0,-Math.sin(ph));}
   else if(q.k===2){const rr=cr*.9*q.r;x=Math.cos(q.a)*rr;z=Math.sin(q.a)*rr;y=cy+tube*.5+Math.sqrt(Math.max(0,1-q.r*q.r))*tube*.9;sz=tube*.6*q.s;heat=.2;}
-  else{const rr=Math.min(NK_R*1.05,NK_SHOCK*T*(.75+q.r*.3));x=Math.cos(q.a)*rr;z=Math.sin(q.a)*rr;y=3+q.r*5;sz=(5+Math.min(10,T*2))*q.s*(T<1?T:1);heat=0;}
+  else{const rr=Math.min(NK_R*1.05,NK_SHOCK*T*(.75+q.r*.3));x=Math.cos(q.a)*rr;z=Math.sin(q.a)*rr;y=3+q.r*5;sz=.001;heat=0;}
   if(T<.35){sz*=T/.35;}
   _nkO.position.set(x,y,z);_nkO.rotation.set(q.b+T*.2,q.a,0);_nkO.scale.setScalar(Math.max(.01,sz));_nkO.updateMatrix();F.puffs.setMatrixAt(n,_nkO.matrix);
   const hf=Math.min(1,fire*(.6+.8*heat*q.hot)+(q.k===1?heat*.25*Math.exp(-T/12):0));
@@ -5968,7 +5968,7 @@ function nkCine(dt){
  const bm=NK.bm;if(bm){bm.position.set(bxp,ALT+Math.sin(t*.8)*1.2,bzp);bm.rotation.set(Math.sin(t*.6)*.04,-Math.atan2(dir.y,dir.x),0);if(bt>11)bm.visible=false;nkSpin(bm,dt);}
  // 爆弾：投下〜落下
  const TR=4.0,TF=3.3,TD=TR+TF;
- if(t>=TR&&!NK.rel){NK.rel=true;NK.r0=[bxp,ALT-2.5,bzp];NK.bomb.visible=true;tone(1500,420,TF,.14,'sine');hqSay('爆弾投下。繰り返す、爆弾投下！',3.5);cineUI(true,'爆弾投下<small>着弾まで　あと3秒</small>');}
+ if(t>=TR&&!NK.rel){NK.rel=true;NK.r0=[bxp,ALT-2.5,bzp];NK.bomb.visible=true;nkWhistle(TF);hqSay('爆弾投下。繰り返す、爆弾投下！',3.5);cineUI(true,'爆弾投下<small>着弾まで　あと3秒</small>');}
  if(NK.rel&&!NK.boom){const u=Math.min(1,(t-TR)/TF);const r=NK.r0;const x=r[0]+(d.x-r[0])*u,z=r[2]+(d.z-r[2])*u,y=r[1]*(1-u*u);NK.bomb.position.set(x,y,z);emit(x,y+1,z,rnd(-.5,.5),1.5,rnd(-.5,.5),0xf0f0f0,rnd(.9,1.5),1.4,-.6,false);if(((t*8)|0)%2)emit(x,y,z,0,0,0,0xff3020,.6,.12,0,true);
   NK.bomb.rotation.set(0,-Math.atan2(dir.y,dir.x),-Math.min(1.45,.25+u*1.3));if(u>=1){NK.bomb.visible=false;nkBoom();cineUI(true,'');}}
  // カメラ
@@ -13572,9 +13572,213 @@ if(window.__TEST__)window.__CFSET=u=>{NET_CF_URL=u;NET_ICE_T=0;return netIceFres
 {const _sw2=startWave;startWave=function(){try{['hqOrd','kjT'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('on');});}catch(e){}return _sw2.apply(this,arguments);};}
 if(window.__TEST__)window.__ACT=()=>['hqOrd','kjT'].map(id=>{const el=document.getElementById(id);return id+':'+(el?el.className:'-');}).join(',');
 
+/* ---------- 5. バージョンを常に表示（v2.01） ----------
+   タイトル・一時停止に加え、プレイ中も画面の下中央に小さく表示する（操作の邪魔にならないよう、触れても反応しない） */
+function verHudMk(){try{if(document.getElementById('verHud'))return;const hud=document.getElementById('hud');if(!hud)return;const d=document.createElement('div');d.id='verHud';d.textContent='Ver '+GAME_VER;
+ const st=document.createElement('style');st.textContent='#verHud{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom) + 2px);transform:translateX(-50%);font-size:10px;letter-spacing:.08em;color:#fff;opacity:.5;text-shadow:0 1px 2px #000;pointer-events:none;z-index:5;white-space:nowrap}';
+ (document.head||document.body).appendChild(st);hud.appendChild(d);}catch(e){}}
+verHudMk();addEventListener('load',verHudMk);setTimeout(verHudMk,1500);
+
+/* ===================== v2.02 難易度の作り直し・伝令テロップ・HUD配置・アイテム自動回収 ===================== */
+
+/* ---------- 1. 難易度 ----------
+   これまで：最大ライフは全難易度で共通・永続で、拾うほど上がり続ける（最大5000）。敵の攻撃力はステージが進んでも上がらない。
+   → ライフを稼いだあとは、どの難易度でもほとんど減らなくなっていた。
+   今回：
+   ・敵の攻撃力をステージが進むほど上げる（ST_DMG）
+   ・「そのステージで想定される最大ライフ」（LIFE_EXP）より多く持っている分は、効き目を半分ほどに抑える（敵の攻撃が比例して強くなる）
+     　→ ライフを上げた分はちゃんと有利になるが、稼ぎすぎで無敵にはならない
+   ・難易度ごとに：最大ライフUPの量／回復量／落ちているアイテムの数と間隔／敵の体力・攻撃力 を調整
+   目安：戦場＝初めてでも75面まで何とかクリアできる／地獄＝各ステージ何度も挑戦してようやくクリア */
+var B202={
+ stDmg:.05,               /* ステージ1つごとの敵攻撃力の上がり方（75面で約4.7倍） */
+ lifeBase:100,lifeStep:12,/* 想定最大ライフ = 100 + 12×(ステージ-1)  （75面で約990） */
+ over:.6,                 /* 想定より多いライフの効き目（0＝そのまま有利、1＝まったく有利にならない） */
+ /*          平穏  戦場  激戦  惨劇  地獄 */
+ life:     [  6,    5,    5,    4,    4 ],   /* 最大ライフUP 1個あたり */
+ heal:     [ .30,  .25,  .22,  .18,  .14 ],  /* 回復1個で最大ライフの何割 */
+ fieldIv:  [  5,    7,    8,   10,   13 ],   /* 落ちているアイテムが補充される間隔（秒） */
+ fieldMax: [  8,    7,    6,    5,    4 ],   /* 同時に落ちている数の上限 */
+ fieldInit:[  7,    6,    5,    4,    3 ],   /* ステージ開始時に置く数 */
+ maxRate:  [ .22,  .20,  .18,  .15,  .12 ],  /* 落ちているアイテムのうち「最大ライフUP」の割合 */
+ dmg:      [ .45,  1,   1.6,  2.5,  4.2 ],   /* 敵の攻撃力（旧：.45/1/1.5/2.2/3.2） */
+ hp:       [ .55,  1,   1.6,  2.6,  4.4 ],   /* 敵の体力（旧：.55/1/1.6/2.4/3.6） */
+ bhp:      [ .6,   1,   1.4,  2.0,  2.9 ]    /* ボスの体力（旧：.6/1/1.4/1.9/2.6） */
+};
+function B202i(){try{return Math.max(0,Math.min(4,curDL()|0));}catch(e){return 1;}}
+(function(){try{for(let i=0;i<5;i++){const D=DIFF[i];D.life=B202.life[i];D.dmg=B202.dmg[i];D.hp=B202.hp[i];D.bhp=B202.bhp[i];}}catch(e){}})();
+function LIFE_EXP(n){n=Math.max(1,n||wave||1);return B202.lifeBase+B202.lifeStep*(n-1);}
+function W202_DM(){const n=Math.max(1,wave||1);let m=1+B202.stDmg*(n-1);
+ const ex=LIFE_EXP(n),mh=Math.max(1,P.maxhp||1);if(mh>ex)m*=Math.pow(mh/ex,B202.over);return m;}
+{const _hu=hurt;hurt=function(d){if(typeof d==='number'&&!(NET&&NET.redir))d*=W202_DM();return _hu.call(this,d);};}
+/* 回復量（難易度別）は本体の回復処理を置き換え（c194.py）。ここでは毎フレームの見張り（テロップ）だけ追加 */
+{const _up=updatePickups;updatePickups=function(dt){_up(dt);telopTick(dt);};}
+/* 落ちているアイテム（難易度別の数・間隔・中身） */
+spawnFieldItem=function(){if(TRAIN.on)return;const i=B202i(),r=Math.random(),mr=B202.maxRate[i],type=r<mr?'max':r<mr+.42?'med':'wpn',p=randStreet(14);
+ dropPickup(type,p.x,p.z,type==='wpn'?'box':undefined,70,true);};
+updateFieldItems=function(dt){if(state!=='play'||paused||(NET.on&&!NET.host))return;fieldT-=dt;
+ if(fieldT<=0){const i=B202i();fieldT=B202.fieldIv[i];let n=0;for(const p of pickups)if(p.field)n++;if(n<B202.fieldMax[i])spawnFieldItem();}};
+/* ステージ開始時の初期配置数：元の処理は7個置くので、多すぎる分を取り除く */
+{const _sw3=startWave;startWave=function(){const r=_sw3.apply(this,arguments);try{const want=B202.fieldInit[B202i()];const f=pickups.filter(p=>p.field);
+  for(let k=want;k<f.length;k++){const p=f[k];p.life=0;}fieldT=B202.fieldIv[B202i()]*.6;}catch(e){}return r;};}
+if(window.__TEST__)window.__B202={B202,dm:()=>W202_DM(),exp:n=>LIFE_EXP(n),field:()=>pickups.filter(p=>p.field&&p.life>0).length,setMax:h=>{P.maxhp=P.hp=h;},pk:()=>pickups};
+
+/* ---------- 2. 伝令テロップ ----------
+   使える特殊コマンドや大事な状況を、画面上部に流れる帯でお知らせする */
+var TELOP={q:[],cur:null,el:null,said:{},chestT:0,g100:false,core:false,exRev:false};
+function telopEl(){if(TELOP.el)return TELOP.el;const hud=document.getElementById('hud');if(!hud)return null;
+ const st=document.createElement('style');st.textContent=
+ '#telop{position:fixed;left:0;right:0;top:auto;bottom:calc(env(safe-area-inset-bottom) + 16px);height:30px;display:none;pointer-events:none;z-index:60;overflow:hidden;background:linear-gradient(90deg,rgba(4,14,28,.0),rgba(4,14,28,.78) 8%,rgba(4,14,28,.78) 92%,rgba(4,14,28,0));border-top:1.5px solid var(--tc,#5dff8a);border-bottom:1.5px solid var(--tc,#5dff8a)}'+
+ '#telop.on{display:block}#telop b{position:absolute;left:0;top:0;bottom:0;z-index:2;display:flex;align-items:center;padding:0 12px 0 10px;font:900 13px/1 sans-serif;letter-spacing:.2em;color:#04121c;background:var(--tc,#5dff8a);clip-path:polygon(0 0,100% 0,88% 100%,0 100%)}'+
+ '#telop span{position:absolute;top:0;bottom:0;display:flex;align-items:center;white-space:nowrap;font:800 16px/1 sans-serif;color:#f2fff6;text-shadow:0 1px 3px #000;left:100%;will-change:transform}'+
+ 'body.touch #telop{height:26px}body.touch #telop span{font-size:14px}body.touch #telop b{font-size:11px}';
+ (document.head||document.body).appendChild(st);const d=document.createElement('div');d.id='telop';d.innerHTML='<b>伝令</b><span></span>';document.body.appendChild(d);return TELOP.el=d;}
+function telop(txt,col,key,again){try{if(key){const t=TELOP.said[key];if(t&&performance.now()-t<(again||1e9))return;TELOP.said[key]=performance.now();}
+ if(TELOP.q.some(m=>m.txt===txt)||(TELOP.cur&&TELOP.cur.txt===txt))return;TELOP.q.push({txt,col:col||'#5dff8a'});if(!TELOP.cur)telopNext();}catch(e){}}
+function telopNext(){const el=telopEl();if(!el)return;const m=TELOP.q.shift();TELOP.cur=m||null;if(!m){el.classList.remove('on');return;}
+ el.style.setProperty('--tc',m.col);const sp=el.querySelector('span');sp.textContent=m.txt;el.classList.add('on');
+ const W=el.clientWidth||innerWidth,tw=sp.scrollWidth||m.txt.length*16,dist=W+tw+20,dur=Math.max(6000,dist/150*1000);
+ sp.style.transition='none';sp.style.transform='translateX(0)';void sp.offsetWidth;sp.style.transition='transform '+dur+'ms linear';sp.style.transform='translateX('+(-dist)+'px)';
+ clearTimeout(telopNext.t);telopNext.t=setTimeout(telopNext,dur+150);}
+function telopClear(){TELOP.q.length=0;TELOP.cur=null;clearTimeout(telopNext.t);if(TELOP.el)TELOP.el.classList.remove('on');TELOP.said={};TELOP.chestT=0;TELOP.g100=false;TELOP.core=false;TELOP.exRev=false;}
+{const _sw4=startWave;startWave=function(){telopClear();return _sw4.apply(this,arguments);};}
+/* 状況を見張って、必要なときにテロップを流す（毎フレーム） */
+function telopTick(dt){if(state!=='play')return;try{
+ /* 衛星ストライク（オービタルストライク）準備完了 */
+ const full=P.gauge>=100;if(full&&!TELOP.g100)telop('衛星ストライクの準備完了！　STRIKEボタン（PC：Qキー）で発射できる','#b08aff');TELOP.g100=full;
+ /* 七色の宝箱（空爆「地獄の火炎」） */
+ if(NK&&NK.chest){TELOP.chestT-=dt;if(TELOP.chestT<=0){TELOP.chestT=25;const d=Math.round(Math.hypot(P.x-NK.chest.x,P.z-NK.chest.z));
+   telop('七色の宝箱を設置！　回収すると空爆「地獄の火炎」を要請できる（あと '+d+'m・七色の光の柱が目印）','#ffd24a');}}else TELOP.chestT=0;
+ /* 母艦のコア露出 */
+ if(boss&&!boss.dead&&boss.tur){const c=!boss.tl;if(c&&!TELOP.core)telop('母艦のコアが露出！　母艦の中心を集中攻撃せよ','#ff8a5a');TELOP.core=c;}
+ /* 脱出ポイント */
+ if(EX.rev&&!TELOP.exRev&&!EX.ready)telop('脱出ポイントを表示した。敵を減らしつつ、地図の緑の印へ向かえ','#5dff8a');TELOP.exRev=EX.rev;
+}catch(e){}}
+/* 全ての敵の排除・巨獣の接近：今までの中央の大きな表示の代わりにテロップで知らせる（画面中央をふさがない） */
+{const _fxL=kjFxLocal;kjFxLocal=function(k,a){
+ if(k==='ok'){telop('戦域内の全ての敵の排除を確認！　必要物資を回収し、脱出ポイントへ向かえ','#5dff8a');
+  try{RQ.q.length=0;RQ.t=6.8;$('hqR').classList.remove('on');rSpeak('','戦域内の全ての敵の排除を確認。必要物資を回収し、脱出ポイントへ向かえ。','hq');}catch(e){}
+  try{tone(660,990,.25,.2,'triangle');setTimeout(()=>tone(990,1320,.3,.18,'triangle'),220);}catch(e){}return;}
+ if(k==='pw')telop('前方に巨大な生体反応！　まもなく巨獣が出現する。警戒せよ','#ff5a5a');
+ return _fxL.apply(this,arguments);};}
+if(window.__TEST__)window.__TELOP=()=>({cur:TELOP.cur&&TELOP.cur.txt,q:TELOP.q.map(m=>m.txt),on:!!(TELOP.el&&TELOP.el.classList.contains('on'))});
+
+/* ---------- 3. スマホのHUD配置 ----------
+   ・縦画面：ステージ情報（STAGE 〇 / 75・母艦の砲台など）を右寄せにして、左のライフバーと重ならないように
+   ・乗り物の「降りる」ボタン：画面中央下から、左上（レーダーの下）へ。射撃・移動の指が届かない位置 */
+(function(){try{const st=document.createElement('style');st.textContent=
+ '@media (orientation:portrait){body.touch #topC{left:auto!important;right:calc(6px + env(safe-area-inset-right))!important;transform:none!important;max-width:58vw;top:calc(env(safe-area-inset-top) / .84 + 46px)!important}body.touch #bossInfo{font-size:11px!important}}'+
+ '#touch #bExit,body.touch #bExit{left:calc(12px + env(safe-area-inset-left))!important;right:auto!important;bottom:auto!important;top:calc(env(safe-area-inset-top) / .84 + 150px)!important;width:46px!important;height:46px!important}'+
+ '@media (orientation:landscape){#touch #bExit,body.touch #bExit{top:calc(env(safe-area-inset-top) / .84 + 132px)!important}}'+
+ '#hqOrd{display:none!important}';
+ (document.head||document.body).appendChild(st);}catch(e){}})();
+
+/* ---------- 4. 空爆「地獄の火炎」のお知らせもテロップに統一（v2.03） ----------
+   宝箱の設置・要請の受理・着弾後の結果を、大きな帯（showBanner）・無線の吹き出し（hqSay）・小さな通知（toast）ではなく、伝令テロップで流す。
+   爆撃中のムービーの字幕（cineUI）はそのまま */
+function W203_viaTelop(fn,col){return function(){const sb=showBanner,hs=hqSay,ts=toast;
+ showBanner=(a,b)=>telop(String(a||'').replace(/<[^>]+>/g,'')+(b?'　'+String(b).replace(/<[^>]+>/g,''):''),col);
+ hqSay=(t)=>{telop(String(t||''),col);try{rSpeak('',String(t||''),'hq');}catch(e){}};toast=()=>{};
+ try{return fn.apply(this,arguments);}finally{showBanner=sb;hqSay=hs;toast=ts;}};}
+{const _no=W203_viaTelop(nkOffer,'#ffd24a');nkOffer=function(){const r=_no.apply(this,arguments);try{if(NK&&NK.chest){const d=Math.round(Math.hypot(P.x-NK.chest.x,P.z-NK.chest.z));telop('七色の宝箱を回収すると、空爆「地獄の火炎」を要請できる（あと '+d+'m・七色の光の柱が目印）','#ffd24a');}}catch(e){}return r;};}nkClaim=W203_viaTelop(nkClaim,'#ffd24a');nkEnd=W203_viaTelop(nkEnd,'#ffb060');
+/* 宝箱の再通知（25秒ごと）は、最初の通知の直後には出さない */
+{const _tt=telopTick;telopTick=function(dt){if(NK&&NK.chest&&TELOP.chestT===0)TELOP.chestT=25;return _tt(dt);};}
+
+/* ---------- 5. スマホのHUD配置の自動調整（v2.03） ----------
+   ライフ（階級名＋LIFE＋バー）の高さは端末や階級名の長さで変わるため、実際の位置を測って
+   ・レーダーはライフバーのすぐ下
+   ・伝令テロップはレーダーとステージ情報の両方より下
+   に毎回置き直す */
+function hudFit(){try{if(!document.body.classList.contains('touch'))return;const tl=$('topL'),rd=$('radar'),tc=$('topC');if(!tl||!rd)return;
+ const z=(rd.getBoundingClientRect().height/(rd.offsetHeight||1))||1,b=tl.getBoundingClientRect().bottom;if(!b)return;
+ const want=Math.round((b+6)/z);if(Math.abs((parseFloat(rd.style.top)||0)-want)>1)rd.style.setProperty('top',want+'px','important');
+ const bx=$('bExit');if(bx){const zb=(bx.getBoundingClientRect().height/(bx.offsetHeight||1))||1,rb=rd.getBoundingClientRect().bottom;if(rb)bx.style.setProperty('top',Math.round((rb+12)/zb)+'px','important');}}catch(e){}}
+addEventListener('resize',()=>setTimeout(hudFit,120));addEventListener('orientationchange',()=>setTimeout(hudFit,350));
+{const _sw5=startWave;startWave=function(){const r=_sw5.apply(this,arguments);setTimeout(hudFit,60);setTimeout(hudFit,800);return r;};}
+setInterval(()=>{if(state==='play')hudFit();},1500);
+{const _tn=telopNext;telopNext=function(){hudFit();return _tn.apply(this,arguments);};}
+
+/* ---------- 6. 難易度をはっきり表示（v2.03） ----------
+   「STAGE 20 / 75 ［地獄］」の小さな文字を、難易度ごとの色のついた大きめのバッジに */
+(function(){try{const st=document.createElement('style');st.textContent=
+ '#waveTxt .dlB{display:inline-block;vertical-align:middle;margin-left:.45em;padding:2px 10px 3px;border-radius:5px;font-size:.92em;font-weight:900;letter-spacing:.14em;color:#fff;line-height:1.15;text-shadow:0 1px 2px rgba(0,0,0,.7);box-shadow:0 0 0 1.5px rgba(255,255,255,.55) inset}'+
+ '#waveTxt .dl0{background:#2a9ae0}#waveTxt .dl1{background:#23a957}#waveTxt .dl2{background:#d98a0a}#waveTxt .dl3{background:#e0501c}'+
+ '#waveTxt .dl4{background:linear-gradient(180deg,#ff3a4a,#a50e22);box-shadow:0 0 0 1.5px #ffd0d0 inset,0 0 10px #ff2a3a;animation:dlPulse 1.6s ease-in-out infinite}'+
+ '@keyframes dlPulse{50%{box-shadow:0 0 0 1.5px #ffd0d0 inset,0 0 18px #ff2a3a}}'+
+ '@media (orientation:portrait){body.touch #waveTxt{font-size:14px!important}body.touch #waveTxt .dlB{font-size:15px}}';
+ (document.head||document.body).appendChild(st);}catch(e){}})();
+{const _uh=updateHud;let lw='';updateHud=function(dt){const r=_uh.apply(this,arguments);try{const el=$('waveTxt'),h=el.innerHTML;
+ if(h!==lw&&h.indexOf('<small>')>=0){const i=B202i();el.innerHTML=h.replace(/<small>［?([^<］]*)］?<\/small>/,'<span class="dlB dl'+i+'">$1</span>');lw=el.innerHTML;}}catch(e){}return r;};}
+if(window.__TEST__)window.__NKO=()=>{nkOffer();return __TELOP();};
+
+
+/* ===================== v2.04 地獄の火炎の仕上げ ===================== */
+/* ---------- 1. 読み上げ：「着弾」が「ちゃくたま」になる ----------
+   読み替え表の「弾→たま」が先に効いていたため、「弾」を含む熟語を表の先頭に追加 */
+try{YOMI.unshift(['着弾','ちゃくだん'],['爆弾','ばくだん'],['砲弾','ほうだん'],['銃弾','じゅうだん'],['被弾','ひだん'],['弾薬','だんやく'],['弾丸','だんがん'],['弾道','だんどう'],['弾頭','だんとう'],['散弾','さんだん'],['榴弾','りゅうだん'],['焼夷弾','しょういだん'],['弾倉','だんそう'],['実弾','じつだん'],['跳弾','ちょうだん'],['爆弾投下','ばくだんとうか']);}catch(e){}
+if(window.__TEST__)window.__YOMI=t=>yomi(t);
+
+/* ---------- 2. ムービー中の字幕・無線もテロップに ----------
+   爆撃のムービー中に出ていた四角い字幕（「着弾確認　半径150m 壊滅」など）を伝令テロップで流す。
+   テロップは画面のいちばん手前（ムービー中も見える）に置く */
+{const _cu=cineUI;cineUI=function(on,txt){if(on&&txt&&NK&&NK.cine){telop(String(txt).replace(/<small>/g,'　').replace(/<[^>]+>/g,''),'#ffb060');return _cu(on,'');}return _cu.apply(this,arguments);};}
+nkCine=W203_viaTelop(nkCine,'#ffb060');
+
+/* ---------- 3. 落下音（v2.05 作り直し） ----------
+   v2.04 の「揺れながら下がる笛の音」は漫画のような印象になったため廃止。
+   音程のある音は使わず、巨大な物体が空気を押し分けて落ちてくる「ゴォォォ」という低い轟音だけで作る。
+   ・空気を裂く風圧（雑音の高い成分が少しずつ開いていく）
+   ・胸に響く低い唸り（低い雑音＋ごく低い振動）
+   いずれも着弾に向けて大きくなり、着弾の瞬間に断ち切る（爆発音へつながる） */
+function nkWhistle(dur){try{if(!AC||muted)return;const t=AC.currentTime,end=t+dur,out=busS||master;
+ const mk=(type,f0,f1,q,g0,g1,gStart)=>{const s=AC.createBufferSource();s.buffer=noiseBuf;s.loop=true;const f=AC.createBiquadFilter();f.type=type;f.Q.value=q;
+  f.frequency.setValueAtTime(f0,t);f.frequency.exponentialRampToValueAtTime(f1,end);const g=AC.createGain();g.gain.setValueAtTime(.0001,t);
+  g.gain.setValueAtTime(.0001,t+dur*(gStart||0));g.gain.exponentialRampToValueAtTime(g0,t+dur*Math.max(.35,gStart||0)+.01);g.gain.exponentialRampToValueAtTime(g1,end-.02);g.gain.linearRampToValueAtTime(0,end+.03);
+  s.connect(f);f.connect(g);g.connect(out);s.start(t,Math.random()*.5);s.stop(end+.1);};
+ mk('lowpass',260,1900,.7,.10,.55);        /* 風圧の轟音：こもった音から開けた音へ */
+ mk('bandpass',700,1300,.6,.04,.30,.2);     /* 空気を裂く音（音程は感じない広い帯域） */
+ mk('lowpass',90,160,.9,.12,.65,.3);         /* 低い唸り */
+ const o=AC.createOscillator();o.type='sine';o.frequency.setValueAtTime(34,t+dur*.45);o.frequency.linearRampToValueAtTime(42,end);
+ const og=AC.createGain();og.gain.setValueAtTime(.0001,t);og.gain.setValueAtTime(.0001,t+dur*.45);og.gain.exponentialRampToValueAtTime(.45,end-.02);og.gain.linearRampToValueAtTime(0,end+.03);
+ o.connect(og);og.connect(out);o.start(t);o.stop(end+.1);}catch(e){}}
+
+/* ---------- 4. 爆発の煙 ----------
+   ・キノコ雲が薄くなって消えるまでを2倍の速さに（70秒後から30秒 → 35秒後から15秒。c194.py で置き換え）
+   ・地面をはう煙の輪：これまでは半径150m付近で止まっていた → 止まらずに円が広がり続け、広がるほど薄くなって消える
+   ・煙（輪・キノコ雲の柱）に触れている敵は、0.5秒ごとにダメージを受ける */
+const NKR_N=64;
+{const _bf=nkBuildFx;nkBuildFx=function(x,z,par,mini){const F=_bf.apply(this,arguments);if(mini)return F;try{
+ const m=new THREE.MeshLambertMaterial({color:0x80766e,emissive:0x0c0906,transparent:true,opacity:0,depthWrite:true,fog:false});
+ const R=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,1),m,NKR_N);R.instanceMatrix.setUsage(THREE.DynamicDrawUsage);R.frustumCulled=false;R.count=0;R.position.set(x,0,z);(par||scene).add(R);
+ const Q=[];for(let i=0;i<NKR_N;i++)Q.push({a:i/NKR_N*6.283+rnd(-.05,.05),r:Math.random(),s:rnd(.75,1.3),b:Math.random()*6.283,v:rnd(.8,1.25)});
+ F.ring={R,m,Q,dmgT:0};}catch(e){}return F;};}
+function nkRingR(T,r,v){const R0=NK_R*(.8+.3*r),t0=R0/NK_SHOCK;return T<t0?NK_SHOCK*T:R0+(T-t0)*5*v;}
+{const _cf=nkCloudF;nkCloudF=function(F,dt){const G=F&&F.ring;_cf.apply(this,arguments);if(!G||F.T<0)return;try{
+ const T=F.T,op=Math.min(1,T/.4)*(T<20?1:Math.max(0,1-(T-20)/28));G.m.opacity=op;const dw=op>.97;if(G.m.depthWrite!==dw){G.m.depthWrite=dw;G.m.needsUpdate=true;}let n=0;
+ if(op>0.01){for(const q of G.Q){const rr=nkRingR(T,q.r,q.v),t0=NK_R*(.8+.3*q.r)/NK_SHOCK,sp=Math.max(0,T-t0);
+   _nkO.position.set(Math.cos(q.a)*rr,3+q.r*6+sp*.35,Math.sin(q.a)*rr);_nkO.rotation.set(q.b+T*.15,q.a,0);
+   _nkO.scale.setScalar(Math.max(.01,(6+Math.min(12,T*2))*q.s*(1+sp*.04)*(T<1?T:1)));_nkO.updateMatrix();G.R.setMatrixAt(n++,_nkO.matrix);}}
+ G.R.count=n;G.R.instanceMatrix.needsUpdate=true;
+ /* 煙に触れた敵へのダメージ（ホストのみ） */
+ G.dmgT-=dt;if(G.dmgT<=0&&op>.08&&!(NET.on&&!NET.host)){G.dmgT=.5;
+  const rIn=nkRingR(T,0,.8)-10,rOut=nkRingR(T,1,1.25)+14,cy=26+170*(1-Math.exp(-T/3.6)),stR=7+7*(1-Math.exp(-T/3))+10,cap=14+50*(1-Math.exp(-T/3.2))+12,cf=T<35?1:Math.max(0,1-(T-35)/15);
+  for(const e of enemies){if(e.dying)continue;const d=Math.hypot(e.x-F.x,e.z-F.z),ey=e.y||0;
+   const inRing=d>rIn&&d<rOut&&ey<30,inStem=cf>.1&&d<stR&&ey<cy,inCap=cf>.1&&d<cap&&Math.abs(ey-cy)<cap*.6;
+   if(inRing||inStem||inCap){try{hitEnemy(e,Math.max(8,(e.maxhp||100)*.07)*(inRing?op:1),{ix:e.x-F.x,iz:e.z-F.z,power:1});e.burn=Math.max(e.burn||0,1.2);}catch(err){}}}}
+ }catch(e){}};}
+{const _cx=nkClearFx;nkClearFx=function(){const F=NK.fx;try{if(F&&F.ring){F.par.remove(F.ring.R);F.ring.R.geometry.dispose();F.ring.m.dispose();F.ring=null;}}catch(e){}return _cx.apply(this,arguments);};}
+if(window.__TEST__)window.__NKR={ringR:(T,r,v)=>nkRingR(T,r,v),fx:()=>NK.fx&&{T:NK.fx.T,ring:!!NK.fx.ring,count:NK.fx.ring&&NK.fx.ring.R.count,op:NK.fx.ring&&NK.fx.ring.m.opacity},build:(x,z)=>{nkBuildFx(x,z);NK.fx.T=0;return true;}};
+
+/* ---------- v2.05 伝令テロップを画面の下端へ・プレイ以外では流さない ----------
+   ・画面中央だと邪魔なので、画面下端（操作ボタンのさらに下）に細く流す。タップは下のボタンにそのまま届く
+   ・ムービー後やステージを終えて基地画面などに戻ったら、残っているテロップは消す */
+setInterval(()=>{try{if(state!=='play'&&!(NK&&NK.cine)&&(TELOP.cur||TELOP.q.length))telopClear();}catch(e){}},400);
+{const _tn2=telopNext;telopNext=function(){try{if(state!=='play'&&!(NK&&NK.cine)){telopClear();return;}}catch(e){}return _tn2.apply(this,arguments);};}
+(function(){try{const st=document.createElement('style');st.textContent='#verHud{bottom:calc(env(safe-area-inset-bottom) + 1px)!important;font-size:9px!important}';(document.head||document.body).appendChild(st);}catch(e){}})();
+
 if(window.__TEST__)window.__nk={KJ,kjSpawn,KJAI,nkDemoTick,nkBomberModel,NK,nkOffer,nkClaim,nkStart,nkRun,nkBest,nkFrame,scene,get WR(){return WR},get chests(){return chests},get webs(){return webs}};
 /* ---------- バージョン表示と更新 ---------- */
-const GAME_VER='1.94';
+const GAME_VER='2.06';
 function verCmp(a,b){const x=String(a).split('.').map(Number),y=String(b).split('.').map(Number);for(let i=0;i<Math.max(x.length,y.length);i++){const d=(x[i]||0)-(y[i]||0);if(d)return d>0?1:-1;}return 0;}
 function hardReload(){try{saveGame();}catch(e){}const u=location.pathname+'?r='+Date.now()+location.hash;try{location.replace(u);}catch(e){location.reload();}}
 let VER_NEW=null;
@@ -13878,13 +14082,13 @@ function updatePickups(dt){
   const p=pickups[i];p.t+=dt;p.life-=dt;
   p.box.rotation.y+=dt*3;p.box.position.y=1.5+Math.sin(p.t*4)*.25;
   let d=Math.hypot(P.x-p.x,P.z-p.z)+Math.max(0,P.alt-terrH(p.x,p.z)-1.5)*4;
-  if(!P.dead&&(d<3||(p.mag&&d<14))){p.mag=true;const dx=P.x-p.x,dz=P.z-p.z,dd=Math.hypot(dx,dz)||1,st=Math.min(dd,48*dt);p.x+=dx/dd*st;p.z+=dz/dd*st;d=Math.hypot(P.x-p.x,P.z-p.z)+Math.max(0,P.alt-terrH(p.x,p.z)-1.5)*4;}
+  if(!P.dead&&(d<10||(p.mag&&d<16))){p.mag=true;const dx=P.x-p.x,dz=P.z-p.z,dd=Math.hypot(dx,dz)||1,st=Math.min(dd,48*dt);p.x+=dx/dd*st;p.z+=dz/dd*st;d=Math.hypot(P.x-p.x,P.z-p.z)+Math.max(0,P.alt-terrH(p.x,p.z)-1.5)*4;}
   else if(p.mag&&d>=14)p.mag=false;
   p.m.position.x=p.x;p.m.position.z=p.z;
   if(d<1.8&&!P.dead){
    if(p.type==='wpn')giveWeapon(p.wid);
    else{
-    if(p.type==='med'){const h=Math.max(1,Math.round(P.maxhp*.25)),b=P.hp;P.hp=Math.min(P.maxhp,P.hp+h);toast('＋ 回復 '+Math.round(P.hp-b),'#5dff8a');}
+    if(p.type==='med'){const h=Math.max(1,Math.round(P.maxhp*(typeof B202i==='function'?B202.heal[B202i()]:.25))),b=P.hp;P.hp=Math.min(P.maxhp,P.hp+h);toast('＋ 回復 '+Math.round(P.hp-b),'#5dff8a');}
     else if(p.type==='max'){lifeUp();}
     else{P.rocketStock=Math.min(5,P.rocketStock+2);toast('ロケット補給','#ffa83a');}
     sfxPick();
