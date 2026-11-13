@@ -13783,9 +13783,19 @@ setInterval(()=>{try{if(state!=='play'&&!(NK&&NK.cine)&&(TELOP.cur||TELOP.q.leng
 setInterval(()=>{try{if(NK&&NK.cine&&dnums.length)dnums.length=0;}catch(e){}},100);
 if(window.__TEST__)window.__DN=c=>{if(c!==undefined)NK.cine=c;return dnums.length;};
 
+/* ---------- v2.08 資料館（街の探索）に母艦が残る不具合 ----------
+   母艦はステージの街とは別に置かれていて、片付けは「次のステージを始めるとき」だけだった。
+   母艦の出るステージ（20面など）を遊んだあとに資料館を開くと、どの街にも母艦が浮いたままになっていた。
+   → 資料館を開く・街を切り替えるときに、母艦と爆撃の煙を片付ける */
+function w208Clean(){try{if(boss){scene.remove(boss.g);boss=null;}bossDie=0;const bi=$('bossInfo');if(bi)bi.style.display='none';const bw=$('bossWrap');if(bw)bw.style.display='none';
+ if(NK&&NK.fx)nkClearFx();}catch(e){}}
+{const _vo=vOpen;vOpen=function(){w208Clean();return _vo.apply(this,arguments);};}
+{const _vb=vBuildStage;vBuildStage=function(){w208Clean();return _vb.apply(this,arguments);};}
+if(window.__TEST__)window.__BOSS=()=>!!boss;
+
 if(window.__TEST__)window.__nk={KJ,kjSpawn,KJAI,nkDemoTick,nkBomberModel,NK,nkOffer,nkClaim,nkStart,nkRun,nkBest,nkFrame,scene,get WR(){return WR},get chests(){return chests},get webs(){return webs}};
 /* ---------- バージョン表示と更新 ---------- */
-const GAME_VER='2.07';
+const GAME_VER='2.08';
 function verCmp(a,b){const x=String(a).split('.').map(Number),y=String(b).split('.').map(Number);for(let i=0;i<Math.max(x.length,y.length);i++){const d=(x[i]||0)-(y[i]||0);if(d)return d>0?1:-1;}return 0;}
 function hardReload(){try{saveGame();}catch(e){}const u=location.pathname+'?r='+Date.now()+location.hash;try{location.replace(u);}catch(e){location.reload();}}
 let VER_NEW=null;
