@@ -13776,9 +13776,16 @@ setInterval(()=>{try{if(state!=='play'&&!(NK&&NK.cine)&&(TELOP.cur||TELOP.q.leng
 {const _tn2=telopNext;telopNext=function(){try{if(state!=='play'&&!(NK&&NK.cine)){telopClear();return;}}catch(e){}return _tn2.apply(this,arguments);};}
 (function(){try{const st=document.createElement('style');st.textContent='#verHud{bottom:calc(env(safe-area-inset-bottom) + 1px)!important;font-size:9px!important}';(document.head||document.body).appendChild(st);}catch(e){}})();
 
+/* ---------- v2.07 爆撃ムービー中はダメージの数字を出さない ----------
+   地獄の火炎のムービー中は、敵へのダメージの数字（撃破表示を含む）が画面を埋めてキノコ雲が見えなくなるため表示しない。
+   ダメージ自体はこれまでどおり与える。ムービーに入った瞬間に、残っている数字も消す */
+{const _sn=spawnNum;spawnNum=function(){if(NK&&NK.cine)return;return _sn.apply(this,arguments);};}
+setInterval(()=>{try{if(NK&&NK.cine&&dnums.length)dnums.length=0;}catch(e){}},100);
+if(window.__TEST__)window.__DN=c=>{if(c!==undefined)NK.cine=c;return dnums.length;};
+
 if(window.__TEST__)window.__nk={KJ,kjSpawn,KJAI,nkDemoTick,nkBomberModel,NK,nkOffer,nkClaim,nkStart,nkRun,nkBest,nkFrame,scene,get WR(){return WR},get chests(){return chests},get webs(){return webs}};
 /* ---------- バージョン表示と更新 ---------- */
-const GAME_VER='2.06';
+const GAME_VER='2.07';
 function verCmp(a,b){const x=String(a).split('.').map(Number),y=String(b).split('.').map(Number);for(let i=0;i<Math.max(x.length,y.length);i++){const d=(x[i]||0)-(y[i]||0);if(d)return d>0?1:-1;}return 0;}
 function hardReload(){try{saveGame();}catch(e){}const u=location.pathname+'?r='+Date.now()+location.hash;try{location.replace(u);}catch(e){location.reload();}}
 let VER_NEW=null;
