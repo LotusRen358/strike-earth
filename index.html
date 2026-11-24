@@ -7174,7 +7174,7 @@ function terrBuild(R){
  if(o===P&&veh&&veh.type==='heli'){if(P.alt<th+1.5)P.alt=th+1.5;return;}
  if(o.T){o._tx=o.x;o._tz=o.z;return;}
  const foot=(alt!==undefined&&alt!==null)?alt:(o.alt!==undefined?o.alt:0);
- if(o._tx!==undefined){const bad=(x,z)=>{const d=Math.hypot(x-o._tx,z-o._tz);return terrH(x,z)-foot>d*.9+.05;};
+ if(o._tx!==undefined){/* v2.78 乗り物は登れる急さを上げる（ロボは棚田の段も登れる、戦車は急な土手まで） */const sk=(o===P&&veh)?(veh.type==='mech'?6.5:veh.type==='tank'?2.2:.9):.9;const bad=(x,z)=>{const d=Math.hypot(x-o._tx,z-o._tz);return terrH(x,z)-foot>d*sk+.05;};
   if(bad(o.x,o.z)){const ox=o.x,oz=o.z;if(!bad(ox,o._tz)){o.z=o._tz;}else if(!bad(o._tx,oz)){o.x=o._tx;}else{o.x=o._tx;o.z=o._tz;}
    if(o===P){P.vx*=.6;P.vz*=.6;}}}
  o._tx=o.x;o._tz=o.z;
@@ -7295,7 +7295,7 @@ function riverBuild(){
  worldTick.push(dt=>{try{WATER_N.offset.set(0,WT*.02);}catch(e){}});
  /* 橋・葦・街灯 */
  const M=new Merger(),G=new Merger();
- for(const bz of brs){const L=x1-x0+4;M.add(GB,0xb8b4aa,L,.35,RW-1,cx,.17,bz);
+ for(const bz of (W279_ON?[]:brs)){const L=x1-x0+4;M.add(GB,0xb8b4aa,L,.35,RW-1,cx,.17,bz);
   for(const s of[-1,1]){M.add(GB,0x8a8478,L,.9,.35,cx,.75,bz+s*(RW/2-.6));M.add(GB,0xd8d2c4,L,.14,.5,cx,1.25,bz+s*(RW/2-.6));
    for(let x=x0;x<=x1;x+=4.5)M.add(GB,0x7a7468,.4,1.2,.5,x,.6,bz+s*(RW/2-.6));
    for(let k=-1;k<=1;k+=2){const ax=cx+k*hw*.5;M.add(GC,0x9a9488,1.1,2.4,1.1,ax,-.9,bz+s*(RW/2-2.5));}
@@ -9525,11 +9525,11 @@ function waterLower(){if(CUR_T&&CUR_T.sky)return;const RV=rivNow();if(!RV&&!SEA.
  const clr=(x0,z0,x1,z1)=>{x0=Math.max(x0,-WH);z0=Math.max(z0,-WH);x1=Math.min(x1,WH);z1=Math.min(z1,WH);if(x1<=x0||z1<=z0||!g)return;g.clearRect(GX(x0),GX(z0),(x1-x0)*MU,(z1-z0)*MU);};
  const M=new Merger(),L=new LM(M,0,0,0,0),SW=0x8a8478,SW2=0xa8a090;
  if(RV){const hw=RV.hw,cx=RV.cx,brs=(RV.br||[]).slice();if(RV.skip!==undefined&&brs.indexOf(RV.skip)<0)brs.push(RV.skip);brs.sort((a,b)=>a-b);
-  let z=-WH;for(const b of brs.concat([WH+RW])){const zb=b-RW/2;if(zb>z)clr(cx-hw,z,cx+hw,zb);z=b+RW/2;}
+  let z=-WH;for(const b of (W279_ON?[]:brs).concat([WH+RW])){const zb=b-RW/2;if(zb>z)clr(cx-hw,z,cx+hw,zb);z=b+RW/2;}
   WR.traverse(o=>{if(o.isMesh&&o.material&&o.material.normalMap===WATER_N&&o.material.opacity>.6&&o.material.opacity<.64&&Math.abs(o.position.y-.05)<.02)o.position.y=WL;});
   L.add(GB,0x3a3a30,hw*2+1,.3,WH*2,cx,BED,0);/* 川底：水面の10m下 */
   for(const s of[-1,1]){L.add(GB,SW,.9,-BED+.1,WH*2,cx+s*(hw+.45),BED/2,0);L.add(GB,SW2,1.3,.3,WH*2,cx+s*(hw+.45),.08,0);for(let zz=-WH;zz<WH;zz+=3.2)L.add(GB,0x6e695e,.06,-WL-.4,.12,cx+s*(hw-.02),WL/2,zz);for(let y=-1;y>WL;y-=1.5)L.add(GB,0x7a7468,.05,.08,WH*2,cx+s*(hw-.02),y,0);}
-  for(const b of brs){const np=Math.max(2,Math.round((hw*2+8)/18));for(let k=1;k<np;k++){const x=cx-hw-4+(hw*2+8)*k/np;L.add(GB,0xa8a090,2.4,-BED-.2,RW-3,x,BED/2-.1,b);}if(TBG&&Math.abs(TBG.z-b)<1)for(const xx of[TBG.x0-5,TBG.x1+5])L.add(GB,0x8a8478,16,-BED-.6,RW+12,xx,BED/2-.3,b);}
+  for(const b of (W279_ON?[]:brs)){const np=Math.max(2,Math.round((hw*2+8)/18));for(let k=1;k<np;k++){const x=cx-hw-4+(hw*2+8)*k/np;L.add(GB,0xa8a090,2.4,-BED-.2,RW-3,x,BED/2-.1,b);}if(TBG&&Math.abs(TBG.z-b)<1)for(const xx of[TBG.x0-5,TBG.x1+5])L.add(GB,0x8a8478,16,-BED-.6,RW+12,xx,BED/2-.3,b);}
   const T=TERR.find(t=>t.river);if(T)for(let j=0;j<T.nz;j++){const zz=T.z0+j*T.cz;if(brs.some(b=>Math.abs(zz-b)<RW/2-.5))continue;for(let i=1;i<T.nx-1;i++){const xx=T.x0+i*T.cx,ad=Math.abs(xx-cx);T.h[j*T.nx+i]=BED*Math.max(0,Math.min(1,(hw-ad)/7));}}
   WLY=WL;}
  if(SEA.length){for(const r of SEA)clr(r.x0,r.z0,r.x1,r.z1);
@@ -14289,8 +14289,8 @@ function w217Music(){
  try{if(typeof initAudio==='function')initAudio();}catch(e){}
  if(!AC)return null;
  const t0=AC.currentTime,mf=n=>440*Math.pow(2,(n-69)/12);
- const out=AC.createGain();out.gain.setValueAtTime(0.0001,t0);out.gain.exponentialRampToValueAtTime(Math.max(.05,(VOL.bgm||.6)*1.25),t0+2.5);
- const cmp=AC.createDynamicsCompressor();cmp.threshold.value=-26;cmp.knee.value=12;cmp.ratio.value=4;cmp.attack.value=.02;cmp.release.value=.4;const mk=AC.createGain();mk.gain.value=1.7;const lim=AC.createDynamicsCompressor();lim.threshold.value=-6;lim.knee.value=0;lim.ratio.value=20;lim.attack.value=.002;lim.release.value=.15;out.connect(cmp);cmp.connect(mk);mk.connect(lim);lim.connect(master);
+ const out=AC.createGain();out.gain.setValueAtTime(0.0001,t0);out.gain.exponentialRampToValueAtTime(Math.max(.05,(VOL.bgm||.6)*1.2),t0+2.5);
+ const cmp=AC.createDynamicsCompressor();cmp.threshold.value=-26;cmp.knee.value=12;cmp.ratio.value=4;cmp.attack.value=.02;cmp.release.value=.4;const mk=AC.createGain();mk.gain.value=1.5;const lim=AC.createDynamicsCompressor();lim.threshold.value=-19;lim.knee.value=0;lim.ratio.value=20;lim.attack.value=.002;lim.release.value=.15;out.connect(cmp);cmp.connect(mk);mk.connect(lim);{const pg=AC.createGain();pg.gain.value=1.25;lim.connect(pg);pg.connect(master);}
  const dry=AC.createGain();dry.gain.value=.75;dry.connect(out);
  const rv=AC.createConvolver();{const L=AC.sampleRate*3.6|0,b=AC.createBuffer(2,L,AC.sampleRate);for(let c=0;c<2;c++){const d=b.getChannelData(c);for(let i=0;i<L;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/L,2.6);}rv.buffer=b;}
  const wet=AC.createGain();wet.gain.value=.5;rv.connect(wet);wet.connect(out);
@@ -14326,18 +14326,18 @@ function w217Music(){
    if(I>=1)for(const n of ch.slice(-2))choir(n+12,t,BAR,.018+.008*I);
    if(I<=1&&mode==='calm'){const ar=[0,1,2,3,2,1,2,3];ar.forEach((k,j)=>bell(ch[k]+24,t+j*beat/2,.026));}
    if(I>=1)timp(t,.16+.05*I);
-   if(I>=3){timp(t+beat*2,.2);if(bar%2===1)for(let r=0;r<8;r++)timp(t+beat*3+r*beat/8,.06+r*.02,96);}
+   if(I>=3){timp(t+beat*2,.15);if(bar%2===1)for(let r=0;r<8;r++)timp(t+beat*3+r*beat/8,.045+r*.012,96);}
    if(I>=2&&mode!=='hero')horn(root+12,t+beat,beat*2.6,.03+.01*I);
-   if(mode==='hero'){let tt=t;for(const[n,d]of THEME[bar%4]){horn(n-12,tt,beat*d*.95,.06);tt+=beat*d;}timp(t+beat*2,.18);}
+   if(mode==='hero'){let tt=t;for(const[n,d]of THEME[bar%4]){horn(n-12,tt,beat*d*.95,.045);tt+=beat*d;}timp(t+beat*2,.18);}
    next+=BAR;bar++;}};
  const iv=(AC instanceof OfflineAudioContext)?0:setInterval(()=>sched(),100);if(iv)sched();
  return{
   pre(lim){sched(lim);},
   scene(i,at){const m=SC[Math.min(i,SC.length-1)]||SC[0],t=at||AC.currentTime;sceneT=t;if(m[0]!==mode){mode=m[0];bar=0;}I=m[1];
-   if(i===1)boom(t+4.3,.5);
-   if(i===4){swell(t,1.2,.12);boom(t+1.2,.6);}
-   if(i===5){boom(t+.05,.8);}
-   if(i===7){swell(Math.max(t,next-1.4),1.4,.15);boom(next,.9);}if(at)sched(at);},
+   if(i===1)boom(t+4.3,.32);
+   if(i===4){swell(t,1.2,.07);boom(t+1.2,.38);}
+   if(i===5){boom(t+.05,.48);}
+   if(i===7){swell(Math.max(t,next-1.4),1.4,.08);boom(next,.52);}if(at)sched(at);},
   stop(){if(!alive)return;alive=false;clearInterval(iv);const t=AC.currentTime;try{out.gain.cancelScheduledValues(t);out.gain.setValueAtTime(out.gain.value,t);out.gain.exponentialRampToValueAtTime(0.0001,t+1.6);}catch(e){}
    setTimeout(()=>{try{out.disconnect();mk.disconnect();}catch(e){}},2200);try{if(busB){busB.gain.cancelScheduledValues(t);busB.gain.setValueAtTime(0,t);busB.gain.linearRampToValueAtTime(VOL.bgm,t+1.8);}}catch(e){}}};}
 
@@ -14859,13 +14859,13 @@ function w225Lookout(pb,x,z){const WD=0x4a3a2a,RD=0x9a2a22;propAt(pb,x,z,0,1.8,1
 /* v2.73 棚田の里（ステージ2）：北は高さ約40mの高台（台地）、その南向きの斜面に棚田、南は低地（森・田畑・まばらな村）。
    高台の縁は東西にゆるく波打つ。戦場の外（w273）も同じ式で台地と北の山並みへつなぐ */
 const W273_HP=40;function w273B(x,z){const N=-z+18*Math.sin(x*.011+.7)+10*Math.sin(x*.027+2.1);const L=144*(1-.55*_sm(120,300,Math.abs(x)));return W273_HP*Math.max(0,Math.min(1,(N-8)/L));}/* v2.74 1段の奥行きを2倍（斜面 72m→144m、1段 約29m） */
-function w225Valley(pb){const NEWR=!W232_TEA;const isT=isTouch,LIM=RING-6,c=isT?1.6:1.1,STEP=W232_TEA?1.6:8,/* v2.73 棚田の里：1段 8m の高い段（崖のような急斜面） */HM=W232_TEA?17.4:19.8;const HSE=[];
+function w225Valley(pb){const NEWR=!W232_TEA;const isT=isTouch,LIM=RING-6,c=isT?1.6:1.1,STEP=W232_TEA?(W282_ON?1.8:1.6):8,/* v2.73 棚田の里：1段 8m の高い段（崖のような急斜面） */HM=W232_TEA?17.4:19.8;const HSE=[];
  /* 農道（谷底の本道＋斜面の枝道） */const ax=rnd(-30,30),MAIN=crSpline([[ax,-LIM-10],[ax+rnd(-70,-30),-LIM*.55],[ax+rnd(25,70),-LIM*.12],[ax+rnd(-55,-15),LIM*.3],[ax+rnd(15,50),LIM*.65],[ax+rnd(-20,20),LIM+10]],2.5);
  const BR=[];/* v2.76 棚田の里では枝分かれの農道を作らない */if(!NEWR)for(const t of[.3,.55,.78]){const p=MAIN[Math.floor(MAIN.length*t)],side=t===.55?-1:1,ex=side*LIM*rnd(.75,.95),ez=p[1]+rnd(-60,60);BR.push(crSpline([[p[0],p[1]],[p[0]+(ex-p[0])*.35,p[1]+rnd(-30,30)],[p[0]+(ex-p[0])*.7,ez+rnd(-25,25)],[ex,ez]],2.5));}
- if(window.__TEST__)window.__W225P={main:MAIN.length,br:BR.length};window.W273_MAIN=NEWR?MAIN:null;
+ if(window.__TEST__)window.__W225P={main:MAIN.length,br:BR.length};window.W273_MAIN=NEWR?MAIN:null;window.W282_MAIN=W232_TEA?MAIN:null;
  /* 谷底の農家（本道ぞい、交互の側に） */let nh=0;for(let k=14;k<MAIN.length-14;k+=Math.floor(rnd(14,22))){const p=MAIN[k],q=MAIN[k+1],dx=q[0]-p[0],dz=q[1]-p[1],dl=Math.hypot(dx,dz)||1,side=nh%2?1:-1,off=rnd(12,15),x=p[0]-dz/dl*off*side,z=p[1]+dx/dl*off*side;
   if(Math.abs(x)>LIM-12||Math.abs(z)>LIM-12)continue;if(NEWR&&w273B(x,z)>.3)continue;if(insideBuilding(x,z,6)||inSea(x,z,6))continue;let bad=false;for(const R of TERR)if(x>R.x0-8&&x<R.x1+8&&z>R.z0-8&&z<R.z1+8)bad=true;if(bad)continue;
-  HSE.push([x,z]);(W232_TEA?w232CnFarm:w225Minka)(pb,x,z,0,Math.atan2(dx*side,dz*side)*0+Math.round(Math.atan2(-dz/dl*side,-dx/dl*side)/(Math.PI/2))*Math.PI/2,rnd(.85,1));nh++;if(nh>=(isT?7:11))break;}
+  HSE.push([x,z]);(W232_TEA?w232CnFarm:w225Minka)(pb,x,z,0,Math.atan2(dx*side,dz*side)*0+Math.round(Math.atan2(-dz/dl*side,-dx/dl*side)/(Math.PI/2))*Math.PI/2,rnd(.85,1));nh++;if(nh>=(W282_ON?(isT?10:16):(isT?7:11)))break;}
  {const p=MAIN[Math.floor(MAIN.length*(NEWR?.82:.45))];(W232_TEA?w232Pavilion:w225Lookout)(pb,p[0]+7,p[1]+3);}
  /* 距離場（2m格子）：本道・枝道・建物/海/既存の山/外枠 */const BC=2,n=Math.ceil(2*LIM/BC)+1,ix=v=>Math.round((v+LIM)/BC);
  const seedP=P=>A=>{for(const q of P){const i=ix(q[0]),j=ix(q[1]);if(i>=0&&j>=0&&i<n&&j<n)A[j*n+i]=0;}};
@@ -14884,16 +14884,16 @@ function w225Valley(pb){const NEWR=!W232_TEA;const isT=isTouch,LIM=RING-6,c=isT?
  const X0=-LIM,Z0=-LIM,N=Math.ceil(2*LIM/c)+1,cc=2*LIM/(N-1),H=new Float32Array(N*N),B=new Float32Array(N*N),DB=new Float32Array(N*N),DMk=new Float32Array(N*N),TY=new Int8Array(N*N),TI=new Int16Array(N*N),PT=new Uint8Array(N*N),OUT=new Uint8Array(N*N),LV=new Uint8Array(N*N);let mx=0;
  for(let j=0;j<N;j++)for(let i=0;i<N;i++){const x=X0+i*cc,z=Z0+j*cc,k=j*N+i,dm=F(dM,x,z),db=F(dB,x,z),dk=F(dK,x,z);
   let inT=false;for(const R of TERR)if(x>R.x0&&x<R.x1&&z>R.z0&&z<R.z1){inT=true;break;}OUT[k]=inT?1:0;
-  let b;if(NEWR){b=w273B(x,z);/* 家は低地にしか建てないので、建物のまわりを下げる処理はいらない */}else{b=HM*Math.pow(_sm(8,165,dm),1.15)*(.82+.18*Math.sin(x*.021+ph1)*Math.sin(z*.017+ph2));for(const p of KN){const v=terrPrim(p,x,z);if(v>b)b=v;}b=Math.min(b,HM);{const e=Math.max(Math.abs(x),Math.abs(z));b*=1-_sm(BOUND+5,LIM-4,e);}
-  b*=_sm(1.5,12,dk);b*=_sm(4,11,dm);}if(!NEWR&&(i===0||j===0||i===N-1||j===N-1))b=0;B[k]=b;DB[k]=NEWR?Math.min(db,dm):db;DMk[k]=dm;}
+  let b;if(W282_ON){b=w282In(x,z,dm,dk);}else if(NEWR){b=w273B(x,z);/* 家は低地にしか建てないので、建物のまわりを下げる処理はいらない */}else{b=HM*Math.pow(_sm(8,165,dm),1.15)*(.82+.18*Math.sin(x*.021+ph1)*Math.sin(z*.017+ph2));for(const p of KN){const v=terrPrim(p,x,z);if(v>b)b=v;}b=Math.min(b,HM);{const e=Math.max(Math.abs(x),Math.abs(z));b*=1-_sm(BOUND+5,LIM-4,e);}
+  b*=_sm(1.5,12,dk);b*=_sm(4,11,dm);}if(!NEWR&&!W282_ON&&(i===0||j===0||i===N-1||j===N-1))b=0;B[k]=b;DB[k]=NEWR?Math.min(db,dm):db;DMk[k]=dm;}
  for(let j=0;j<N;j++)for(let i=0;i<N;i++){const k=j*N+i,b=B[k],db=DB[k],dm=DMk[k];
   const gx=(B[j*N+Math.min(N-1,i+1)]-B[j*N+Math.max(0,i-1)])/(2*cc),gz=(B[Math.min(N-1,j+1)*N+i]-B[Math.max(0,j-1)*N+i])/(2*cc),gr=Math.hypot(gx,gz);
-  const RF=Math.max(.08,Math.min(.6,1.5*gr/STEP));/* 法面の水平幅は約1.5m（段は高く、法面はきりっと） */
+  const RF=W282_ON?Math.max(.1,Math.min(.75,gr/.8)):Math.max(.08,Math.min(.6,1.5*gr/STEP));/* v2.82 茶の段丘：法面は歩いて登れる急さ（0.8）に *//* 法面の水平幅は約1.5m（段は高く、法面はきりっと） */
   const t=b/STEP,ti=Math.floor(t),f=t-ti,rise=f>1-RF?(f-(1-RF))/RF:0;let h=(ti+_sm(0,1,rise)*1)*STEP;
-  let ty=h<.12?0:(rise>0?2:1);if(NEWR&&b>=W273_HP-.3){h=b;ty=5;}if(NEWR&&ty!==5){/* v2.76 左右の端：段の高さの刻みをなめらかにほどき、自然な斜面へ（段の奥行きも w273B で端ほど狭く） */const xx=Math.abs(X0+(k%N)*cc),sd=_sm(LIM-140,LIM-30,xx);if(sd>0){h=h*(1-sd)+b*sd;if(sd>.5&&h>.12)ty=6;}}/* v2.77 段は端の手前でほどき終え、そこから外は外の地形と同じ色（TY=6） */
-  /* 農道：段を切り通す坂道（なめらか）、道のふちは段へなじませる */const rd=_sm(2.4,4.2,db);if(db<4.2&&b>=.12){h=b*(1-rd)+h*rd;if(db<2.6)ty=3;}
+  let ty=h<.12?0:(rise>0?2:1);if(NEWR&&b>=W273_HP-.3){h=b;ty=5;}if(NEWR&&ty!==5){/* v2.76 左右の端：段の高さの刻みをなめらかにほどき、自然な斜面へ（段の奥行きも w273B で端ほど狭く） */const xx=Math.abs(X0+(k%N)*cc),sd=_sm(LIM-140,LIM-30,xx);if(sd>0){h=h*(1-sd)+b*sd;if(sd>.5&&h>.12)ty=6;}}if(W282_ON){const sd=_sm(LIM-90,LIM-15,Math.max(Math.abs(X0+(k%N)*cc),Math.abs(Z0+Math.floor(k/N)*cc)));if(sd>0){h=h*(1-sd)+b*sd;if(sd>.5&&h>.12)ty=6;}}/* v2.77 段は端の手前でほどき終え、そこから外は外の地形と同じ色（TY=6） */
+  /* 農道：段を切り通す坂道（なめらか）、道のふちは段へなじませる *//* v2.78 棚田の里の本道は幅を広げ（約10m）、戦車でも高台まで上れる */const RS=NEWR?5.2:2.4,RE=NEWR?8.6:4.2,RC=NEWR?5:2.6;const rd=_sm(RS,RE,db);if(db<RE&&b>=.12){h=b*(1-rd)+h*rd;if(db<RC)ty=3;}
   {const x=X0+i*cc,z=Z0+j*cc;for(const P of PADS){const d=Math.hypot(x-P.x,z-P.z);if(d<P.r){h=P.y;ty=4;}else if(d<P.r+2.2&&ty!==3){const t=(d-P.r)/2.2;h=P.y*(1-t)+h*t;ty=2;}}}
-  H[k]=h<.12?0:h;TY[k]=h<.12&&ty!==4?0:ty;TI[k]=ti;PT[k]=dm<3.2?2:(db<2.6&&h>=.12?1:0);if(H[k]>mx)mx=H[k];}
+  H[k]=h<.12?0:h;TY[k]=h<.12&&ty!==4?0:ty;TI[k]=ti;PT[k]=dm<(NEWR?5.2:3.2)?2:(db<(NEWR?5:2.6)&&h>=.12?1:0);if(H[k]>mx)mx=H[k];}
  /* 畦：田面のふちで、隣が下の法面になる所を少し盛る */
  for(let j=1;j<N-1;j++)for(let i=1;i<N-1;i++){const k=j*N+i;if(TY[k]!==1)continue;const h=H[k];if((TY[k+1]===2&&H[k+1]<h-.05)||(TY[k-1]===2&&H[k-1]<h-.05)||(TY[k+N]===2&&H[k+N]<h-.05)||(TY[k-N]===2&&H[k-N]<h-.05))LV[k]=1;}
  /* 1枚ずつの田（区切りにも畦） */const PID=new Int32Array(N*N);for(let j=0;j<N;j++)for(let i=0;i<N;i++){const x=X0+i*cc,z=Z0+j*cc,ti=TI[j*N+i];
@@ -14909,7 +14909,8 @@ function w225Valley(pb){const NEWR=!W232_TEA;const isT=isTouch,LIM=RING-6,c=isT?
  const TEA=W232_TEA,YARD=0xa89a74;
  for(let j=0;j<N;j++)for(let i=0;i<N;i++){const k=j*N+i,h=H[k],x=X0+i*cc,z=Z0+j*cc;pos[k*3]=x;pos[k*3+1]=h===0?.03:h-.04;pos[k*3+2]=z;
   let hx;const ti=TI[k];
-  if(TEA&&PT[k]!==2&&PT[k]!==1&&TY[k]!==2&&TY[k]!==3){const st=Math.floor((x*.55+z*.83+3*Math.sin(x*.05))/2.2)&1;hx=TY[k]===0?(st?0x3f6e34:0x6a8a4a):(st?0x3a6a30:0x58823e);}
+  if(W282_ON&&(TY[k]===6||TY[k]===0||TY[k]===1)&&PT[k]!==2&&PT[k]!==1&&!nearHse(x,z)){hx=TY[k]===6?w282Col(x,z):TY[k]===0?w282Floor(x,z):((((x*.37+z*.61)/1.4)|0)&1?0x4e5a30:0x56603a);}
+  else if(TEA&&PT[k]!==2&&PT[k]!==1&&TY[k]!==2&&TY[k]!==3){const st=Math.floor((x*.55+z*.83+3*Math.sin(x*.05))/2.2)&1;hx=TY[k]===0?(st?0x3f6e34:0x6a8a4a):(st?0x3a6a30:0x58823e);}
   else if(TY[k]===4||(TY[k]<=1&&nearHse(x,z)))hx=YARD;
   else if(PT[k]===2||TY[k]===3)hx=PT[k]===2?PATH:PATH2;else if(TY[k]===6){hx=w273Col(x,z);}else if(TY[k]===5){/* 高台の上：草地と雑木林の地面（v2.77 外の地形 w273Outer と同じ式・同じ色でなじませる） */hx=w265Fbm(x*.02,z*.02)>.5?0x3e6430:0x5a7a38;}else if(TY[k]===0){const v=Math.floor((z+5*Math.sin(x*.045))/11),u=Math.floor((x+7*Math.sin(z*.03)+v*6.3)/17);hx=FLOOR[(((u*7+v*3)%4)+4)%4];}
   else if(TY[k]===2){const st=((ti*7+Math.floor((x+z)/38))%6+6)%6===0;hx=st?STONE[(i+j)&1]:GRASS[(i*3+j)%2];}
@@ -14926,6 +14927,7 @@ function w225Valley(pb){const NEWR=!W232_TEA;const isT=isTouch,LIM=RING-6,c=isT?
    if(!window.W225_WMAT)window.W225_WMAT=new THREE.MeshStandardMaterial({color:0x6aa2b4,roughness:.05,metalness:.15,transparent:true,opacity:.5,normalMap:WATER_N||null,normalScale:new THREE.Vector2(.12,.12),depthWrite:false});
    const wm=new THREE.Mesh(wg,window.W225_WMAT);wm.renderOrder=2;WR.add(wm);if(window.__TEST__)window.__PADDY=wi.length/6;}}
  const HL=KN.slice();/* 斜面の農家・松の目安：段のある所を広く使う */for(let q=0;q<8;q++){const a=q/8*6.283;HL.push({x:Math.cos(a)*LIM*.62,z:Math.sin(a)*LIM*.62,r:LIM*.35});}
+ if(W282_ON)try{w282Hedges({X0,Z0,N,cc,B,H,TY,TI,PT,STEP,nearHse,LIM});}catch(e){console.warn('w282 hedges',e);}
  W225_TER={T,HL,TY,TI,PADS};if(window.__TEST__)window.__PADS=PADS;
  /* 稲株・畦の石・あぜの彼岸花 */const M=pb.a;let nr=0,ns=0;
  for(let q=0;q<(isT?1400:3200)&&nr<(isT?320:800);q++){const x=rnd(-LIM,LIM),z=rnd(-LIM,LIM),h=terrH(x,z);if(h<1)continue;const e=.5,sl=Math.abs(terrH(x+e,z)-h)+Math.abs(terrH(x,z+e)-h)+Math.abs(terrH(x-e,z)-h)+Math.abs(terrH(x,z-e)-h);if(sl>.02)continue;nr++;M.add(GB,Math.random()<.5?0x6aa040:0x7cb24a,.35,.55,.35,x,h+.25,z);}
@@ -17142,7 +17144,7 @@ function w273Outer(){const LIM=RING-6,S=1500,C=10,n=Math.round(2*S/C)+1,H=new Fl
 function w273Trees(){const LIM=RING-6,NT=isTouch?2600:6400,cone=new THREE.ConeGeometry(1,1,6).translate(0,.5,0),blob=new THREE.DodecahedronGeometry(1,0).scale(1,.85,1).translate(0,1,0);
  const mC=new THREE.InstancedMesh(cone,new THREE.MeshStandardMaterial({roughness:1,flatShading:true}),NT),mB=new THREE.InstancedMesh(blob,new THREE.MeshStandardMaterial({roughness:1,flatShading:true}),NT),o=new THREE.Object3D(),C=new THREE.Color();let kc=0,kb=0;
  const TC=[0x2e5228,0x37602e,0x2a4a26],TB=[0x3e6a30,0x4a7a36,0x56843a,0x8a6a2a,0x9a4a26];
- const MP=window.W273_MAIN||[],nearMain=(x,z)=>{for(let i=0;i<MP.length;i+=2){const p=MP[i];if(Math.abs(p[0]-x)<5.5&&Math.abs(p[1]-z)<5.5)return true;}return false;};const flatAt=(x,z)=>{const h=terrH(x,z);return Math.abs(terrH(x+2,z)-h)+Math.abs(terrH(x,z+2)-h)<.6;};
+ const MP=window.W273_MAIN||[],nearMain=(x,z)=>{for(let i=0;i<MP.length;i+=2){const p=MP[i];if(Math.abs(p[0]-x)<9&&Math.abs(p[1]-z)<9)return true;}return false;};const flatAt=(x,z)=>{const h=terrH(x,z);return Math.abs(terrH(x+2,z)-h)+Math.abs(terrH(x,z+2)-h)<.6;};
  /* 戦場の中を先に（枠を分けて）植え、残りを外へ */const IN=isTouch?900:2200;let ni=0;for(let t=0;t<NT*10&&(kc<NT||kb<NT);t++){const pin=ni<IN&&t%2===0;const x=pin?rnd(-LIM,LIM):rnd(-1100,1100),z=pin?rnd(-LIM,LIM):rnd(-1100,700);const inside=Math.abs(x)<LIM&&Math.abs(z)<LIM;let h,dens;
   if(inside){h=terrH(x,z);/* 戦場の中：台地の上（雑木林）と南の低地の森のかたまりだけ。棚田（斜面）・道・家には植えない */const hb=w273B(x,z);if(hb>1&&hb<W273_HP-.4)continue;
    const f=w265Fbm(x*.018+5,z*.018);dens=hb>1?(f>.5?.95:.18):(z>40&&f>.52?.95:(f>.6?.6:0));if(Math.random()>dens)continue;/* v2.76 見えない道の線（碁盤の目）では避けない。見える農道（本道）と家だけ避ける */try{if(insideBuilding(x,z,4))continue;}catch(e){}if(nearMain(x,z))continue;if(!flatAt(x,z))continue;}
@@ -17161,9 +17163,1160 @@ function w273Hamlets(){const pb=new PB(detMat),LIM=RING-6;let nh=0,nv=0;const V=
 if(window.__TEST__)window.__T73D=()=>{let a=0,r=0,b=0,f=0,t=0;for(let q=0;q<4000;q++){const x=rnd(-RING+6,RING-6),z=rnd(-RING+6,-120);const hb=w273B(x,z);if(hb<W273_HP-.4)continue;a++;try{if(onRoad(x,z,-3)){r++;continue;}if(insideBuilding(x,z,4)){b++;continue;}}catch(e){}const h=terrH(x,z);if(Math.abs(terrH(x+2,z)-h)+Math.abs(terrH(x,z+2)-h)>=.6){f++;continue;}t++;}return {a,r,b,f,t,h:terrH(0,-200)};};
 if(window.__TEST__)window.__TL=()=>TERR.map(T=>[T.x0|0,T.z0|0,T.x1|0,T.z1|0,(T.max||0)|0,T.w273?1:0]).concat([[terrH(0,-200),terrH(0,-150),terrH(50,-250),w273B(0,-200)]]);
 
+/* ===== v2.78 プレイヤーからの報告への対応 =====
+   ・山などの地形で、最初の降下（輸送機から滑空して着地）のとき地面にめり込んでいた → 着地の高さを地形の高さに（c194.py の置き換え）
+   ・国・ステージ名の表示の間に攻撃される → ステージ開始から約6秒は敵が出てこない静かな時間。最初の4.5秒は被弾しない。国の表示も短く
+   ・棚田など急な地形を乗り物で進めない → ロボは段も登れる、戦車は急な土手まで（v128.js）、棚田の里の本道を広く（v225.js） */
+function w278G(x,z){try{return Math.max(0,terrH(x,z)||0);}catch(e){return 0;}}
+/* 降下の地点がプレイできる範囲の外（例：ステージ16で x=237m）だと、着地後に範囲の端へ引き戻されて段差を落ちていた → 範囲の内側に寄せる（道の線上のまま） */
+{const _si=startIntro;startIntro=function(n){try{const m=10;STARTPT.x=clamp(STARTPT.x,PAX0+m,PAX1-m);STARTPT.z=clamp(STARTPT.z,PAZ0+m,PAZ1-m);}catch(e){}return _si.apply(this,arguments);};}
+let W278_T0=-99;const W278_CALM=6;
+{const _sw=startWave;startWave=function(n){const r=_sw.apply(this,arguments);try{W278_T0=S.time;spawnT=Math.max(spawnT,W278_CALM);}catch(e){}return r;};}
+{const _h=hurt;hurt=function(d){try{if(state==='play'&&!P.dead&&S.time-W278_T0<W278_CALM-1.5)return;}catch(e){}return _h.apply(this,arguments);};}
+(function(){try{const st=document.createElement('style');st.textContent='#ctT.on{animation-duration:4.2s!important}';document.head.appendChild(st);}catch(e){}})();
+if(window.__TEST__)window.__T78={calm:()=>({t:S.time-W278_T0,spawnT,en:enemies.length}),g:w278G,cin:()=>({alt:CIN.alt,gy:CIN.gy,og:CIN.og,mode:CIN.mode,t:CIN.t,jl:(JL||[]).map(j=>[j.st,+(j.g.position.y.toFixed(1)),+((j.gy||0).toFixed(1))])}),P:()=>({x:P.x,z:P.z,alt:P.alt,g:w278G(P.x,P.z)})};
+
+/* ===== v2.79 天衡帝国 ステージ10「大運河の水郷」の作り込み =====
+   ・霧の朝の水郷：大運河（幅100m）から街の中へ水路が枝分かれし、水路は地面の2m下を流れる（石の護岸・河岸の石畳・柳・提灯）
+   ・道が水路を渡る所は石のアーチ橋、街の中ほどには歩いて渡る太鼓橋。大運河には七つのアーチの石橋（車も人も上り下りできる）
+   ・家並み：白い漆喰の壁と黒い瓦、階段状の防火壁（うだつ壁）、格子窓と木の店構え、赤い提灯
+   ・伝統と未来の融合：白い壁と階段状の壁の形をそのまま高層に重ねた、ガラスと木の格子の新しい建物（大運河の近くに多め）
+   ・名所：八角七重の塔、水路と大運河の合流点の水門、八角の亭
+   ・交通：水路を行き来する苫舟（とまぶね）、大運河を上り下りする荷船 */
+var W279_ON=false,W279_CAN=[],W279_BR=[],W279_PLAN=false,W279_BOATS=[],W279_STAT={},W279_PIERS=[];
+try{ATM_FIX[13]=['mo','cd'];}catch(e){}
+try{if(W224_ST[10])W224_ST[10].f=['willow'];}catch(e){}
+const W279_CW=10,W279_G8=new THREE.CylinderGeometry(1,1,1,8),W279_C8=new THREE.ConeGeometry(1,1,8);
+{const _bw=buildWorld0;buildWorld0=function(si){W279_ON=((si||0)+1)===13;W279_CAN=[];W279_BR=[];W279_PLAN=false;W279_BOATS=[];W279_PIERS=[];W279_STAT={fus:0,house:0};
+ const r=_bw.apply(this,arguments);if(W279_ON)try{w279After();}catch(e){console.warn('w279',e);}return r;};}
+
+/* ---------- 水路の配置：道路から離れた所に、大運河から街の外れまで ---------- */
+function w279Plan(){if(W279_PLAN||!W279_ON||!RIVER)return;W279_PLAN=true;
+ const R=RIVER,CW=W279_CW,E=BOUND-3,lines=WORLD_LINES||[],hs=lines.filter(l=>l.o==='h'),vs=lines.filter(l=>l.o==='v'),need=RW/2+CW/2+8;
+ const rv0=R.cx-R.hw-.9,rv1=R.cx+R.hw+.9;
+ const best=(a,b,score,min,taken,gap)=>{let bx=null,bs=-1;for(let p=a;p<=b;p+=2){if(taken.some(t=>Math.abs(t-p)<gap))continue;const s=score(p);if(s>bs){bs=s;bx=p;}}return bs>=min?bx:null;};
+ for(const S of[{a:rv1,b:E,s:1},{a:-E,b:rv0,s:-1}]){if(S.b-S.a<70)continue;
+  /* 縦の水路 */const tx=[];for(let k=0;k<2;k++){const x=best(S.a+30,S.b-22,p=>Math.min(...vs.map(l=>Math.abs(l.c-p)),40)-Math.abs(p-(S.a+S.b)/2)*.04,need-3,tx,70);if(x==null)break;tx.push(x);if(S.b-S.a<150)break;}
+  for(const x of tx)W279_CAN.push({o:'v',c:x,x0:x-CW/2,x1:x+CW/2,z0:-E,z1:E});
+  /* 横の水路（大運河から） */const tz=[];for(let k=0;k<2;k++){const z=best(-E+30,E-30,p=>Math.min(...hs.filter(l=>l.a<S.b&&l.b>S.a).map(l=>Math.abs(l.c-p)),40)-Math.abs(p)*.04,need-3,tz,90);if(z==null)break;tz.push(z);}
+  for(const z of tz)W279_CAN.push({o:'h',c:z,x0:S.s>0?rv1:-E,x1:S.s>0?E:rv0,z0:z-CW/2,z1:z+CW/2,mouth:S.s>0?rv1:rv0,ms:S.s});}
+ /* 河岸の石畳（水路の両側3m）→ 水面 */
+ for(const c of W279_CAN){gR(c.x0-3,c.z0-3,c.x1+3,c.z1+3,'#8e8a80');for(let i=0;i<260;i++){const x=rnd(c.x0-3,c.x1+3),z=rnd(c.z0-3,c.z1+3);gctx.fillStyle=Math.random()<.5?'rgba(60,58,52,.25)':'rgba(200,196,186,.22)';gctx.fillRect(GX(x),GX(z),rnd(2,6),rnd(2,6));}}
+ for(const c of W279_CAN)waterRect(c.x0,c.x1,c.z0,c.z1,0x3e6a62);
+ /* 道が水路を渡る所：石のアーチ橋 */
+ for(const c of W279_CAN){if(c.o==='v'){for(const l of hs)if(l.a<c.x0-1&&l.b>c.x1+1&&l.c>c.z0+3&&l.c<c.z1-3)W279_BR.push({ax:'x',c:c.c,m:l.c,S:CW+5,W:RW,r:1.5,road:1});}
+  else{for(const l of vs)if(l.c>c.x0+3&&l.c<c.x1-3&&l.a<c.z0-1&&l.b>c.z1+1)W279_BR.push({ax:'z',c:c.c,m:l.c,S:CW+5,W:RW,r:1.5,road:1});}}
+ /* 歩いて渡る太鼓橋（道の橋・水路の交差・端から離れた所） */
+ for(const c of W279_CAN){const a=c.o==='v'?c.z0:c.x0,b=c.o==='v'?c.z1:c.x1;for(let p=a+22;p<b-18;p+=rnd(38,52)){
+   if(W279_BR.some(q=>(q.ax==='x'?c.o==='v'&&Math.abs(q.m-p)<19:c.o==='h'&&Math.abs(q.m-p)<19)))continue;
+   if(W279_CAN.some(o=>o!==c&&o.o!==c.o&&Math.abs(o.c-p)<20))continue;if(c.mouth!=null&&Math.abs(p-c.mouth)<30)continue;
+   W279_BR.push({ax:c.o==='v'?'x':'z',c:c.c,m:p,S:CW+7,W:3.8,r:3.2,ped:1});}}
+ if(window.__TEST__)W279_STAT.can=W279_CAN.map(c=>[c.o,Math.round(c.c)]);}
+{const _rb=riverBuild;riverBuild=function(){const r=_rb.apply(this,arguments);try{w279Plan();}catch(e){console.warn('w279Plan',e);}return r;};}
+/* 元の平らな橋・鉄のアーチ橋は作らない（石橋に置き換え） */
+{const _bd=bridgeDetail;bridgeDetail=function(){if(W279_ON)return;return _bd.apply(this,arguments);};}
+/* 水郷の街は田園の区画も家並みに（密に） */
+{const _cb=ctryBlock;ctryBlock=function(R,zone,S){if(W279_ON&&zone==='country')zone='residential';return _cb.call(this,R,zone,S);};}
+/* 区画は水路と河岸の石畳をよける */
+{const _wr=waterRects;waterRects=function(port){const W=_wr(port);if(W279_ON)for(const c of W279_CAN)W.push({x0:c.x0-3,x1:c.x1+3,z0:c.z0-3,z1:c.z1+3});return W;};}
+
+/* ---------- 橋の上の高さ（車も人も上り下りできる） ---------- */
+function w279BrH(x,z){for(const b of W279_BR){const s=b.ax==='x'?x:z,m=b.ax==='x'?z:x,u=(s-b.c)/b.S;if(Math.abs(u)<.5&&Math.abs(m-b.m)<b.W/2+.1)return b.r*Math.pow(Math.cos(Math.PI*u),2)+.05;}return null;}
+{const _t=terrH;terrH=function(x,z){const v=_t(x,z);if(W279_BR.length){const h=w279BrH(x,z);if(h!=null)return Math.max(v,h);}return v;};}
+{const _wi=wInWater;wInWater=function(x,z){if(W279_BR.length&&w279BrH(x,z)!=null)return false;return _wi(x,z);};}
+
+/* ---------- 石のアーチ橋 ---------- */
+function w279Bridge(M,G,b){const L=new LM(M,b.ax==='x'?b.c:b.m,0,b.ax==='x'?b.m:b.c,b.ax==='x'?0:Math.PI/2),S=b.S,W=b.W,r=b.r,WL=b.big?-8:PWL,n=b.big?44:b.ped?16:12;
+ const h=u=>r*Math.pow(Math.cos(Math.PI*u),2),ST=[0x9a968c,0x8e8a80,0xa39e92,0x948f84],CAP=0xb8b2a4,DK=0x6e6a62,pk=()=>ST[(Math.random()*ST.length)|0];
+ for(let i=0;i<n;i++){const u0=-.5+i/n,u1=u0+1/n,x0=u0*S,x1=u1*S,y0=h(u0),y1=h(u1),len=Math.hypot(x1-x0,y1-y0),ang=Math.atan2(y1-y0,x1-x0),xm=(x0+x1)/2,ym=(y0+y1)/2;
+  L.add(GB,b.road?0x8a8680:0x9a958a,len+.05,.5,W,xm,ym-.24,0,0,0,ang);
+  if(b.ped)L.add(GB,DK,.08,.05,W-.5,xm,ym+.02,0,0,0,ang);
+  for(const s of[-1,1]){L.add(GB,pk(),len+.05,.95,.38,xm,ym+.46,s*(W/2-.19),0,0,ang);L.add(GB,CAP,len+.08,.14,.5,xm,ym+.98,s*(W/2-.19),0,0,ang);}
+  if(i%(b.big?4:3)===0)for(const s of[-1,1]){L.add(GB,DK,.55,1.45,.55,x0,y0+.72,s*(W/2-.19));L.add(GB,CAP,.65,.22,.65,x0,y0+1.52,s*(W/2-.19));if(b.big&&i%8===0){L.add(GB,0x8a8478,.42,.5,.42,x0,y0+1.88,s*(W/2-.19));L.add(GB,0x6e6a62,.6,.14,.6,x0,y0+2.2,s*(W/2-.19));G.add(GB,0xffb060,.26,.3,.44,x0,y0+1.9,s*(W/2-.19));}}}
+ /* アーチ：開口（大運河は七つ、真ん中ほど大きい） */
+ const ops=[];if(b.big){const wts=[.8,.9,1.05,1.3,1.05,.9,.8],tot=wts.reduce((a,c)=>a+c,0),ab=4,pier=3.2,free=S-ab*2-pier*6;let x=-S/2+ab;for(const w of wts){const a=free*w/tot;ops.push([x+a/2,a/2]);x+=a+pier;}}
+ else ops.push([0,(S-4)/2]);
+ const arc=(x)=>{for(const[c,a]of ops)if(Math.abs(x-c)<a){const top=h(c/S)-(b.big?1.1:.75),ra=a,yc=top-ra;return yc+Math.sqrt(Math.max(0,ra*ra-(x-c)*(x-c)));}return null;};
+ for(let x=-S/2+.25;x<S/2;x+=.5){const top=h(x/S)-.45,ya=arc(x),bot=ya==null?(b.big?WL-10.2:WL-2):Math.max(ya,WL-.3);if(top-bot>.05)for(const s of[-1,1])L.add(GB,pk(),.52,top-bot,.7,x,(top+bot)/2,s*(W/2-.35));}
+ for(const[c,a]of ops){const top=h(c/S)-(b.big?1.1:.75),yc=top-a,K=b.big?14:10;for(let k=0;k<=K;k++){const t=Math.PI*k/K,x=c+Math.cos(t)*a,y=yc+Math.sin(t)*a;if(y<WL-.2)continue;
+   for(const s of[-1,1])L.add(GB,CAP,.62,.42,.78,x,y,s*(W/2-.31),0,0,t+Math.PI/2);
+   if(k<K){const t2=Math.PI*(k+1)/K,x2=c+Math.cos(t2)*a,y2=yc+Math.sin(t2)*a;if(y2>WL-.2)L.add(GB,0x7e7a70,Math.hypot(x2-x,y2-y)+.05,.3,W-.8,(x+x2)/2,(y+y2)/2+.15,0,0,0,Math.atan2(y2-y,x2-x));}}}
+ if(b.big)for(let k=0;k<ops.length-1;k++){const px=(ops[k][0]+ops[k][1]+ops[k+1][0]-ops[k+1][1])/2;for(const s of[-1,1])L.add(GB,DK,2.4,11.8,2.4,px,WL-5.3,s*(W/2+.5),0,Math.PI/4,0);L.add(GB,0x5e5a52,4.4,1.4,W+4.4,px,WL-9.7,0);if(b.ax==='x')W279_PIERS.push({x:b.c+px,z:b.m,hx:1.75,hz:W/2+2.1});else W279_PIERS.push({x:b.m,z:b.c+px,hx:W/2+2.1,hz:1.75});}}
+
+/* ---------- 家：白い漆喰の壁・黒い瓦・階段状の防火壁 ---------- */
+function w279House(mp,lot){const w=Math.max(3.4,Math.min(lot.w*.72,8.6)),d=Math.max(3.4,Math.min(lot.d*.74,7)),one=Math.random()<.22,H=one?3.4:6,rh=Math.min(d*.32,2.4),T=isTouch;
+ const WW=[0xf2efe8,0xece8de,0xf4f1ea,0xe4e0d6][(Math.random()*4)|0],TL=0x34373c,TL2=0x2a2c30,WD=[0x5a3a26,0x4e3222,0x6a4630][(Math.random()*3)|0];
+ const e=bld(mp,lot.x,lot.z,lot.ry,w/2,d/2,H+rh+1.4,{hp:110+H*14,arm:.6,name:'house'},(L,G)=>{
+  L.add(GB,0x6a6862,w+.3,.6,d+.3,0,.3,0);L.add(GB,WW,w,H,d,0,H/2+.3,0);
+  const fz=d/2+.06;L.add(GB,WD,w*.72,2.5,.1,0,1.55,fz);L.add(GB,0x2a1e16,1.3,2.2,.12,w*.18,1.4,fz+.03);
+  if(!one){L.add(GB,WD,w*.8,1.5,.12,0,H-1.2,fz);if(!T){for(let k=-2;k<=2;k++)L.add(GB,0x2a2018,.08,1.3,.14,k*w*.16,H-1.2,fz+.03);L.add(GB,0x6a4a30,w*.86,.18,.9,0,H-2.1,fz+.4);L.add(GB,0x4a3222,w*.86,.5,.06,0,H-1.85,fz+.83);}}
+  /* 屋根：棟は間口の向き */const a=Math.atan2(rh,d/2),sl=Math.hypot(rh,d/2)+.5;
+  for(const s of[-1,1])L.add(GB,s>0?TL:TL2,w+.5,.24,sl,0,H+.3+rh/2-.15,s*(d/4+.1),s*a,0,0);
+  L.add(gableGeo(),WW,w-.05,rh,d,0,H+.3,0);L.add(GB,TL2,w+.1,.36,.5,0,H+.3+rh+.08,0);
+  /* 階段状の防火壁（両端） */
+  for(const s of[-1,1]){const x=s*(w/2+.05);const tiers=[[d/2,H+.3+rh*.42],[d*.3,H+.3+rh*.85],[d*.13,H+.3+rh+.9]];
+   for(const[hz,ty]of tiers){L.add(GB,WW,.34,ty-H-.3+.02,hz*2,x,(ty+H+.3)/2,0);L.add(GB,TL2,.5,.2,hz*2+.4,x,ty+.1,0);}}
+  if(!T&&Math.random()<.45)for(const q of[-1,1]){if(q<0){(W279_STAT.lan=W279_STAT.lan||[]).push([Math.round(lot.x),Math.round(lot.z),Math.round((lot._o||lot).x)]);}L.add(GB,0x3a2a1e,.08,.08,.45,w*.18+q*.95,3,fz+.2);G.add(GS,0xff3a28,.22,.3,.22,w*.18+q*.95,2.72,fz+.38);}});
+ W279_STAT.house++;return e;}
+
+/* ---------- 伝統と未来の融合：白い壁と階段状の壁を高層に重ねる ---------- */
+function w279Fusion(mp,lot){const w=Math.max(6,Math.min(lot.w*.72,12)),d=Math.max(6,Math.min(lot.d*.72,10)),fl=Math.round(rnd(4,7)),FH=3.2,T=isTouch;
+ const WW=0xf2f0ea,TL2=0x2c2e32,GL=0x506878,WD=[0xa06a3c,0x8a5a34,0xb07a48][(Math.random()*3)|0],tw=Math.random()<.5;
+ const e=bld(mp,lot.x,lot.z,lot.ry,w/2,d/2,fl*FH+5,{hp:200+fl*80,arm:.7,name:'tower'},(L,G)=>{
+  /* 2〜3段に重ねた白い箱（上ほど少し小さく、ずらす） */const n=fl>5?3:2;let y=0;
+  for(let k=0;k<n;k++){const f=k<n-1?Math.round(fl/n):fl-Math.round(fl/n)*(n-1),bh=f*FH,bw=w*(1-k*.12),bd=d*(1-k*.1),ox=(k%2?1:-1)*w*.05*k*(tw?1:-1);
+   L.add(GB,WW,bw,bh,bd,ox,y+bh/2,0);
+   for(let j=0;j<f;j++){const yy=y+j*FH+FH*.55;for(const s of[-1,1]){L.add(GB,GL,bw*.78,FH*.46,.12,ox,yy,s*(bd/2+.04));if(!T&&(j+k)%2===0)G.add(GB,0xffe8c0,bw*.7,.1,.06,ox,yy+FH*.2,s*(bd/2+.1));}
+    if(!T)for(let q=-3;q<=3;q++)L.add(GB,WD,.12,FH*.5,.3,ox+q*bw*.11,yy,bd/2+.2);}
+   /* 段の上：黒い瓦の薄い屋根と、両端の階段状の壁 */
+   const ty=y+bh;L.add(GB,TL2,bw+.5,.22,bd+.5,ox,ty+.11,0);
+   for(const s of[-1,1]){const x=ox+s*(bw/2-.2);const tiers=[[bd/2,1.1],[bd*.3,2.2],[bd*.12,3.3]];for(const[hz,th]of tiers){L.add(GB,WW,.4,th,hz*2,x,ty+th/2,0);L.add(GB,TL2,.6,.22,hz*2+.4,x,ty+th+.11,0);}}
+   y=ty+.22;}
+  /* 屋上の庭 */L.add(GB,0x5a7a3a,w*.6,.3,d*.5,0,y+.15,0);for(let k=0;k<4;k++)L.add(GS,k%2?0x4a7a34:0x5e8a3e,1.2,1.3,1.2,rnd(-w*.25,w*.25),y+1,rnd(-d*.2,d*.2));
+  L.add(GB,0x9a958a,w+.4,.5,d+.4,0,.25,0);});
+ try{e.eco=1;}catch(x){}W279_STAT.fus++;return e;}
+function w279Pick(mp,lot){/* v2.84 川の上の区画には建てない（家は後で消えても提灯の光だけ宙に残っていた） */try{const R=RIVER;if(R&&Math.abs(lot.x-R.cx)<R.hw+Math.max(lot.w,lot.d)*.5+1){W279_STAT.rivSkip=(W279_STAT.rivSkip||0)+1;return null;}}catch(e){W279_STAT.rivErr=String(e);}const R=RIVER,d=R?Math.abs(lot.x-R.cx)-R.hw:200,big=lot.w>=10&&lot.d>=9;const p=big?(d<70?.16:.04):0;
+ /* v2.83 中心から外へなだらかに空き地（庭・畑）を増やす：中心 12% → 外周の先 70% */const e=Math.max(Math.abs(lot.x),Math.abs(lot.z));if(Math.random()<.12+.58*_sm(60,RING+20,e)){W279_STAT.empty=(W279_STAT.empty||0)+1;try{const hw=lot.w*.46,hd=lot.d*.46,fld=Math.random()<.5;gR(lot.x-hw,lot.z-hd,lot.x+hw,lot.z+hd,['#6f8a4e','#7a9256','#66804a'][Math.floor(Math.random()*3)]);if(fld)for(let q=-hw+1;q<hw-1;q+=1.6)gR(lot.x+q,lot.z-hd+1,lot.x+q+.7,lot.z+hd-1,'#7a6a4c');}catch(e){}return null;}
+ const a=ASCL;ASCL=2;try{const l2=Object.assign({},lot,{w:lot.w/2,d:lot.d/2,_o:lot});return Math.random()<p?w279Fusion(mp,l2):w279House(mp,l2);}finally{ASCL=a;}}
+for(const k of['hutong','tower','cnModern','glass']){if(!STY[k])continue;const f=STY[k];STY[k]=function(mp,lot){if(!W279_ON||ASCL!==1)return f.apply(this,arguments);return w279Pick(mp,lot);};}
+
+/* ---------- 名所：八角七重の塔・八角の亭・水門 ---------- */
+function w279Pagoda(pb,x,z,s,Y){s=s||1.35;Y=Y||0;const WW=0xe8e2d4,TL=0x34373c,RD=0x8a3a26,WD=0x5a3422,GD=0xc8a040,N=7;
+ const e=propAt(pb,x,z,0,8*s,8*s,58*s+Y,{hp:3200,arm:.7,name:'house'},(L0,G0)=>{const L=w282Off(L0,Y),G=w282Off(G0,Y);if(Y)L.add(GB,0x8a8478,13*s,Y+1,13*s,0,-Y/2-.2,0);L.add(W279_G8,0x8a8478,9*s,1.6*s,9*s,0,.8*s,0,0,Math.PI/8,0);L.add(W279_G8,0x9a948a,7.6*s,1*s,7.6*s,0,2.1*s,0,0,Math.PI/8,0);
+  let y=2.6*s;for(let k=0;k<N;k++){const r=(5.6-k*.48)*s,th=(k===0?6:4.4-k*.18)*s;
+   L.add(W279_G8,WW,r,th,r,0,y+th/2,0,0,Math.PI/8,0);
+   for(let q=0;q<8;q++){const a=q*Math.PI/4+Math.PI/8,ca=Math.cos(a),sa=Math.sin(a);L.add(GB,RD,.32*s,th,.32*s,ca*r*.93,y+th/2,sa*r*.93,0,-a,0);}
+   for(let q=0;q<4;q++){const a=q*Math.PI/2,ca=Math.cos(a),sa=Math.sin(a);L.add(GB,0x2a1e16,1.1*s,th*.5,.2*s,ca*r*.9,y+th*.42,sa*r*.9,0,-a+Math.PI/2,0);}
+   const ey=y+th;L.add(W279_G8,WD,r*1.08,.35*s,r*1.08,0,ey+.15*s,0,0,Math.PI/8,0);L.add(W279_C8,TL,r*1.62,1.5*s,r*1.62,0,ey+.95*s,0,0,Math.PI/8,0);
+   for(let q=0;q<8;q++){const a=q*Math.PI/4,ca=Math.cos(a),sa=Math.sin(a),rr=r*1.62*.96;L.add(GB,TL,.4*s,.3*s,1.4*s,ca*rr,ey+.45*s,sa*rr,0,-a,-.5);}
+   if(k<N-1){L.add(W279_G8,RD,r*.78,.6*s,r*.78,0,ey+1.85*s,0,0,Math.PI/8,0);}y=ey+1.9*s;}
+  L.add(GCO,GD,.9*s,5.6*s,.9*s,0,y+2.8*s,0);for(let k=0;k<3;k++)L.add(GS,GD,.5*s-k*.08*s,.4*s,.5*s-k*.08*s,0,y+1+k*1.4*s,0);G.add(GS,0xffd890,.3*s,.3*s,.3*s,0,y+5.8*s,0);});
+ try{e.sacred=1;}catch(x){}return e;}
+function w279Pavilion(pb,x,z){return propAt(pb,x,z,0,4,4,8,{hp:300,arm:.5,name:'prop'},(L,G)=>{L.add(W279_G8,0x8a8478,4.4,.6,4.4,0,.3,0,0,Math.PI/8,0);
+ for(let q=0;q<8;q++){const a=q*Math.PI/4+Math.PI/8;L.add(GC,0xa8402e,.18,3.4,.18,Math.cos(a)*3.4,2.3,Math.sin(a)*3.4);}
+ L.add(W279_G8,0x5a3422,3.9,.3,3.9,0,4.1,0,0,Math.PI/8,0);L.add(W279_C8,0x34373c,5.2,2.8,5.2,0,5.6,0,0,Math.PI/8,0);L.add(GS,0xc8a040,.35,.5,.35,0,7.2,0);
+ for(let q=0;q<8;q++){const a=q*Math.PI/4;L.add(GB,0x34373c,.3,.25,1.2,Math.cos(a)*5,4.5,Math.sin(a)*5,0,-a,-.45);}
+ G.add(GS,0xff3a28,.35,.45,.35,0,3.4,0);});}
+function w279Gate(M,G,c){const x=c.mouth+c.ms*1.2,z=c.c,L=new LM(M,x,0,z,0),CW=W279_CW;
+ for(const s of[-1,1]){L.add(GB,0x8e8a80,2.4,8.4,2.4,0,1.6,s*(CW/2+.6));L.add(GB,0xb8b2a4,2.8,.3,2.8,0,5.95,s*(CW/2+.6));}
+ L.add(GB,0x8e8a80,2.4,1.4,CW+4.8,0,5.4,0);L.add(GB,0x34373c,3.2,.3,CW+6,0,6.3,0);for(const s of[-1,1])L.add(GB,0x34373c,.6,.4,.6,0,6.6,s*(CW/2+3),s*.4,0,0);
+ L.add(GB,0x5a3a26,.5,3.6,CW,0,-1.4,0);for(let k=-4;k<=4;k++)L.add(GB,0x3e2a1c,.56,3.6,.12,0,-1.4,k*1.1);G.add(GS,0xff3a28,.3,.4,.3,1.4,4.2,CW/2+.6);G.add(GS,0xff3a28,.3,.4,.3,1.4,4.2,-CW/2-.6);}
+
+/* ---------- 舟 ---------- */
+function w279BoatGeo(){const M=new Merger(),L=new LM(M,0,0,0,0),k=1.6;
+ /* v2.85 船頭をプレイヤーと同じ背丈（約3.5m）に。舟も1.6倍（長さ約10m・幅2.4m） */
+ L.add(GB,0x3a2a1e,6.4*k,.7*k,1.5*k,0,.35*k,0);for(const s of[-1,1])L.add(GB,0x3a2a1e,1.1*k,.7*k,1.1*k,s*3.4*k,.35*k,0,0,Math.PI/4,0);
+ L.add(GB,0x4a3424,6.5*k,.1,.12,0,.7*k,.75*k);L.add(GB,0x4a3424,6.5*k,.1,.12,0,.7*k,-.75*k);
+ L.add(GB,0x6a5038,6.2*k,.08,1.3*k,0,.72*k,0);L.add(GCX,0x1e1e20,2.6*k,.78*k,.78*k,.2*k,.72*k,0);L.add(GCX,0x2a2a2c,1.4*k,.7*k,.7*k,-1.9*k,.72*k,0);
+ for(const x of[-1.2,.2,1.5])L.add(GB,0x5a4030,.08,.08,1.4*k,x*k,.72*k+.78*k*.98,0);
+ /* 船頭（舳先寄りに立って竿をさす） */const fx=0,fy=0,FX=2.55*k,FY=.76*k,MM=new Merger(),L2=new LM(MM,0,0,0,0),BL=0x3a4a5a,BL2=0x2e3c4a,SK=0xb08a68;
+ for(const s of[-1,1]){L2.add(GB,0x2a2a2c,.34,1.5,.36,fx,fy+.75,s*.24);L2.add(GB,0x1e1e20,.46,.16,.4,fx+.06,fy+.08,s*.24);}
+ L2.add(GB,BL,.62,1.35,.9,fx,fy+2.1,0);L2.add(GB,BL2,.66,.18,.94,fx,fy+1.55,0);L2.add(GB,0x6a4a30,.66,.12,.94,fx,fy+1.68,0);
+ L2.add(GB,BL,.26,1.15,.26,fx+.25,fy+2.15,.55,-.35,0,.5);L2.add(GB,BL,.26,1.15,.26,fx+.3,fy+2.05,-.55,.3,0,.6);
+ L2.add(GB,SK,.24,.2,.24,fx,fy+2.86,0);L2.add(GS,SK,.34,.38,.32,fx,fy+3.18,0);L2.add(GCO,0xc8b078,.85,.42,.85,fx,fy+3.62,0);L2.add(GB,0xa8905a,.1,.06,1.7,fx,fy+3.42,0,0,0,0);
+ /* 竿：手から水へ斜めに */L2.add(GB,0x6a5038,.12,7.2,.12,fx+.9,fy+1.4,-.1,0,0,-.42);
+ const hull=M.build(detMat),man=MM.build(detMat);man.position.set(FX,FY,0);man.castShadow=true;hull.add(man);hull.userData.man=1;return hull;}
+function w279BargeGeo(){const M=new Merger(),L=new LM(M,0,0,0,0);
+ L.add(GB,0x2e2a26,20,1.3,5.2,0,.65,0);for(const s of[-1,1])L.add(GB,0x2e2a26,3.6,1.3,3.6,s*10.6,.65,0,0,Math.PI/4,0);L.add(GB,0x7a5a3a,19,.12,4.6,0,1.34,0);
+ const C=[0x8a5a34,0x5a6a4a,0xa8402e,0xc8b078,0x4a5a6a];for(let k=-3;k<=2;k++)L.add(GB,C[(k+3)%5],2.4,rnd(1,1.8),3.6,k*2.7,2,0);
+ L.add(GB,0xe8e2d4,3,2.4,4,-8,2.5,0);L.add(GB,0x34373c,3.6,.3,4.6,-8,3.85,0);L.add(GB,0x2a3a48,2.2,.7,.1,-8,2.8,2.02);return M.build(detMat);}
+/* v2.83 航跡（船尾から V 字に広がる白い波）と舳先の波：半透明の板を船に付けて動かす */
+function w279WakeTex(){const cv=document.createElement('canvas');cv.width=256;cv.height=128;const g=cv.getContext('2d');
+ for(let i=0;i<1400;i++){const t=Math.random(),u=1-t*t,x=256*u,sp=(.08+.42*(1-u)),side=Math.random()<.5?-1:1,j=Math.random();
+  const y=64+side*64*sp*(j<.7?1:Math.random())+(Math.random()-.5)*6*(1-u+.2),a=(.12+.5*u)*(j<.7?1:.5),r=1.5+3*(1-u)*Math.random()+1;
+  g.fillStyle='rgba(255,255,255,'+a.toFixed(3)+')';g.beginPath();g.ellipse(x,y,r*2.2,r*.8,0,0,6.283);g.fill();}
+ for(let i=0;i<260;i++){const u=Math.random(),x=256*(1-Math.pow(u,1.6)),y=64+(Math.random()-.5)*(10+30*u),a=.25*(1-u);g.fillStyle='rgba(235,245,245,'+a.toFixed(3)+')';g.beginPath();g.ellipse(x,y,5,2,0,0,6.283);g.fill();}
+ const tx=new THREE.CanvasTexture(cv);return tx;}
+function w279BowTex(){const cv=document.createElement('canvas');cv.width=64;cv.height=64;const g=cv.getContext('2d');
+ for(let i=0;i<220;i++){const a=Math.random()*Math.PI,rr=18+Math.random()*12,x=32-Math.sin(a)*rr*.7,y=32+Math.cos(a)*rr;g.fillStyle='rgba(255,255,255,'+(.08+.25*Math.sin(a)).toFixed(3)+')';g.beginPath();g.arc(x,y,1.2+Math.random()*1.6,0,6.283);g.fill();}
+ return new THREE.CanvasTexture(cv);}
+function w279AddWake(m,len,wid,L,sc){const mat=new THREE.MeshBasicMaterial({map:W279_WK.t,transparent:true,depthWrite:false,opacity:.85,fog:true,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});
+ const g=new THREE.PlaneGeometry(len,wid);g.rotateX(-Math.PI/2);g.translate(-L/2-len/2+.6,.04,0);const w=new THREE.Mesh(g,mat);w.renderOrder=3;m.add(w);
+ const bm=new THREE.MeshBasicMaterial({map:W279_WK.b,transparent:true,depthWrite:false,opacity:.9,fog:true,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});
+ const bg=new THREE.PlaneGeometry(3*sc,3.6*sc);bg.rotateX(-Math.PI/2);bg.translate(L/2-.4*sc,.05,0);const bw=new THREE.Mesh(bg,bm);bw.renderOrder=3;m.add(bw);return {w,mat,bm};}
+let W279_WK=null;
+function w279Boats(){if(!W279_WK)W279_WK={t:w279WakeTex(),b:w279BowTex()};const geo=w279BoatGeo(),bg=w279BargeGeo(),R=RIVER,N=isTouch?8:16;let k=0;
+ for(const c of W279_CAN){const len=(c.o==='v'?c.z1-c.z0:c.x1-c.x0)-16;if(len<40)continue;const nb=Math.max(1,Math.round(len/90));
+  for(let i=0;i<nb&&k<N;i++,k++){const m=geo.clone();m.castShadow=!isTouch;WR.add(m);const wk=w279AddWake(m,isTouch?16:22,isTouch?8:11,13.6,1.2);W279_BOATS.push({m,c,s:rnd(0,len),len,v:rnd(1.6,2.6)*(Math.random()<.5?1:-1),lane:(i%2?1:-1)*1.8,riv:0,wk});}}
+ if(R){const S=R.hw*2+12,wts=[.8,.9,1.05,1.3,1.05,.9,.8],tot=wts.reduce((a,c)=>a+c,0),free=S-8-3.2*6,ac=[];{let x=-S/2+4;for(const w of wts){const a=free*w/tot;ac.push(R.cx+x+a/2);x+=a+3.2;}}const lanes=[ac[2],ac[4],ac[1],ac[5]];W279_STAT.lanes=lanes.map(v=>Math.round(v));for(let i=0;i<(isTouch?3:6);i++){const m=bg.clone();m.castShadow=!isTouch;WR.add(m);const wk=w279AddWake(m,isTouch?26:34,isTouch?13:17,24,1.9);W279_BOATS.push({m,s:rnd(0,1400),len:1400,v:rnd(2.4,3.6)*(i%2?1:-1),x:lanes[i%4],riv:1,wk});}}
+ worldTick.push(dt=>{for(const b of W279_BOATS){if(b.v0==null)b.v0=Math.abs(b.v);const edge=Math.min(b.s,b.len-b.s),f=Math.max(.15,Math.min(1,edge/12));b.s+=b.v*f*dt;if(b.s<0||b.s>b.len){b.v=-b.v;b.s=Math.max(0,Math.min(b.len,b.s));}
+   if(b.wk){const k=Math.max(0,(f-.15)/.85);b.wk.mat.opacity=(.55+.3*Math.sin(WT*2.1+b.s*.3))*k;b.wk.bm.opacity=(.6+.3*Math.sin(WT*3.3+b.s))*k;b.wk.w.scale.x=.6+.4*k;}
+   if(b.riv){const z=-700+b.s,RC=(z2)=>{try{return W238_RIV?w238Rcx(z2)-W238_RIV.cx:0;}catch(e){return 0;}},dx=RC(z),dd=(RC(z+3)-RC(z-3))/6;b.m.position.set(b.x+dx,(typeof WLY==='number'&&WLY<0?WLY:-8)+.05,z);b.m.rotation.y=(b.v>0?-Math.PI/2:Math.PI/2)+(b.v>0?-1:1)*Math.atan(dd);}
+   else{const c=b.c,t=(c.o==='v'?c.z0:c.x0)+8+b.s,lane=b.lane*(b.v>0?1:-1);if(c.o==='v'){b.m.position.set(c.c+lane,PWL+.02,t);b.m.rotation.y=b.v>0?-Math.PI/2:Math.PI/2;}else{b.m.position.set(t,PWL+.02,c.c+lane);b.m.rotation.y=b.v>0?0:Math.PI;}}
+   if(!b.riv){const man=b.m.children.find(o=>o.isMesh&&!o.material.map);if(man){const c=b.c,t=(c.o==='v'?c.z0:c.x0)+8+b.s+(b.v>0?1:-1)*4.1,ax=c.o==='v'?'x':'z';let near=99;for(const q of W279_BR){if(q.ax!==ax||Math.abs(q.c-c.c)>1)continue;near=Math.min(near,Math.abs(t-q.m)-q.W/2);}
+     const want=near<4?.42:1;man.scale.y+=(want-man.scale.y)*Math.min(1,dt*4);}}
+   b.m.position.y+=Math.sin(WT*1.3+b.s)*.04;}});}
+
+/* v2.83 大運河の石橋の橋脚に当たり判定（橋の上を歩く人は対象外） */
+{const _co=collide;collide=function(o,r,alt){const res=_co.apply(this,arguments);if(W279_ON&&W279_PIERS.length&&o){try{const y=o.y!=null?o.y:(alt||0);if(y<-2.5){const rr=(r||.5);for(const q of W279_PIERS){const dx=o.x-q.x,dz=o.z-q.z,ox=q.hx+rr-Math.abs(dx),oz=q.hz+rr-Math.abs(dz);if(ox>0&&oz>0){if(ox<oz)o.x+=Math.sign(dx||1)*ox;else o.z+=Math.sign(dz||1)*oz;}}}}catch(e){}}return res;};}
+/* ---------- 組み立ての後 ---------- */
+function w279Clear(x0,x1,z0,z1){for(const b of buildings){if(!b.alive||b.x1<x0||b.x0>x1||b.z1<z0||b.z0>z1)continue;b.alive=false;b.hp=0;if(b.pb){try{b.pb.squash(b,1);}catch(e){}}else if(b.mesh)b.mesh.visible=false;}for(const p of PBS)if(p.dA||p.dG)p.flush();}
+function w279After(){const R=RIVER;
+ /* 大運河の石橋（元の平らな橋の代わり） */
+ if(R){const brs=(R.br||[]).slice();try{for(const l of(RINGL||[]))if(l.o==='h'&&l.per&&l.a<=R.x0&&l.b>=R.x1&&brs.every(z=>Math.abs(z-l.c)>20))brs.push(l.c);}catch(e){}
+  for(const bz of brs)W279_BR.push({ax:'x',c:R.cx,m:bz,S:R.hw*2+12,W:RW,r:5,big:1});
+  try{const cv=ground.material.map&&ground.material.map.image,g=cv&&cv.getContext&&cv.getContext('2d');if(g){for(const bz of brs)g.clearRect(GX(R.cx-R.hw),GX(bz-RW/2-1),R.hw*2*MU,(RW+2)*MU);ground.material.map.needsUpdate=true;}}catch(e){}}
+ /* 水路の中に残った建物を取り除く */
+ for(const c of W279_CAN)w279Clear(c.x0+.5,c.x1-.5,c.z0+.5,c.z1-.5);
+ const M=new Merger(),G=new Merger();
+ for(const b of W279_BR){w279Clear(b.ax==='x'?b.c-b.S/2:b.m-b.W/2,b.ax==='x'?b.c+b.S/2:b.m+b.W/2,b.ax==='x'?b.m-b.W/2:b.c-b.S/2,b.ax==='x'?b.m+b.W/2:b.c+b.S/2);w279Bridge(M,G,b);}
+ for(const c of W279_CAN)if(c.mouth!=null)w279Gate(M,G,c);
+ /* 河岸：柳・提灯・水へ下りる石段・舟をつなぐ杭 */
+ const nearBr=(x,z,m)=>W279_BR.some(b=>{const s=b.ax==='x'?x:z,q=b.ax==='x'?z:x;return Math.abs(s-b.c)<b.S/2+m&&Math.abs(q-b.m)<b.W/2+m;});
+ const T=new Merger(),TL=new LM(T,0,0,0,0);let nw=0,nl=0;
+ for(const c of W279_CAN){const a=(c.o==='v'?c.z0:c.x0)+6,bnd=(c.o==='v'?c.z1:c.x1)-6;for(let p=a;p<bnd;p+=rnd(9,15)){const s=Math.random()<.5?-1:1,off=W279_CW/2+1.4;
+   const x=c.o==='v'?c.c+s*off:p,z=c.o==='v'?p:c.c+s*off;if(nearBr(x,z,3)||W279_CAN.some(o=>o!==c&&x>o.x0-4&&x<o.x1+4&&z>o.z0-4&&z<o.z1+4))continue;
+   const r=Math.random();if(r<.42){TL.add(GC,0x5a4634,.22,3.4,.22,x,1.7,z);for(let k=0;k<6;k++){const a2=k*1.05,rr=rnd(.6,1.6);TL.add(GS,k%2?0x7a9a4a:0x8aaa58,.9,rnd(2.4,3.6),.9,x+Math.cos(a2)*rr,3.2,z+Math.sin(a2)*rr);}nw++;}
+   else if(r<.7){const ax=c.o==='v'?-s*.6:0,az=c.o==='v'?0:-s*.6;TL.add(GB,0x4a2a1e,.18,3.4,.18,x,1.7,z);TL.add(GB,0x4a2a1e,c.o==='v'?.8:.12,.12,c.o==='v'?.12:.8,x+ax/2,3.35,z+az/2);TL.add(GB,0x2a1e16,.03,.35,.03,x+ax,3.12,z+az);G.add(GS,0xff4a30,.24,.32,.24,x+ax,2.8,z+az);nl++;}
+   else if(r<.82){for(let k=0;k<5;k++){const q=c.c+s*(W279_CW/2-.35-k*.6),y=-.22-k*.38;if(c.o==='v')TL.add(GB,0x8e8a80,.62,.4,2.6,q,y,z);else TL.add(GB,0x8e8a80,2.6,.4,.62,x,y,q);}}
+   else TL.add(GC,0x4a3a2a,.16,2.6,.16,c.o==='v'?c.c+s*(W279_CW/2-.4):x,-1.2,c.o==='v'?z:c.c+s*(W279_CW/2-.4));}}
+ if(M.n){const m=M.build(detMat);m.receiveShadow=true;m.castShadow=!isTouch;m.rotation.y=1e-7;WR.add(m);}if(T.n){const m=T.build(detMat);m.castShadow=!isTouch;m.rotation.y=1e-7;WR.add(m);}if(G.n){const g=G.build(glowMat2);g.rotation.y=1e-7;WR.add(g);}
+ /* 名所 */
+ const pb=new PB(detMat);let pg=null;
+ if(R){for(const sd of[1,-1]){for(let dx=24;dx<=90&&!pg;dx+=6)for(let z=-130;z<=130&&!pg;z+=10){const x=R.cx+sd*(R.hw+dx);if(Math.abs(x)>BOUND-16)continue;const ok=!nearBr(x,z,12)&&!W279_CAN.some(c=>x>c.x0-14&&x<c.x1+14&&z>c.z0-14&&z<c.z1+14)&&!(typeof onRoad==='function'&&onRoad(x,z,-11));if(ok){w279Clear(x-13,x+13,z-13,z+13);w224gR(x-13,z-13,x+13,z+13,'#8e8a80');w279Pagoda(pb,x,z);pg=[x,z];}}if(pg)break;}}
+ let pv=0;for(const c of W279_CAN){if(pv>=3)break;const x=c.o==='v'?c.x1+8:(c.x0+c.x1)/2+rnd(-30,30),z=c.o==='v'?rnd(-60,60):c.z1+8;if(nearBr(x,z,8)||(typeof onRoad==='function'&&onRoad(x,z,-6)))continue;w279Clear(x-6,x+6,z-6,z+6);w224gR(x-6,z-6,x+6,z+6,'#9a958a');w279Pavilion(pb,x,z);pv++;}
+ pb.build(true);
+ w279Boats();
+ if(scene.fog){scene.fog.near*=.75;scene.fog.far*=.85;}
+ if(window.__TEST__){W279_STAT.br=W279_BR.map(b=>[b.ax,Math.round(b.c),Math.round(b.m),b.big?'big':b.ped?'ped':'road']);W279_STAT.pagoda=pg;W279_STAT.pav=pv;W279_STAT.willow=nw;W279_STAT.lantern=nl;W279_STAT.boats=W279_BOATS.length;}}
+
+if(window.__TEST__)window.__T79P=()=>({piers:W279_PIERS.length,p:W279_PIERS.slice(0,7).map(q=>[Math.round(q.x),Math.round(q.z)]),lanes:W279_STAT.lanes,empty:W279_STAT.empty,house:W279_STAT.house,boats:W279_BOATS.length,wk:W279_BOATS.filter(b=>b.wk).length,rs:W279_STAT.rivSkip,re:W279_STAT.rivErr,R:RIVER&&[RIVER.cx,RIVER.hw],lan:(W279_STAT.lan||[]).filter(a=>a[0]<5&&a[0]>-95&&a[1]>60)});
+if(window.__TEST__)window.__T79={info:()=>({ctn:typeof CTN!=='undefined'?CTN:null,on:W279_ON,theme:CUR_T&&CUR_T.name,riv:RIVER&&{cx:RIVER.cx,hw:RIVER.hw,br:RIVER.br},lines:(WORLD_LINES||[]).map(l=>[l.o,Math.round(l.c),Math.round(l.a),Math.round(l.b)]),nb:buildings.length,ponds:PONDS.length,stat:W279_STAT,names:Object.entries(buildings.filter(b=>b.alive).reduce((a,b)=>{a[b.name]=(a[b.name]||0)+1;return a},{}))}),brh:w279BrH,br:()=>W279_BR,can:()=>W279_CAN};
+
+/* ===================== v2.80 プレイの快適性：ダメージの数字・画面の見やすさ =====================
+   金田さん：「ダメージの数字表示がデカすぎて画面が見えなくなる。プレイの快適性を追求して」
+   - 数字の大きさを画面の大きさに合わせて小さく（スマホ 11〜20px、PC 13〜26px）。会心・撃破も控えめに
+   - 同じ敵への連続ヒットは 0.2 秒ぶんまとめて1つの数字に
+   - 画面に出す数の上限（スマホ 10・PC 16）、表示時間 0.65 秒
+   - 照準（画面中央）のまわりでは数字を薄く、照準の上に重ならないように
+   - 設定に「ダメージの数字」：小さく（標準）／大きく（従来）／出さない
+   - 連続撃破の大きな文字・会心の画面の白い光・中央のお知らせを控えめに */
+var W280_DN=(function(){try{const v=localStorage.getItem('seDmgNum');return v==='big'||v==='off'?v:'small';}catch(e){return 'small';}})();
+function w280DnSet(v){W280_DN=v;try{localStorage.setItem('seDmgNum',v);}catch(e){}w280DnUI();}
+function w280K(){/* 画面の短い辺で大きさを決める（iPhone 縦 ≒ .78、PC ≒ 1） */return clamp(Math.min(fxW,fxH)/680,.72,1.08);}
+{const _dnx=DNX;DNX=function(){if(W280_DN==='big')return _dnx();const m=isTouch?10:16;return GOV&&GOV.lv>1?Math.max(6,m-4):m;};}
+{const _ad=addDmg;addDmg=function(o,dmg,crit,burn){const fresh=!o.pt;_ad.apply(this,arguments);if(fresh&&W280_DN!=='big')o.pt=.2;};}
+{const _sn=spawnNum;spawnNum=function(x,y,z,txt,col,stroke,glow,size,life,crit,oy,vx){
+  if(W280_DN==='off')return;
+  if(W280_DN==='small'){const k=w280K(),hi=isTouch?20:26,lo=isTouch?11:13;
+   /* 元の大きさ（22〜68、会心×1.45）を、なだらかに小さな幅へ */
+   size=clamp(lo+(size-20)*.22,lo,hi)*k*(crit?1.12:1);life=Math.min(life||.95,crit?.8:.65);
+   if(vx===undefined)vx=rnd(-22,22);}
+  return _sn.call(this,x,y,z,txt,col,stroke,glow,size,life,crit,oy,vx);};}
+{const _ps=popScreen;popScreen=function(txt,col,size){if(W280_DN==='off')return;if(W280_DN==='small')size=Math.min(size,(isTouch?22:30)*w280K());return _ps.call(this,txt,col,size);};}
+/* 数字と体力バーの描画（元の drawFx を置き換え：小さい表示では跳ね方・光・回転を控えめに、照準の近くは薄く） */
+drawFx=function(dt){
+ fx.setTransform(fxS,0,0,fxS,0,0);fx.clearRect(0,0,fxW,fxH);
+ if(state==='title')return;
+ camera.updateMatrixWorld();
+ const small=W280_DN!=='big',k=small?w280K():1;
+ for(const e of enemies){
+  if(e.dying||!(e.showHp>0))continue;
+  e.showHp-=dt;
+  const ratio=clamp(e.hp/e.maxhp,0,1);e.lag+=(ratio-e.lag)*Math.min(1,dt*3);
+  _pv.set(ehx(e),e.y+e.hy*2.1+1.4,ehz(e)).project(camera);
+  if(_pv.z>1)continue;
+  const x=(_pv.x*.5+.5)*fxW,y=(-_pv.y*.5+.5)*fxH,w=(e.T.big?110:(small?40:56))*(small?Math.max(.8,k):1),h=e.T.big?8:(small?4:6);
+  fx.save();fx.globalAlpha=Math.min(1,e.showHp*2)*(small?.85:1);fx.translate(x,y);fx.transform(1,0,-.3,1,0,0);
+  fx.fillStyle='rgba(0,0,0,.6)';fx.fillRect(-w/2-1.5,-1.5,w+3,h+3);
+  fx.fillStyle='#ffffff';fx.fillRect(-w/2,0,w*e.lag,h);
+  fx.fillStyle=ratio>.5?'#6aff6a':ratio>.25?'#ffd23a':'#ff4a3a';fx.fillRect(-w/2,0,w*ratio,h);
+  fx.restore();
+ }
+ const cx=fxW*.5,cy=fxH*(isTouch?.5:.5),cr=Math.min(fxW,fxH)*.16;
+ for(let i=0;i<dnums.length;i++){
+  const n=dnums[i];n.age+=dt;
+  if(n.age>n.life){dnums.splice(i,1);i--;continue;}
+  if(small){n.ox+=n.vx*dt*.6;n.oy+=n.vy*dt*.45;n.vy+=300*dt;}else{n.ox+=n.vx*dt;n.oy+=n.vy*dt;n.vy+=300*dt;}
+  let sx,sy;
+  if(n.scr){sx=n.sx+n.ox;sy=n.sy+n.oy;}
+  else{_pv.set(n.x,n.y,n.z).project(camera);if(_pv.z>1)continue;sx=(_pv.x*.5+.5)*fxW+n.ox*(small?.5:1);sy=(-_pv.y*.5+.5)*fxH+n.oy;}
+  const a=n.age,pk=small?(n.crit?.3:.18):(n.crit?1.3:.8),pop=a<.12?1+(1-a/.12)*pk:1,fade=a>n.life-.25?(n.life-a)/.25:1;
+  let al=Math.max(0,fade);
+  if(small&&!n.scr){const d=Math.hypot(sx-cx,sy-cy);if(d<cr)al*=.3+.7*(d/cr);}
+  if(al<=.02)continue;
+  fx.save();fx.globalAlpha=al;fx.translate(sx,sy);if(!small)fx.rotate(n.rot);fx.scale(pop,pop);
+  fx.font=(small?'italic 800 ':'italic 900 ')+Math.round(n.size)+'px "Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif';
+  fx.textAlign='center';fx.textBaseline='middle';fx.lineJoin='round';
+  fx.lineWidth=small?Math.max(2,n.size*.16):Math.max(3,n.size*.2);fx.strokeStyle=n.stroke;
+  if(!small&&n.size>30&&!(GOV&&GOV.lv>1)){fx.shadowColor=n.glow;fx.shadowBlur=n.size*.5;}
+  fx.strokeText(n.txt,0,0);fx.shadowBlur=0;fx.fillStyle=n.col;fx.fillText(n.txt,0,0);
+  fx.restore();
+ }
+};
+/* 画面全体の白い光を控えめに（会心・大型の撃破で画面が真っ白にならないように） */
+{const _fl=flashScr;flashScr=function(a,col){return _fl.call(this,W280_DN==='big'?a:Math.min(a,.14),col);};}
+/* 表示の大きさ・位置（連続撃破の大きな文字・コンボ・お知らせ） */
+(function(){try{const st=document.createElement('style');st.id='w280Css';st.textContent=
+ 'body:not(.dnBig) #streak{top:17%;font-size:clamp(18px,3.4vw,32px);text-shadow:0 0 10px #ffb000,2px 2px 0 #b03a00}'+
+ 'body.touch:not(.dnBig) #streak{top:15%;font-size:clamp(15px,4.2vw,22px)}'+
+ 'body:not(.dnBig) #combo .cn{font-size:46px}body.touch:not(.dnBig) #combo .cn{font-size:26px}'+
+ 'body.touch:not(.dnBig) #toast{top:20%;font-size:13px}'+
+ '#w280Dn{margin-top:6px}#w280Dn .gqSeg button.on{outline:2px solid #ffd84a}';
+ document.head.appendChild(st);}catch(e){}})();
+function w280DnUI(){try{document.body.classList.toggle('dnBig',W280_DN==='big');const r=document.getElementById('w280Dn');if(!r)return;
+ for(const b of r.querySelectorAll('button'))b.classList.toggle('on',b.dataset.v===W280_DN);}catch(e){}}
+(function(){try{const s=document.getElementById('settings');if(!s||document.getElementById('w280Dn'))return;
+ const d=document.createElement('div');d.className='pwRow';d.id='w280Dn';d.style.cssText='flex-direction:column;align-items:stretch;gap:8px';
+ d.innerHTML='<div class="pwTx"><b>ダメージの数字</b><small>小さく表示すると、照準のまわりも見やすくなります</small></div><div class="gqSeg"><button type="button" data-v="small">小さく</button><button type="button" data-v="big">大きく</button><button type="button" data-v="off">出さない</button></div>';
+ const c=document.getElementById('setClose');s.insertBefore(d,c&&c.previousElementSibling&&c.previousElementSibling.tagName==='P'?c.previousElementSibling:c);
+ for(const b of d.querySelectorAll('button'))b.addEventListener('click',()=>w280DnSet(b.dataset.v));
+ w280DnUI();}catch(e){console.warn('w280 ui',e);}})();
+if(window.__TEST__)window.__T80={dn:()=>({mode:W280_DN,k:w280K(),n:dnums.length,max:DNX(),sizes:dnums.map(n=>Math.round(n.size))}),set:w280DnSet};
+
+/* ===================== v2.80 ステージ1〜9を別々の場所に作り分ける =====================
+   金田さん：「ステージ1〜9で同じステージが出てきているように感じる。一度壊した街が復活しているのは不思議」
+   調査：①ステージ1（カグラ環都の郊外）とステージ8（カグラ環都）が、どちらも高層の碁盤の街＋同じ未来建築
+         ②三脚の電波塔がステージ3（ミヤツ門前町）とステージ8の両方に建っていた
+   対応（金田さんの決定：別の場所に作り分ける）
+   - ステージ1（スロット1）：本当の郊外に。戸建ての住宅地・公園・畑・運動場が主で、駅前に低い商店街が1区画だけ。
+     高層・未来建築（エコタワー・中層の白い建物）は建てない。外周も住宅と畑（OUTER を country）
+   - ステージ3（スロット62）：電波塔をやめ、その敷地に鎮守の杜の神社（大鳥居・拝殿・本殿・御神木）。電波塔はステージ8だけ */
+var W280_SUB=false;
+{const _bw=buildWorld0;buildWorld0=function(si){const m=(si||0)+1;if(m!==1)return _bw.apply(this,arguments);
+ const t=themeOf(1),T=THEMES[t],sv={pool:T.pool,tall:T.tall},ko=OUTER[t],N=W223_NATS&&W223_NATS.jp,sn=N&&{down:N.down,res:N.res,cnt:N.cnt};
+ T.pool=['residential','residential','park','residential','country','residential','stadium','residential','country','residential','park','downtown'];T.tall=.55;OUTER[t]='country';
+ if(N){N.down='machiya';N.res='jpHouse';N.cnt='jpHouse';}
+ W280_SUB=true;
+ try{return _bw.apply(this,arguments);}
+ finally{W280_SUB=false;T.pool=sv.pool;T.tall=sv.tall;OUTER[t]=ko;if(N)Object.assign(N,sn);}};}
+/* 郊外では未来建築に置き換えない（v2.62 の w262City からスロット1を外す） */
+w262City=function(){return W262_N===55;};
+/* 郊外の都心区画は高い塔を建てず、低い商店街（町家）に */
+{const _t=STY.tokyo;STY.tokyo=function(mp,lot){if(W280_SUB&&STY.machiya)return STY.machiya(mp,lot);return _t.apply(this,arguments);};}
+{const _tw=STY.tower;if(_tw)STY.tower=function(mp,lot){if(W280_SUB&&STY.machiya)return STY.machiya(mp,lot);return _tw.apply(this,arguments);};}
+/* ステージ3：電波塔の代わりに神社 */
+{const _st=lmSkyTree;lmSkyTree=function(pb,x,z,k){if(CTN===62){try{w229Shrine(pb,x,z);if(window.__TEST__)window.__W280S={shrine:[Math.round(x),Math.round(z)]};}catch(e){console.warn('w280 shrine',e);}return;}return _st.apply(this,arguments);};}
+if(window.__TEST__)window.__T80B=()=>{const c={};for(const b of buildings){const k=b.eco?'eco':b.landmark?'landmark':(b.h>40?'tall':b.h>18?'mid':'low');c[k]=(c[k]||0)+1;}return{ctn:CTN,sub:W280_SUB,c,maxH:Math.round(Math.max(0,...buildings.map(b=>b.h||0)))};};
+
+/* ===================== v2.80 BGM を全面的に作り直す（Web Audio で合成・外部素材なし・すべて独自の曲） =====================
+   - 国（章）ごとに楽器・音階・リズムを変えた曲：ワダツ／天衡／ラージャヴァル／セネフ／カラメサ／マリセラ／セプタリオ／ベルリューヌ／グレイモア／終章
+   - タイトル・基地の曲、中ボス、母艦の曲
+   - 曲の構成：前奏(4小節) → A(8) → B(8・主旋律) → A'(8・主旋律と対旋律) → 間奏(4・打楽器を抜く) → A に戻る
+   - 敵が多いほど打楽器と高音を重ねる（緊張感）。音楽だけに軽い圧縮をかけ、急に大きくならないように
+   - 旋律は音階・和音から決まった手順で作る（乱数の種は曲ごとに固定＝毎回同じ曲） */
+var M80={on:true,cur:null,want:null,step:0,next:0,bus:null,cmp:null,heat:0,sec:0,songs:{},fill:false};
+const M80_SC={/* 音階（半音） */
+ minor:[0,2,3,5,7,8,10],dorian:[0,2,3,5,7,9,10],major:[0,2,4,5,7,9,11],phryg:[0,1,3,5,7,8,10],
+ miyako:[0,1,5,7,8],yo:[0,2,5,7,9],penta:[0,2,4,7,9],bhairav:[0,1,4,5,7,8,11],hijaz:[0,1,4,5,7,8,10],harm:[0,2,3,5,7,8,11],mixo:[0,2,4,5,7,9,10]};
+/* 曲の定義：root（MIDI）・bpm・音階・和音進行（各小節：根音の半音・種類 m/M/5/d/s）・リズム・楽器 */
+const M80_DEF={
+ title:{bpm:108,root:50,sc:'major',A:[[0,'M'],[7,'M'],[9,'m'],[5,'M'],[0,'M'],[7,'M'],[5,'M'],[7,'M']],B:[[9,'m'],[5,'M'],[0,'M'],[7,'M'],[9,'m'],[5,'M'],[2,'m'],[7,'M']],
+  dr:'march',bass:'string',pad:'string',arp:'harp',lead:'horn',ctr:'flute',perc:'timp',seed:11},
+ jp:{bpm:148,root:45,sc:'miyako',hsc:'minor',A:[[0,'m'],[-4,'M'],[-2,'M'],[0,'m'],[0,'m'],[-4,'M'],[-7,'m'],[-5,'M']],B:[[5,'m'],[3,'M'],[-2,'M'],[0,'m'],[5,'m'],[3,'M'],[-5,'s'],[-5,'M']],
+  dr:'rock',bass:'drive',pad:'synth',arp:'koto',lead:'shaku',ctr:'koto',perc:'taiko',seed:23},
+ cn:{bpm:138,root:50,sc:'penta',hsc:'major',A:[[0,'M'],[-3,'m'],[5,'M'],[7,'M'],[0,'M'],[-3,'m'],[2,'m'],[7,'M']],B:[[-3,'m'],[5,'M'],[0,'M'],[7,'M'],[-3,'m'],[2,'m'],[7,'s'],[7,'M']],
+  dr:'march',bass:'round',pad:'string',arp:'zheng',lead:'erhu',ctr:'flute',perc:'gong',seed:37},
+ in:{bpm:126,root:47,sc:'bhairav',hsc:'bhairav',A:[[0,'M'],[1,'M'],[0,'M'],[-1,'m'],[0,'M'],[1,'M'],[5,'m'],[0,'M']],B:[[5,'m'],[4,'M'],[1,'M'],[0,'M'],[5,'m'],[7,'5'],[1,'M'],[0,'M']],
+  dr:'tabla',bass:'round',pad:'drone',arp:'sitar',lead:'sitar',ctr:'flute',perc:'tabla',seed:41},
+ eg:{bpm:118,root:50,sc:'hijaz',hsc:'hijaz',A:[[0,'M'],[1,'M'],[0,'M'],[-2,'m'],[0,'M'],[1,'M'],[5,'m'],[0,'M']],B:[[5,'m'],[1,'M'],[-2,'m'],[0,'M'],[5,'m'],[3,'d'],[1,'M'],[0,'M']],
+  dr:'maqsum',bass:'round',pad:'drone',arp:'oud',lead:'ney',ctr:'oud',perc:'darbuka',seed:53},
+ us:{bpm:152,root:40,sc:'minor',hsc:'dorian',A:[[0,'5'],[0,'5'],[-2,'5'],[-4,'5'],[0,'5'],[3,'5'],[-2,'5'],[-5,'5']],B:[[3,'M'],[-2,'M'],[-4,'M'],[-2,'M'],[3,'M'],[-2,'M'],[-5,'m'],[-5,'M']],
+  dr:'rock',bass:'drive',pad:'guitar',arp:'guitar',lead:'brass',ctr:'synth',perc:'crash',seed:61},
+ es:{bpm:132,root:45,sc:'phryg',hsc:'phryg',A:[[0,'m'],[-2,'M'],[-4,'M'],[-5,'M'],[0,'m'],[-2,'M'],[-4,'M'],[-5,'M']],B:[[5,'m'],[0,'m'],[-2,'M'],[-5,'M'],[3,'M'],[-4,'M'],[-5,'M'],[-5,'M']],
+  dr:'palmas',bass:'round',pad:'string',arp:'nylon',lead:'trumpet',ctr:'nylon',perc:'casta',seed:71},
+ it:{bpm:116,root:48,sc:'minor',hsc:'harm',A:[[0,'m'],[-4,'M'],[-9,'m'],[-5,'M'],[0,'m'],[-4,'M'],[-7,'m'],[-5,'M']],B:[[-4,'M'],[-2,'M'],[3,'M'],[-5,'M'],[-4,'M'],[-9,'m'],[-7,'m'],[-5,'M']],
+  dr:'epic',bass:'string',pad:'choir',arp:'ostin',lead:'brass',ctr:'choir',perc:'timp',seed:83},
+ fr:{bpm:142,root:43,sc:'minor',hsc:'harm',A:[[0,'m'],[5,'m'],[-2,'M'],[3,'M'],[-4,'M'],[-9,'d'],[-5,'M'],[0,'m']],B:[[3,'M'],[-2,'M'],[5,'m'],[0,'m'],[-4,'M'],[-7,'m'],[-5,'M'],[-5,'M']],
+  dr:'snare',bass:'string',pad:'string',arp:'cemb',lead:'violin',ctr:'cemb',perc:'timp',seed:97},
+ gb:{bpm:130,root:50,sc:'dorian',hsc:'dorian',A:[[0,'m'],[-2,'M'],[0,'m'],[5,'M'],[0,'m'],[-2,'M'],[3,'M'],[-2,'M']],B:[[3,'M'],[-2,'M'],[5,'M'],[0,'m'],[3,'M'],[-2,'M'],[-5,'m'],[-2,'M']],
+  dr:'pipe',bass:'round',pad:'drone',arp:'harp',lead:'pipe',ctr:'whistle',perc:'snroll',seed:103},
+ fin:{bpm:158,root:47,sc:'minor',hsc:'harm',A:[[0,'m'],[-4,'M'],[-2,'M'],[0,'m'],[0,'m'],[-4,'M'],[-7,'m'],[-1,'d']],B:[[-4,'M'],[-2,'M'],[0,'m'],[-5,'M'],[-4,'M'],[-2,'M'],[-5,'s'],[-5,'M']],
+  dr:'epic',bass:'drive',pad:'choir',arp:'ostin',lead:'brass',ctr:'synth',perc:'taiko',seed:113},
+ mid:{bpm:166,root:40,sc:'phryg',hsc:'phryg',A:[[0,'5'],[1,'5'],[0,'5'],[3,'5'],[0,'5'],[1,'5'],[5,'5'],[3,'5']],B:[[0,'m'],[1,'M'],[-2,'M'],[1,'M'],[0,'m'],[1,'M'],[5,'m'],[3,'M']],
+  dr:'heavy',bass:'drive',pad:'synth',arp:'ostin',lead:'synth',ctr:'brass',perc:'crash',seed:127},
+ boss:{bpm:160,root:49,sc:'minor',hsc:'harm',A:[[0,'m'],[1,'M'],[0,'m'],[-4,'M'],[0,'m'],[1,'M'],[3,'M'],[-1,'d']],B:[[-4,'M'],[-2,'M'],[0,'m'],[1,'M'],[-4,'M'],[-2,'M'],[-5,'s'],[-5,'M']],
+  dr:'epic',bass:'drive',pad:'choir',arp:'ostin',lead:'brass',ctr:'choir',perc:'taiko',seed:131}};
+/* 乱数（曲ごとに固定） */
+function m80Rng(s){let a=s>>>0||1;return()=>{a^=a<<13;a>>>=0;a^=a>>17;a^=a<<5;a>>>=0;return a/4294967296;};}
+function m80Chord(root,q){const r=root;return q==='m'?[r,r+3,r+7]:q==='M'?[r,r+4,r+7]:q==='5'?[r,r+7,r+12]:q==='d'?[r,r+3,r+6]:q==='s'?[r,r+5,r+7]:[r,r+4,r+7];}
+/* 旋律：2小節の動機を作り、A A' B A'' の形で8小節に。強拍は和音の音、弱拍は音階の音 */
+function m80Melody(D,prog,R,lo){const sc=M80_SC[D.hsc||D.sc],rt=D.root+12*2,pick=(n,ref)=>{let best=n,bd=99;for(let o=-2;o<=3;o++)for(const s of sc){const c=rt+o*12+s;const d=Math.abs(c-ref);if(d<bd){bd=d;best=c;}}return best;};
+ const rh=[];/* 動機の音の長さ（16分音符単位）2小節＝32 */
+ const pats=[[4,2,2,4,4,8,4,4],[2,2,4,2,2,4,8,8],[6,2,4,4,6,2,8],[4,4,2,2,4,8,4,4],[3,3,2,4,4,8,8]];
+ const pa=pats[Math.floor(R()*pats.length)],pb=pats[Math.floor(R()*pats.length)];
+ const mk=(pat,bars,ref0)=>{const out=[];let t=0,ref=ref0;for(const d of pat){if(t>=32)break;const bar=bars+Math.floor(t/16),ch=prog[bar%prog.length],cr=m80Chord(D.root+ch[0],ch[1]);
+   let n;if(t%8===0){const c=cr[Math.floor(R()*3)]+24;n=pick(c,ref);n=pick(n,ref+(R()<.5?-2:3));let bd=99,bb=n;for(const c2 of cr)for(let o=1;o<=4;o++){const v=c2+o*12;if(Math.abs(v-n)<bd){bd=Math.abs(v-n);bb=v;}}n=bb;}
+   else{const st=(R()<.5?-1:1)*(R()<.7?1:2);let idx=0,bd=99;const all=[];for(let o=-2;o<=3;o++)for(const s of sc)all.push(rt+o*12+s);all.sort((a,b)=>a-b);for(let i=0;i<all.length;i++){const d2=Math.abs(all[i]-ref);if(d2<bd){bd=d2;idx=i;}}n=all[clamp(idx+st,0,all.length-1)];}
+   while(n<lo)n+=12;while(n>lo+19)n-=12;if(R()<.12&&t%8)out.push(null);else out.push([t,n,Math.min(d,32-t)]);ref=n;t+=d;}return out;};
+ const base=rt+(D.hsc==='major'||D.sc==='major'?4:3);
+ const m1=mk(pa,0,base),m2=mk(pa,2,base+2),m3=mk(pb,4,base+5),m4=mk(pa,6,base);
+ const all=[];const add=(m,o)=>{for(const e of m)if(e)all.push([e[0]+o*16,e[1],e[2]]);};add(m1,0);add(m2,2);add(m3,4);add(m4,6);
+ /* 最後の音は根音で終わる */if(all.length){const L=all[all.length-1];L[1]=pick(rt+12,L[1]);}
+ return all;}
+function m80Song(id){if(M80.songs[id])return M80.songs[id];const D=M80_DEF[id];const R=m80Rng(D.seed*7919+5);
+ const S={id,D,melA:m80Melody(D,D.A,R,D.root+20),melB:m80Melody(D,D.B,R,D.root+22),ctr:m80Melody(D,D.B,R,D.root+20)};
+ M80.songs[id]=S;return S;}
+/* ---------- 音を作る部品 ---------- */
+const m80f=n=>440*Math.pow(2,(n-69)/12);
+function m80Env(g,t,a,h,r,v){g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.0002,v),t+a);g.gain.setValueAtTime(Math.max(.0002,v),t+a+h);g.gain.exponentialRampToValueAtTime(0.0001,t+a+h+r);}
+function m80Osc(type,f,t,end,dt){const o=AC.createOscillator();o.type=type;o.frequency.setValueAtTime(f,t);if(dt)o.detune.value=dt;o.start(t);o.stop(end);return o;}
+function m80Out(){return M80.bus||busB||master;}
+function m80Noise(t,len,ft,f,q,v,a,dest){const s=AC.createBufferSource();s.buffer=noiseBuf;const fl=AC.createBiquadFilter();fl.type=ft;fl.frequency.value=f;if(q)fl.Q.value=q;const g=AC.createGain();m80Env(g,t,a||.002,0,len,v);s.connect(fl);fl.connect(g);g.connect(dest||m80Out());s.start(t,Math.random()*.5,len+.05);}
+const M80I={
+ kick(t,v){const o=m80Osc('sine',150,t,t+.4);o.frequency.exponentialRampToValueAtTime(44,t+.12);const g=AC.createGain();m80Env(g,t,.003,.02,.3,v);o.connect(g);g.connect(m80Out());m80Noise(t,.02,'highpass',3000,0,v*.25);},
+ snare(t,v){m80Noise(t,.16,'bandpass',1900,.8,v);const o=m80Osc('triangle',200,t,t+.15);o.frequency.exponentialRampToValueAtTime(150,t+.1);const g=AC.createGain();m80Env(g,t,.002,.01,.09,v*.6);o.connect(g);g.connect(m80Out());},
+ hat(t,v,op){m80Noise(t,op?.22:.035,'highpass',8200,0,v);},
+ clap(t,v){for(let i=0;i<3;i++)m80Noise(t+i*.011,.07+(i===2?.08:0),'bandpass',1400,1.2,v*(i===2?1:.6));},
+ taiko(t,v){const o=m80Osc('sine',105,t,t+.9);o.frequency.exponentialRampToValueAtTime(58,t+.35);const g=AC.createGain();m80Env(g,t,.004,.04,.55,v);o.connect(g);g.connect(m80Out());m80Noise(t,.16,'lowpass',420,0,v*.6);},
+ tom(t,f,v){const o=m80Osc('sine',f,t,t+.5);o.frequency.exponentialRampToValueAtTime(f*.6,t+.25);const g=AC.createGain();m80Env(g,t,.003,.02,.3,v);o.connect(g);g.connect(m80Out());},
+ timp(t,f,v){const o=m80Osc('sine',f,t,t+1.3);o.frequency.exponentialRampToValueAtTime(f*.82,t+.6);const g=AC.createGain();m80Env(g,t,.004,.05,1,v);o.connect(g);g.connect(m80Out());m80Noise(t,.25,'lowpass',380,0,v*.4);},
+ crash(t,v){m80Noise(t,1.6,'highpass',5200,0,v,.004);},
+ gong(t,v){for(const[r,a]of[[1,1],[1.48,.5],[2.13,.35],[2.9,.2]]){const o=m80Osc('sine',m80f(38)*r,t,t+3.2);const g=AC.createGain();m80Env(g,t,.01,.1,2.8,v*a);o.connect(g);g.connect(m80Out());}m80Noise(t,1.2,'bandpass',600,.6,v*.3,.01);},
+ tablaH(t,v){const o=m80Osc('sine',420,t,t+.3);o.frequency.exponentialRampToValueAtTime(470,t+.08);const g=AC.createGain();m80Env(g,t,.002,.01,.18,v);o.connect(g);g.connect(m80Out());},
+ tablaL(t,v){const o=m80Osc('sine',85,t,t+.5);o.frequency.exponentialRampToValueAtTime(130,t+.15);const g=AC.createGain();m80Env(g,t,.003,.03,.32,v);o.connect(g);g.connect(m80Out());},
+ doum(t,v){const o=m80Osc('sine',110,t,t+.45);o.frequency.exponentialRampToValueAtTime(80,t+.2);const g=AC.createGain();m80Env(g,t,.003,.02,.3,v);o.connect(g);g.connect(m80Out());},
+ tek(t,v){m80Noise(t,.05,'bandpass',3400,1.5,v);},
+ casta(t,v){m80Noise(t,.025,'bandpass',2600,3,v);m80Noise(t+.03,.025,'bandpass',2900,3,v*.7);},
+ shaker(t,v){m80Noise(t,.06,'bandpass',6500,1,v,.015);},
+ /* 旋律・和音 */
+ tone(type,n,t,len,v,cut,q,a,r,dt,vib,dest){const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.setValueAtTime(cut,t);f.Q.value=q||.7;const g=AC.createGain();m80Env(g,t,a||.01,Math.max(0,len-(a||.01)),r||.12,v);f.connect(g);g.connect(dest||m80Out());
+  const end=t+len+(r||.12)+.05;for(const d of (dt||[0])){const o=m80Osc(type,m80f(n),t,end,d);if(vib){const l=m80Osc('sine',vib[0],t,end),lg=AC.createGain();lg.gain.setValueAtTime(0,t);lg.gain.linearRampToValueAtTime(m80f(n)*vib[1],t+Math.min(.35,len*.6));l.connect(lg);lg.connect(o.frequency);}o.connect(f);}return f;},
+ pluck(type,n,t,v,cut,dec){const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.setValueAtTime(cut,t);f.frequency.exponentialRampToValueAtTime(Math.max(200,cut*.18),t+dec);const g=AC.createGain();m80Env(g,t,.002,.005,dec,v);f.connect(g);g.connect(m80Out());
+  const o=m80Osc(type,m80f(n),t,t+dec+.1);o.connect(f);const o2=m80Osc('sine',m80f(n+12),t,t+dec*.5+.05);const g2=AC.createGain();g2.gain.value=.3;o2.connect(g2);g2.connect(f);}};
+/* 楽器の割り当て（音色ごとの作り方） */
+function m80Play(kind,n,t,len,v){const I=M80I;switch(kind){
+ case 'string':I.tone('sawtooth',n,t,len,v*.55,1400,.6,.18,.35,[-8,8]);break;
+ case 'synth':I.tone('sawtooth',n,t,len,v*.5,2200,2,.01,.15,[-6,6]);break;
+ case 'choir':{const f=I.tone('triangle',n,t,len,v*.9,2600,.5,.25,.5,[-5,5],[5,.005]);break;}
+ case 'guitar':I.tone('sawtooth',n,t,len,v*.45,1600,3,.004,.1,[-10,10]);break;
+ case 'drone':I.tone('sawtooth',n,t,len,v*.4,700,1,.3,.4,[-4,4]);break;
+ case 'horn':I.tone('sawtooth',n,t,len,v*.5,1300,1.5,.06,.25,[-4,4],[4.5,.004]);break;
+ case 'brass':I.tone('sawtooth',n,t,len,v*.55,2000,1.8,.03,.18,[-6,6],[5,.004]);break;
+ case 'trumpet':I.tone('square',n,t,len,v*.38,2400,1.2,.02,.15,[0],[5.5,.006]);break;
+ case 'flute':I.tone('sine',n,t,len,v*.9,4000,.5,.05,.2,[0],[5,.007]);m80Noise(t,Math.min(.2,len),'bandpass',m80f(n)*2,2,v*.08,.03);break;
+ case 'whistle':I.tone('triangle',n,t,len,v*.8,5000,.5,.02,.12,[0],[6,.008]);break;
+ case 'shaku':I.tone('triangle',n,t,len,v*.85,2400,.8,.08,.25,[0],[4.5,.012]);m80Noise(t,Math.min(.35,len),'bandpass',m80f(n)*1.5,1.5,v*.12,.06);break;
+ case 'erhu':I.tone('sawtooth',n,t,len,v*.42,1800,3,.06,.2,[0],[6,.012]);break;
+ case 'ney':I.tone('sine',n,t,len,v*.85,3000,.5,.09,.3,[0],[5,.009]);m80Noise(t,Math.min(.4,len),'bandpass',m80f(n)*1.2,1,v*.14,.08);break;
+ case 'sitar':I.pluck('sawtooth',n,t,v*.55,4200,Math.min(1.2,len+.4));break;
+ case 'pipe':I.tone('sawtooth',n,t,len,v*.33,2600,4,.02,.08,[0,5]);break;
+ case 'violin':I.tone('sawtooth',n,t,len,v*.42,3000,2,.05,.18,[-3,3],[6,.008]);break;
+ case 'koto':I.pluck('triangle',n,t,v*.9,3600,.7);break;
+ case 'zheng':I.pluck('triangle',n,t,v*.8,4200,.9);break;
+ case 'oud':I.pluck('sawtooth',n,t,v*.45,1800,.55);break;
+ case 'nylon':I.pluck('triangle',n,t,v*.95,2600,.8);break;
+ case 'harp':I.pluck('triangle',n,t,v*.85,3000,1.1);break;
+ case 'cemb':I.pluck('square',n,t,v*.35,5000,.45);break;
+ case 'ostin':I.tone('sawtooth',n,t,Math.min(len,.12),v*.45,1600,2,.004,.08,[-6,6]);break;
+ default:I.tone('triangle',n,t,len,v*.6,2000);}}
+function m80Bass(kind,n,t,len,v){const I=M80I;
+ if(kind==='drive'){I.tone('sawtooth',n,t,len,v*.5,520,2,.004,.06);I.tone('sine',n-12,t,len,v*.7,300,.5,.004,.08);}
+ else if(kind==='string'){I.tone('sawtooth',n,t,len,v*.5,420,.7,.06,.2,[-6,6]);I.tone('sine',n-12,t,len,v*.6,200,.5,.05,.2);}
+ else{I.tone('triangle',n,t,len,v*.9,500,.7,.01,.12);I.tone('sine',n-12,t,len,v*.5,220,.5,.01,.12);}}
+/* ---------- リズム（16分音符16個／小節） ---------- */
+const M80_DR={
+ rock:{K:'x.......x.x.....',S:'....x.......x...',H:'x.x.x.x.x.x.x.x.'},
+ march:{K:'x.......x.......',S:'....x..x....x.xx',H:'..x...x...x...x.'},
+ heavy:{K:'x.x...x.x.x...x.',S:'....x.......x...',H:'x.xxx.xxx.xxx.xx'},
+ epic:{K:'x.....x...x.....',S:'....x.......x...',H:'x...x...x...x...',T:'x.......x...x...'},
+ tabla:{L:'x.....x...x.....',Hh:'..x.x...x.x.xx.x',H:'x...x...x...x...'},
+ maqsum:{D:'x.....x.........',Tk:'...x.x....x.x.x.',S:'........x.......'},
+ palmas:{K:'x.......x.......',C:'...x..x...x..x..',Ca:'x..x..x...x.x...'},
+ snare:{K:'x.......x.......',S:'....x.......x..x',H:'x.x.x.x.x.x.x.x.'},
+ pipe:{K:'x.......x.......',S:'..x.x.x...xxx.x.',H:'x...x...x...x...'}};
+/* ---------- 曲を進める ---------- */
+function m80Step(S,t,st,dur){const D=S.D,i=st%16,barAll=Math.floor(st/16);
+ /* 構成：0-3 前奏、4-11 A、12-19 B、20-27 A'、28-31 間奏（32小節で一巡） */
+ const L=barAll%32,sec=L<4?0:L<12?1:L<20?2:L<28?3:4,secBar=L<4?L:L<12?L-4:L<20?L-12:L<28?L-20:L-28;
+ const useB=sec===2,prog=useB?D.B:D.A,ch=prog[secBar%8],root=D.root+ch[0],cr=m80Chord(root,ch[1]);
+ const h=M80.heat,inten=sec===0?.35:sec===4?.45:sec===1?.75:1;
+ /* 和音（パッド）：小節の頭 */
+ if(i===0){const pv=(sec===4?.05:.04)*(sec===0?.8:1);for(const n of cr)m80Play(D.pad,n+12,t,dur*16*.98,pv);
+  if(D.pad==='drone')m80Play('drone',D.root,t,dur*16,.05);
+  if((sec===1||sec===3)&&secBar===0&&D.perc==='gong')M80I.gong(t,.12);
+  if(secBar===0&&sec!==4&&(D.perc==='crash'||D.dr==='epic'||D.dr==='rock'))M80I.crash(t,.035);}
+ /* 低音 */
+ if(sec!==4||i%8===0){const bp=D.bass==='drive'?(i%2===0):D.bass==='string'?(i%4===0):(i===0||i===6||i===8||i===14);
+  if(bp){const n=root-12+((D.bass==='drive'&&i%8===6)?7:0);m80Bass(D.bass,n,t,dur*(D.bass==='drive'?1.6:D.bass==='string'?3.8:2),.1*inten+.02);}}
+ /* 分散和音 */
+ if(sec!==0||i%4===0){const ap=D.arp,every=(ap==='ostin'||ap==='cemb')?1:(ap==='guitar'?2:2);
+  if(i%every===0&&!(sec===4&&ap==='ostin')){const seq=[0,1,2,1,2,0,1,2],k=seq[(i/every|0)%8],o=(ap==='harp'||ap==='zheng'||ap==='koto'||ap==='cemb')?24:12;
+   const n=ap==='ostin'?root+(i%4===0?12:i%4===2?19:15-(ch[1]==='M'?-1:0)):cr[k]+o;
+   const v=(ap==='ostin'?.05:ap==='guitar'?.045:.04)*(sec===0?.7:1)*(1+h*.2);m80Play(ap==='guitar'?'guitar':ap,n,t,dur*(ap==='ostin'?1:1.5),v);}}
+ /* 主旋律（B と A'）・対旋律（A'） */
+ const mel=sec===2?S.melB:sec===3?S.melA:null;
+ if(mel){const s=secBar*16+i;for(const e of mel)if(e[0]===s)m80Play(D.lead,e[1],t,dur*e[2]*.92,.07);}
+ if(sec===3){const s=secBar*16+i;for(const e of S.ctr)if(e[0]===s&&e[2]>=4)m80Play(D.ctr,e[1]-12,t,dur*e[2]*.9,.035);}
+ /* 打楽器 */
+ const P=M80_DR[D.dr]||M80_DR.rock,hit=(k)=>P[k]&&P[k][i]==='x',dv=sec===0?.55:sec===4?0:1;
+ if(dv){if(hit('K'))M80I.kick(t,.22*dv);if(hit('S'))M80I.snare(t,.09*dv);if(hit('H')&&(sec!==0))M80I.hat(t,(i%4===0?.035:.022)*(1+h*.5));
+  if(hit('C'))M80I.clap(t,.07*dv);if(hit('Ca'))M80I.casta(t,.05);if(hit('T'))M80I.taiko(t,.2*dv);
+  if(hit('L'))M80I.tablaL(t,.16);if(hit('Hh'))M80I.tablaH(t,.07);if(hit('D'))M80I.doum(t,.18);if(hit('Tk'))M80I.tek(t,.06);
+  if(D.perc==='taiko'&&(i===0||i===10)&&sec>=2)M80I.taiko(t,.16);
+  if(D.perc==='timp'&&i===0&&sec>=1)M80I.timp(t,m80f(D.root-12),.12);
+  if(D.perc==='snroll'&&secBar===7&&i>=8)M80I.snare(t,.03+.008*(i-8));
+  if(h>.5&&i%2===1&&sec>=1)M80I.shaker(t,.025*h);
+  /* 区切りの前の小節の終わりは軽いおかず */
+  if((L===3||L===11||L===19||L===27)&&i>=12)M80I.tom(t,[220,180,150,120][i-12],.1);}
+ else if(i===0)M80I.timp(t,m80f(D.root-12),.05);
+}
+function m80Want(){
+ if(bossMode&&state!=='title')return'boss';
+ if(MB&&!MB.dying&&state==='play')return'mid';
+ if(state==='title'||!wave)return'title';
+ try{const row=W223_PLAN.find(r=>r[0]===wave);if(wave>=74)return'fin';let nat=row&&row[2];if(!nat&&row){const C=CT_BY[row[1]];nat=C&&C.fl;}
+  return M80_DEF[nat]?nat:'jp';}catch(e){return'jp';}}
+function m80Bus(){if(M80.bus||!AC||!busB)return;try{const c=AC.createDynamicsCompressor();c.threshold.value=-20;c.knee.value=10;c.ratio.value=3;c.attack.value=.01;c.release.value=.3;
+ const g=AC.createGain();g.gain.value=.56;const i=AC.createGain();i.gain.value=1;i.connect(c);c.connect(g);g.connect(busB);M80.bus=i;M80.cmp=c;}catch(e){}}
+bgmTick=function(){
+ if(!AC||AC.state!=='running')return;
+ m80Bus();
+ const want=m80Want();
+ /* 敵の数で緊張感（0〜1） */
+ try{const n=(typeof enemies!=='undefined'&&enemies)?enemies.length:0;const tgt=state==='play'?clamp((n-6)/30,0,1):0;M80.heat+=(tgt-M80.heat)*.05;}catch(e){}
+ if(!M80.cur){M80.cur=m80Song(want);M80.step=0;M80.next=AC.currentTime+.1;}
+ let guard=0;
+ while(M80.next<AC.currentTime+.25&&guard++<64){
+  const S=M80.cur,dur=60/S.D.bpm/4;
+  /* 曲の切り替えは小節の頭で（前奏から） */
+  if(M80.step%16===0&&want!==S.id){M80.cur=m80Song(want);M80.step=0;}
+  const C=M80.cur,d2=60/C.D.bpm/4;
+  try{m80Step(C,M80.next,M80.step,d2);}catch(e){if(!M80.err){M80.err=1;console.warn('m80',e);}}
+  M80.next+=d2;M80.step++;
+ }
+ if(M80.next<AC.currentTime)M80.next=AC.currentTime+.05;
+};
+if(window.__TEST__){window.__T80M={want:m80Want,cur:()=>M80.cur&&M80.cur.id,heat:()=>M80.heat,song:m80Song,
+ /* オフラインで書き出し：曲 id と秒数 → {peak,rms} */
+ render:async(id,sec,heat)=>{const sv=[AC,master,busB,noiseBuf,M80.bus,M80.cmp];AC=new OfflineAudioContext(2,44100*sec|0,44100);master=AC.createGain();master.gain.value=.55;master.connect(AC.destination);
+  busB=AC.createGain();busB.gain.value=VOL.bgm;busB.connect(master);M80.bus=null;m80Bus();
+  noiseBuf=AC.createBuffer(1,44100,44100);{const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}
+  M80.heat=heat||0;const S=m80Song(id);let st=0,t=.05;while(t<sec-1){const d=60/S.D.bpm/4;m80Step(S,t,st,d);t+=d;st++;}
+  const buf=await AC.startRendering();[AC,master,busB,noiseBuf,M80.bus,M80.cmp]=sv;return buf;},
+ /* 旧BGMを同じ条件で書き出す（音量の比較用） */
+ renderOld:async(th,sec)=>{const sv=[AC,master,busB,noiseBuf,bgmNext,bgmStep,bgmCur];AC=new OfflineAudioContext(2,44100*sec|0,44100);master=AC.createGain();master.gain.value=.55;master.connect(AC.destination);
+  busB=AC.createGain();busB.gain.value=VOL.bgm;busB.connect(master);noiseBuf=AC.createBuffer(1,44100,44100);{const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}
+  const T=BGMT[th];let t=.05;bgmStep=0;while(t<sec-1){const dur=60/T.bpm/2,bar=Math.floor(bgmStep/8)%8,i=bgmStep%8,sec2=Math.floor(bgmStep/64)%2,bn=T.bass[bar],c=T.ch[bar];
+   tone(mf(bn),mf(bn)*.98,dur*.9,.16,T.bw,t,busB);tone(mf(c[T.arp[i]]+12),mf(c[T.arp[i]]+12),dur*.8,.05,T.aw,t,busB);if(sec2===1){const m=T.mel[(bgmStep%16)];if(m>=0){const n=(m===3?c[0]+12:c[m])+24;tone(mf(n),mf(n),dur*1.6,.045,T.lw,t,busB);}}bgmDrum(T.dr,i,t,bar);t+=dur;bgmStep++;}
+  const buf=await AC.startRendering();[AC,master,busB,noiseBuf,bgmNext,bgmStep,bgmCur]=sv;return buf;}};}
+
+/* ===== v2.81 川・水路・池の上に家が建たないように（点検用のフック） ===== */
+if(window.__TEST__)window.__WAUD=function(){const out=[],R=RIVER,RR=(typeof W238_RIV!=='undefined')?W238_RIV:null;
+ const inP=(x,z)=>PONDS.some(p=>x>p.x0+.5&&x<p.x1-.5&&z>p.z0+.5&&z<p.z1-.5);
+ const where=(x,z)=>{if(RR&&w238RivIn(x,z,-1.5))return 'river';if(R&&!RR&&Math.abs(z)<WH&&Math.abs(x-R.cx)<R.hw-1.5)return 'river';if(inP(x,z))return 'pond';return null;};
+ for(const b of buildings){if(!b.alive||b.x1==null)continue;const cx=(b.x0+b.x1)/2,cz=(b.z0+b.z1)/2,hx=(b.x1-b.x0)/2*.6,hz=(b.z1-b.z0)/2*.6;let w=null;
+  for(const[x,z]of[[cx,cz],[cx-hx,cz-hz],[cx+hx,cz-hz],[cx-hx,cz+hz],[cx+hx,cz+hz]]){w=where(x,z);if(w)break;}
+  if(w&&!/^(highway|lamp|bridge|pier|sign|signal|pole|wire)$/.test(b.name||''))out.push([b.name,Math.round(cx),Math.round(cz),w,Math.round(b.h||0),Math.round(b.x1-b.x0),Math.round(b.z1-b.z0)]);}
+ return {riv:!!R,rr:!!RR,cx:R?Math.round(R.cx):null,hw:R?R.hw:null,ponds:PONDS.length,n:out.length,list:out.slice(0,15)};};
+/* 国の様式で建てる区画（ctryBlock）は、川・水路・池をよけずに建てていた（区画の切り抜き zClip を通らない道があった）
+   → 区画を川・水路・池・海の四角で切り抜いてから建てる */
+{const _cb=ctryBlock;ctryBlock=function(R,zone,S){if(!R)return _cb.apply(this,arguments);let P=[R];
+ try{const W=waterRects(false).concat(PONDS.map(p=>({x0:p.x0-2,x1:p.x1+2,z0:p.z0-2,z1:p.z1+2})));for(const w of W)P=P.flatMap(p=>subRect(p,w));}catch(e){P=[R];}
+ if(P.length===1&&P[0]===R)return _cb.call(this,R,zone,S);
+ for(const p of P){if(p.x1-p.x0<10||p.z1-p.z0<10)continue;_cb.call(this,Object.assign({},R,{x0:p.x0,x1:p.x1,z0:p.z0,z1:p.z1}),zone,S);}};}
+/* 念のための後片付け：組み立てのあと、川・水路・池の水の上に残った家を取り除く */
+const W281_KILL=/^(house|tower|apt|shop|office|mansion|factory|warehouse|hotel|school|store|hut|farm|bld|tree)$/;
+function w281Sweep(){const R=RIVER,RR=(typeof W238_RIV!=='undefined')?W238_RIV:null;let n=0;
+ const inW=(x,z)=>{if(RR&&w238RivIn(x,z,-2))return true;if(R&&!RR&&Math.abs(z)<WH&&Math.abs(x-R.cx)<R.hw-2)return true;return typeof pondAt==='function'?pondAt(x,z):false;};
+ for(const b of buildings){if(!b.alive||b.x1==null||!W281_KILL.test(b.name||''))continue;const cx=(b.x0+b.x1)/2,cz=(b.z0+b.z1)/2,hx=(b.x1-b.x0)*.3,hz=(b.z1-b.z0)*.3;
+  if([[cx,cz],[cx-hx,cz-hz],[cx+hx,cz-hz],[cx-hx,cz+hz],[cx+hx,cz+hz]].some(([x,z])=>inW(x,z))){b.alive=false;b.hp=0;if(b.pb){try{b.pb.squash(b,1);}catch(e){}}else if(b.mesh)b.mesh.visible=false;n++;}}
+ if(n)for(const p of PBS)if(p.dA||p.dG)p.flush();if(window.__TEST__)window.__W281N=n;}
+{const _bw=buildWorld0;buildWorld0=function(){const r=_bw.apply(this,arguments);try{if(RIVER||PONDS.length)w281Sweep();}catch(e){console.warn('w281',e);}return r;};}
+
+/* ===== v2.82 天衡帝国 ステージ11「茶畑の段丘」の作り込み =====
+   ・霧の朝の茶の山里：谷の農道を挟んで、丸い茶の山がいくつも並ぶ。山の斜面は段丘（1段1.8m、法面は歩いて登れる急さ）、
+     段の上には茶の畝（立体の生け垣）が等高線に沿って続く。山の頂は小さな森
+   ・戦場の外：茶の山がそのまま続き、遠くは高い山並み（霧にかすむ）。谷は外まで続く
+   ・谷の村：白い漆喰と黒い瓦、階段状の防火壁の二階家（茶農家）、茶工場（干し場と煙突）
+   ・名所：いちばん高い茶の山の頂に展望台、二番目の山の頂に八角七重の塔
+   ・伝統と未来の融合：谷のロープウェイの駅（白い箱を重ね、木の格子・緑の屋根・階段状の壁）
+   ・交通：谷の駅から山頂までロープウェイ（ゴンドラが上り下り） */
+var W282_ON=false,W282_HL=[],W282_STAT={},W282_RW=null;
+try{for(const r of(W223_PLAN||[]))if(r[0]===11){ATM_FIX[r[1]]=['mo','cd'];}}catch(e){}
+function w282Off(L,Y){if(!Y)return L;return{add:(g,c,a,b,d,x,y,z,...r)=>L.add(g,c,a,b,d,x,y+Y,z,...r)};}
+{const _bw=buildWorld0;buildWorld0=function(si){let n=0;try{n=w224Stage((si||0)+1);}catch(e){}W282_ON=n===11;W282_HL=[];W282_STAT={};W282_RW=null;window.W282_MAIN=null;
+ if(W282_ON)w282Plan();const r=_bw.apply(this,arguments);if(W282_ON){try{w282After();}catch(e){console.warn('w282',e);}}return r;};}
+
+/* ---------- 茶の山（丸い山）と遠くの山並み ---------- */
+function w282Plan(){const LIM=RING-6,H=W282_HL;
+ for(let q=0;q<400&&H.filter(h=>h.in).length<(isTouch?5:6);q++){const x=rnd(-BOUND+25,BOUND-25),z=rnd(-BOUND+25,BOUND-25);if(H.some(h=>Math.hypot(h.x-x,h.z-z)<115))continue;H.push({x,z,r:rnd(78,118),H:rnd(20,34),in:1,w:rnd(0,6),a:rnd(0,3.14),e:rnd(.72,1.3)});}
+ for(let q=0;q<900&&H.length<60;q++){const a=rnd(0,6.283),R=rnd(330,1050),x=Math.cos(a)*R,z=Math.sin(a)*R;if(H.some(h=>Math.hypot(h.x-x,h.z-z)<(h.in?150:170)))continue;H.push({x,z,r:rnd(110,210),H:rnd(34,95)*(.6+.4*Math.min(1,R/700)),in:0,w:rnd(0,6),a:rnd(0,3.14),e:rnd(.7,1.35)});}}
+function w282Hills(x,z){let m=0;for(const h of W282_HL){const ux=x-h.x,uz=z-h.z;if(Math.abs(ux)>h.r*1.6||Math.abs(uz)>h.r*1.6)continue;const ca=Math.cos(h.a),sa=Math.sin(h.a),lx=(ux*ca+uz*sa)/h.e,lz=(-ux*sa+uz*ca)*h.e,th=Math.atan2(lz,lx),rr=h.r*(1+.16*Math.sin(3*th+h.w)+.08*Math.sin(5*th+2*h.w)),d=Math.hypot(lx,lz);if(d>=rr)continue;const c=Math.cos(Math.PI/2*d/rr),v=h.H*c*c*(.88+.12*Math.sin(x*.05+h.w)*Math.sin(z*.043+h.w*1.3));if(v>m)m=v;}return m;}
+function w282Mtn(x,z){const R=Math.hypot(x,z);if(R<620)return 0;return (110+170*w265Ridge(x*.0032+7,z*.0032+2))*w265Sm(620,1050,R);}
+function w282Dm(x,z){const M=window.W282_MAIN;if(!M||!M.length)return 99;let d=1e9;for(let i=0;i<M.length;i+=3){const p=M[i],v=(p[0]-x)*(p[0]-x)+(p[1]-z)*(p[1]-z);if(v<d)d=v;}d=Math.sqrt(d);const a=M[0],b=M[M.length-1];if(z<a[1])d=Math.min(d,Math.abs(x-a[0]));if(z>b[1])d=Math.min(d,Math.abs(x-b[0]));return d;}
+function w282In(x,z,dm,dk){return w282Hills(x,z)*_sm(7,46,dm)*_sm(1.5,12,dk);}
+function w282H(x,z){return w282Hills(x,z)*_sm(7,46,w282Dm(x,z))+w282Mtn(x,z);}
+/* 色：谷の畑・遠くの茶の段丘の縞・森・岩 */
+function w282Floor(x,z){const v=Math.floor((z+5*Math.sin(x*.045))/9),u=Math.floor((x+7*Math.sin(z*.03)+v*6.3)/13),k=(((u*7+v*3)%5)+5)%5;return[0x5e8040,0x668a46,0x58783c,0x6e8a4a,0x76784a][k];}
+function w282Col(x,z){const h=w282H(x,z);if(h<.5)return w282Floor(x,z);const dx=w282H(x+3,z)-w282H(x-3,z),dz=w282H(x,z+3)-w282H(x,z-3),ny=6/Math.hypot(dx,6,dz);
+ if(h<90&&Math.hypot(x,z)<900){return (Math.floor(h/1.8)&1)?(ny<.86?0x4a6a30:0x3a6a30):0x56803e;}return ny<.75?0x6e6a60:0x2e5028;}
+
+/* ---------- 茶の畝（等高線に沿った生け垣）：段の上の2本の筋を、等高線（マーチング・スクエア）でたどる ---------- */
+function w282Hedges(D){const{X0,Z0,N,cc,B,H,TY,STEP,nearHse,LIM}=D;const geo=new THREE.CylinderGeometry(.5,.5,1,6,1).rotateZ(Math.PI/2);
+ const MAX=isTouch?9000:26000,m=new THREE.InstancedMesh(geo,new THREE.MeshStandardMaterial({roughness:.95,flatShading:true}),MAX),o=new THREE.Object3D(),C=new THREE.Color(),TC=[0x2f5e2a,0x3a6e30,0x467a34,0x356628,0x4e8238];let k=0;
+ const rows=isTouch?[.3]:[.26,.58],mxH=Math.max(...W282_HL.filter(h=>h.in).map(h=>h.H),1);
+ const put=(x1,z1,x2,z2)=>{if(k>=MAX)return;const mx=(x1+x2)/2,mz=(z1+z2)/2;if(Math.max(Math.abs(mx),Math.abs(mz))>LIM-60)return;const i=Math.round((mx-X0)/cc),j=Math.round((mz-Z0)/cc);if(i<0||j<0||i>=N||j>=N)return;const kk=j*N+i;if(TY[kk]!==1)return;
+  if(nearHse(mx,mz))return;try{if(onRoad(mx,mz,-2))return;}catch(e){}const len=Math.hypot(x2-x1,z2-z1);if(len<.2)return;
+  o.position.set(mx,H[kk]+.22,mz);o.rotation.set(0,-Math.atan2(z2-z1,x2-x1),0);o.scale.set(len+.9,1,1.3);o.updateMatrix();m.setMatrixAt(k,o.matrix);m.setColorAt(k++,C.setHex(TC[(Math.random()*TC.length)|0]));};
+ for(let lv=0;lv*STEP<mxH+STEP;lv++)for(const q of rows){const L=(lv+q)*STEP;if(L<.5)continue;
+  for(let j=0;j<N-1;j++)for(let i=0;i<N-1;i++){const a=B[j*N+i],b=B[j*N+i+1],c=B[(j+1)*N+i],d=B[(j+1)*N+i+1];const lo=Math.min(a,b,c,d),hi=Math.max(a,b,c,d);if(L<lo||L>=hi)continue;
+   const x0=X0+i*cc,z0=Z0+j*cc,P=[];const e=(va,vb,xa,za,xb,zb)=>{if((va<L)!==(vb<L)){const t=(L-va)/(vb-va);P.push([xa+(xb-xa)*t,za+(zb-za)*t]);}};
+   e(a,b,x0,z0,x0+cc,z0);e(b,d,x0+cc,z0,x0+cc,z0+cc);e(d,c,x0+cc,z0+cc,x0,z0+cc);e(c,a,x0,z0+cc,x0,z0);if(P.length>=2)put(P[0][0],P[0][1],P[1][0],P[1][1]);if(P.length===4)put(P[2][0],P[2][1],P[3][0],P[3][1]);}}
+ m.count=k;m.instanceMatrix.needsUpdate=true;if(m.instanceColor)m.instanceColor.needsUpdate=true;m.castShadow=!isTouch;m.receiveShadow=true;WR.add(m);W282_STAT.hedges=k;}
+
+/* ---------- 茶農家：白い漆喰・黒い瓦・階段状の防火壁の二階家（干し台つき） ---------- */
+function w282Farm(pb,x,z,y,ry,s){s=s||1;const w=9.6*s,d=6.4*s,Hh=6.2*s,rh=2.4*s,WW=[0xf2efe8,0xece8de,0xf4f1ea][(Math.random()*3)|0],TL=0x34373c,TL2=0x2a2c30,WD=0x5a3a26;
+ return propAt(pb,x,z,ry,w/2+1,d/2+3,y+Hh+rh+1.6,{hp:160,arm:.6},(L0,G0)=>{const L=w282Off(L0,y),G=w282Off(G0,y);
+  L.add(GB,0x6a6862,w+.4,.7+y,d+.4,0,-y/2+.1,0);L.add(GB,WW,w,Hh,d,0,Hh/2+.45,0);const fz=d/2+.06;
+  L.add(GB,WD,w*.5,2.4,.1,0,1.65,fz);L.add(GB,0x2a1e16,1.2,2.1,.12,0,1.5,fz+.03);for(const u of[-1,1])L.add(GB,0x2a2620,1.1,1,.1,u*w*.33,2,fz);
+  L.add(GB,WD,w*.78,1.4,.12,0,Hh-1,fz);for(let q=-2;q<=2;q++)L.add(GB,0x2a2018,.08,1.2,.14,q*w*.15,Hh-1,fz+.03);
+  const a=Math.atan2(rh,d/2),sl=Math.hypot(rh,d/2)+.5;for(const sg of[-1,1])L.add(GB,sg>0?TL:TL2,w+.5,.24,sl,0,Hh+.45+rh/2-.15,sg*(d/4+.1),sg*a,0,0);
+  L.add(gableGeo(),WW,w-.05,rh,d,0,Hh+.45,0);L.add(GB,TL2,w+.1,.36,.5,0,Hh+.45+rh+.08,0);
+  for(const sg of[-1,1]){const xx=sg*(w/2+.05);for(const[hz,ty]of[[d/2,Hh+.45+rh*.42],[d*.3,Hh+.45+rh*.85],[d*.13,Hh+.45+rh+.9]]){L.add(GB,WW,.34,ty-Hh-.45+.02,hz*2,xx,(ty+Hh+.45)/2,0);L.add(GB,TL2,.5,.2,hz*2+.4,xx,ty+.1,0);}}
+  /* 前庭の茶の干し台（四角い竹のざる） */for(let q=-1;q<=1;q++){L.add(GB,0x8a6a40,2.2,.08,1.4,q*2.6,1.1,fz+2.2);L.add(GB,0x6a8a3a,2,.06,1.2,q*2.6,1.16,fz+2.2);for(const u of[-.9,.9])L.add(GB,0x6a5030,.1,1.1,.1,q*2.6+u,.55,fz+2.2);}
+  G.add(GS,0xff3a28,.3,.4,.3,w*.18,2.7,fz+.35);});}
+{const _cf=w232CnFarm;w232CnFarm=function(pb,x,z,y,ry,s){if(W282_ON)return w282Farm(pb,x,z,y||0,ry,s);return _cf.apply(this,arguments);};}
+
+/* ---------- 茶工場（長い二階建て・干し場・煙突） ---------- */
+function w282Factory(pb,x,z,ry){return propAt(pb,x,z,ry,15,9,16,{hp:600,arm:.6,name:'house'},(L,G)=>{const WW=0xeeeae0,TL=0x34373c,TL2=0x2a2c30;
+ L.add(GB,0x6a6862,27,.6,10.5,0,.3,0);L.add(GB,WW,26,7.4,10,0,4.3,0);for(let q=-5;q<=5;q++){L.add(GB,0x2a3038,1.4,1.3,.1,q*2.3,2.4,5.03);L.add(GB,0x2a3038,1.4,1.3,.1,q*2.3,5.6,5.03);}
+ L.add(GB,0x4a3222,3,3,.12,-8,1.8,5.05);L.add(GB,0x4a3222,3,3,.12,8,1.8,5.05);
+ const a=Math.atan2(3,5),sl=Math.hypot(3,5)+.6;for(const s of[-1,1])L.add(GB,s>0?TL:TL2,26.8,.26,sl,0,8+1.5-.15,s*2.6,s*a,0,0);L.add(gableGeo(),WW,25.9,3,10,0,8,0);L.add(GB,TL2,27,.36,.5,0,11.1,0);
+ /* 屋根の上の換気の小屋根 */L.add(GB,WW,8,1.2,2,0,11.5,0);L.add(GB,TL,8.6,.22,2.6,0,12.2,0);
+ /* 煙突（れんが） */L.add(GB,0x8a4a36,1.6,15,1.6,11,7.5,-3.2);L.add(GB,0x5a3024,1.9,.5,1.9,11,15.2,-3.2);
+ /* 干し場：四角いざるの棚 */for(let r=0;r<3;r++)for(let q=-3;q<=3;q++){const zz=8+r*2.4;L.add(GB,0x6a5030,.12,1.4,.12,q*3.2,.7,zz);L.add(GB,0x8a6a40,2.6,.08,1.8,q*3.2,1.42,zz);L.add(GB,r%2?0x6a8a3a:0x7a9a44,2.4,.06,1.6,q*3.2,1.48,zz);}
+ G.add(GB,0xffe0a8,22,.12,.06,0,3,5.08);});}
+
+/* ---------- 伝統と未来の融合：ロープウェイの駅（谷）・山頂の駅と展望台 ---------- */
+function w282Station(pb,x,z,ry,Y,top){const s=top?.8:1;return propAt(pb,x,z,ry,10*s,8*s,(top?10:15)+(Y||0),{hp:top?500:900,arm:.7,name:'house'},(L0,G0)=>{const L=w282Off(L0,Y||0),G=w282Off(G0,Y||0);const WW=0xf2f0ea,TL2=0x2c2e32,GL=0x506878,WD=0xa06a3c;
+ if(Y)L.add(GB,0x8a8478,20*s,Y+1,15*s,0,-Y/2-.2,0);
+ L.add(GB,0x9a958a,20*s,.6,15*s,0,.3,0);L.add(GB,WW,18*s,4.6,12*s,0,2.9,0);L.add(GB,GL,15*s,2.2,.12,0,2.8,6*s+.05);L.add(GB,GL,15*s,2.2,.12,0,2.8,-6*s-.05);
+ for(let q=-6;q<=6;q++)L.add(GB,WD,.14,2.6,.32,q*1.2*s,2.8,6*s+.25);
+ L.add(GB,WW,14*s,4,10*s,2*s,7.2,-1*s);L.add(GB,GL,11*s,1.8,.12,2*s,7.2,4*s+.05);L.add(GB,TL2,14.6*s,.24,10.6*s,2*s,9.3,-1*s);
+ for(const sg of[-1,1]){const xx=2*s+sg*(7*s-.2);for(const[hz,th]of[[5*s,1],[3*s,2],[1.2*s,3]]){L.add(GB,WW,.4,th,hz*2,xx,9.4+th/2,-1*s);L.add(GB,TL2,.6,.22,hz*2+.4,xx,9.4+th+.11,-1*s);}}
+ L.add(GB,0x5a7a3a,10*s,.3,7*s,2*s,9.55,-1*s);
+ /* 索道の滑車の小屋（片側に張り出し） */L.add(GB,0x4a4e54,5*s,4,9*s,-11*s,4.5,0);L.add(GCY16,0x2a2c30,.6,.4,4.2*s,-11*s,6.8,0,Math.PI/2,0,0);
+ G.add(GB,0xffe8c0,14*s,.1,.06,0,4.2,6*s+.12);});}
+function w282Deck(pb,x,z,Y){return propAt(pb,x,z,0,5,5,9+Y,{hp:200,arm:.5,name:'prop'},(L0,G0)=>{const L=w282Off(L0,Y);L.add(GB,0x8a8478,10,Y+1,10,0,-Y/2-.2,0);
+ L.add(GB,0x9a958a,10,.5,10,0,.25,0);for(const[a,b]of[[-4.5,-4.5],[4.5,-4.5],[-4.5,4.5],[4.5,4.5]])L.add(GB,0xa8402e,.3,4,.3,a,2.5,b);L.add(GB,0x5a3422,10.4,.3,10.4,0,4.6,0);
+ L.add(W279_C8,0x34373c,8,2.6,8,0,6.1,0,0,Math.PI/8,0);L.add(GS,0xc8a040,.4,.5,.4,0,7.6,0);for(const s of[-1,1]){L.add(GB,0x8a6a40,10,.9,.15,0,1,s*4.9);L.add(GB,0x8a6a40,.15,.9,10,s*4.9,1,0);}});}
+
+/* ---------- ロープウェイ（谷の駅 → いちばん高い茶の山の頂） ---------- */
+function w282Ropeway(A,B){const M=new Merger(),TL=new LM(M,0,0,0,0),dx=B[0]-A[0],dz=B[1]-A[1],D=Math.hypot(dx,dz),ux=dx/D,uz=dz/D,px=-uz,pz=ux,ang=Math.atan2(dz,dx);
+ const nT=Math.max(1,Math.ceil(D/60)-1),pts=[];const ya=terrH(A[0],A[1])+11,yb=terrH(B[0],B[1])+9;pts.push([A[0],ya,A[1]]);
+ for(let i=1;i<=nT;i++){const t=i/(nT+1),x=A[0]+dx*t,z=A[1]+dz*t,g=terrH(x,z),hT=14;const y=g+hT;pts.push([x,y,z]);
+  const L=new LM(M,x,g,z,-ang);for(const[a,b]of[[-1.2,-1.6],[1.2,-1.6],[-1.2,1.6],[1.2,1.6]])L.add(GB,0x6a6e74,.3,hT+.6,.3,a*.55,hT/2-.3,b*.55,b*.03,0,-a*.03);
+  for(let q=1;q<5;q++)L.add(GB,0x5a5e64,.16,.16,1.8,0,q*hT/5,0);L.add(GB,0x4a4e54,1.4,.5,6.2,0,hT,0);L.add(GB,0x8a8e94,2.4,.4,.8,0,hT-.6,0);}
+ pts.push([B[0],yb,B[1]]);
+ /* 架線（上り・下りの2本） */for(let i=0;i<pts.length-1;i++){const p=pts[i],q=pts[i+1],L2=Math.hypot(q[0]-p[0],q[2]-p[2]),dy=q[1]-p[1],len=Math.hypot(L2,dy),pit=Math.atan2(dy,L2);
+  for(const s of[-1,1]){const L=new LM(M,(p[0]+q[0])/2+px*s*2.4,(p[1]+q[1])/2,(p[2]+q[2])/2+pz*s*2.4,-ang);L.add(GB,0x2a2c30,len,.09,.09,0,0,0,0,0,pit);}}
+ const mesh=M.build(detMat);mesh.castShadow=!isTouch;mesh.userData.keep=1;WR.add(mesh);
+ /* ゴンドラ */const GM=new Merger(),GL=new LM(GM,0,0,0,0);GL.add(GB,0xc8402e,2.2,1.3,2.2,0,-3,0);GL.add(GB,0xf2efe8,2.2,.9,2.2,0,-1.9,0);GL.add(GB,0x2a3a48,2.24,.6,1.9,0,-2.1,0);GL.add(GB,0x34373c,2.4,.18,2.4,0,-1.36,0);GL.add(GB,0x4a4e54,.12,1.3,.12,0,-.65,0);GL.add(GB,0x4a4e54,.6,.2,.3,0,0,0);
+ const gg=GM.build(detMat),seg=[];let tot=0;for(let i=0;i<pts.length-1;i++){const l=Math.hypot(pts[i+1][0]-pts[i][0],pts[i+1][1]-pts[i][1],pts[i+1][2]-pts[i][2]);seg.push(l);tot+=l;}
+ const at=s=>{let i=0;while(i<seg.length-1&&s>seg[i]){s-=seg[i];i++;}const t=Math.min(1,s/seg[i]),p=pts[i],q=pts[i+1];return[p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t,p[2]+(q[2]-p[2])*t];};
+ const cars=[],nc=isTouch?3:5;for(const lane of[-1,1])for(let i=0;i<nc;i++){const m=gg.clone();m.castShadow=!isTouch;m.userData.keep=1;WR.add(m);cars.push({m,lane,s:tot*(i+.5)/nc});}
+ const v=3.2;worldTick.push(dt=>{for(const c of cars){c.s=(c.s+v*dt)%tot;const s=c.lane>0?c.s:tot-c.s,p=at(s);c.m.position.set(p[0]+px*c.lane*2.4,p[1]-.05,p[2]+pz*c.lane*2.4);c.m.rotation.y=-ang;}});
+ W282_RW={pts:pts.length,len:Math.round(tot),cars:cars.length};}
+
+/* ---------- 戦場の外：茶の山と山並みの地形・木 ---------- */
+function w282Outer(){const LIM=RING-6,S=1500,C=10,n=Math.round(2*S/C)+1,Hh=new Float32Array(n*n);for(let j=0;j<n;j++)for(let i=0;i<n;i++)Hh[j*n+i]=w282H(-S+i*C,-S+j*C);
+ const pos=new Float32Array(n*n*3),col=new Float32Array(n*n*3),idx=[],ins=(x,z)=>Math.abs(x)<LIM-.5&&Math.abs(z)<LIM-.5,cc=new THREE.Color();
+ for(let j=0;j<n;j++)for(let i=0;i<n;i++){const k=j*n+i,x=-S+i*C,z=-S+j*C;pos[k*3]=x;pos[k*3+1]=(Hh[k]>0?Hh[k]:-.02)-(ins(x,z)?.6:0);pos[k*3+2]=z;}
+ for(let j=0;j<n-1;j++)for(let i=0;i<n-1;i++){const a=j*n+i,b=a+1,c=a+n,d=c+1;if(Hh[a]<=.05&&Hh[b]<=.05&&Hh[c]<=.05&&Hh[d]<=.05)continue;const x0=-S+i*C,z0=-S+j*C;if(ins(x0,z0)&&ins(x0+C,z0)&&ins(x0,z0+C)&&ins(x0+C,z0+C))continue;idx.push(a,c,b,b,c,d);}
+ for(let k=0;k<n*n;k++){cc.setHex(w282Col(pos[k*3],pos[k*3+2]));const h=Hh[k];if(h>120)cc.lerp(new THREE.Color(0x8a9098),w265Sm(120,300,h)*.35);col[k*3]=cc.r;col[k*3+1]=cc.g;col[k*3+2]=cc.b;}
+ const G=new THREE.BufferGeometry();G.setAttribute('position',new THREE.BufferAttribute(pos,3));G.setAttribute('color',new THREE.BufferAttribute(col,3));G.setIndex(idx);G.computeVertexNormals();
+ const M=new THREE.Mesh(G,new THREE.MeshStandardMaterial({vertexColors:true,roughness:1}));M.receiveShadow=true;M.userData.keep=1;WR.add(M);
+ for(const[x0,x1,z0,z1]of[[-RING-40,RING+40,-RING-40,-LIM],[-RING-40,RING+40,LIM,RING+40],[-RING-40,-LIM,-LIM,LIM],[LIM,RING+40,-LIM,LIM]]){const c=4,nx=Math.ceil((x1-x0)/c)+1,nz=Math.ceil((z1-z0)/c)+1,hh=new Float32Array(nx*nz);let mx=0;
+  for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const v=w282H(x0+i*c,z0+j*c);hh[j*nx+i]=v;if(v>mx)mx=v;}TERR.push({x0,z0,x1:x0+(nx-1)*c,z1:z0+(nz-1)*c,nx,nz,cx:c,cz:c,h:hh,max:mx,w282:1});}
+ let nk=0;for(const b of buildings){if(!b.alive||b.name==='landmark')continue;const bx=b.x0!==undefined?(b.x0+b.x1)/2:b.x,bz=b.z0!==undefined?(b.z0+b.z1)/2:b.z;if(Math.max(Math.abs(bx),Math.abs(bz))>LIM-2&&w282H(bx,bz)>.5){forceKill(b);nk++;}}
+ return[idx.length/3,nk];}
+{const _r=w238RivIn;w238RivIn=function(x,z,m){if(W282_ON&&Math.max(Math.abs(x),Math.abs(z))>BOUND+4&&w282H(x,z)>.5)return true;return _r.apply(this,arguments);};}
+function w282Trees(){const LIM=RING-6,NT=isTouch?2400:6000,cone=new THREE.ConeGeometry(1,1,6).translate(0,.5,0),blob=new THREE.DodecahedronGeometry(1,0).scale(1,.85,1).translate(0,1,0);
+ const mC=new THREE.InstancedMesh(cone,new THREE.MeshStandardMaterial({roughness:1,flatShading:true}),NT),mB=new THREE.InstancedMesh(blob,new THREE.MeshStandardMaterial({roughness:1,flatShading:true}),NT),o=new THREE.Object3D(),C=new THREE.Color();let kc=0,kb=0;
+ const TC=[0x2e5228,0x37602e,0x2a4a26],TB=[0x3e6a30,0x4a7a36,0x56843a,0x6a7a30];
+ for(let t=0;t<NT*12&&(kc<NT||kb<NT);t++){let x,z,h;const r=Math.random();
+  if(r<.35){const hl=W282_HL[(Math.random()*W282_HL.length)|0],a=rnd(0,6.283),d=Math.sqrt(Math.random())*hl.r*.2;x=hl.x+Math.cos(a)*d;z=hl.z+Math.sin(a)*d;}else{x=rnd(-1200,1200);z=rnd(-1200,1200);}
+  const inside=Math.abs(x)<LIM&&Math.abs(z)<LIM;if(inside){if(r>=.35)continue;h=terrH(x,z);try{if(insideBuilding(x,z,5)||onRoad(x,z,-4))continue;}catch(e){}if(W282_RW&&W282_RW.near&&W282_RW.near(x,z))continue;}
+  else{h=w282H(x,z);if(r>=.35){const R=Math.hypot(x,z);if(!(R>640&&h>40&&h<250&&Math.random()<.8)&&!(h<.5&&Math.random()<.04))continue;}}
+  const far=Math.max(Math.abs(x),Math.abs(z)),sc=(far>600?2:1)*rnd(.8,1.25),con=h>70?Math.random()<.7:Math.random()<.25;o.position.set(x,h-.4,z);o.rotation.set(0,Math.random()*6.28,0);
+  if(con&&kc<NT){o.scale.set(2.3*sc,rnd(8,13)*sc,2.3*sc);o.updateMatrix();mC.setMatrixAt(kc,o.matrix);mC.setColorAt(kc++,C.setHex(TC[(Math.random()*3)|0]));}
+  else if(!con&&kb<NT){const rr=rnd(2.4,3.8)*sc;o.scale.set(rr,rr,rr);o.updateMatrix();mB.setMatrixAt(kb,o.matrix);mB.setColorAt(kb++,C.setHex(TB[(Math.random()*TB.length)|0]));}}
+ mC.count=kc;mB.count=kb;for(const m of[mC,mB]){m.userData.keep=1;m.instanceMatrix.needsUpdate=true;if(m.instanceColor)m.instanceColor.needsUpdate=true;m.castShadow=!isTouch;WR.add(m);}return[kc,kb];}
+
+/* ---------- 組み立ての後 ---------- */
+function w282After(){const LIM=RING-6,pb=new PB(detMat),MAIN=window.W282_MAIN||[];
+ const IN=W282_HL.filter(h=>h.in).map(h=>Object.assign(h,{top:terrH(h.x,h.z)})).filter(h=>h.top>6).sort((a,b)=>b.top-a.top),flat=(x,z,r)=>{for(let q=0;q<10;q++){const a=q/10*6.283;if(terrH(x+Math.cos(a)*r,z+Math.sin(a)*r)>.6)return false;}return terrH(x,z)<.4;};
+ const free=(x,z,r)=>{try{if(insideBuilding(x,z,r))return false;}catch(e){}return true;};
+ /* 谷の村：本道ぞいの平らな所に茶農家の小さな集まりと茶工場 */let nv=0,nf=0,nh=0,vil=[];
+ for(let k=20;k<MAIN.length-20&&nv<(isTouch?2:3);k+=7){const p=MAIN[k],q=MAIN[k+1],ddx=q[0]-p[0],ddz=q[1]-p[1],dl=Math.hypot(ddx,ddz)||1;for(const sd of[-1,1]){const off=30,x=p[0]-ddz/dl*off*sd,z=p[1]+ddx/dl*off*sd;
+   if(Math.abs(x)>LIM-40||Math.abs(z)>LIM-40||!flat(x,z,16)||!free(x,z,16)||vil.some(v=>Math.hypot(v[0]-x,v[1]-z)<120))continue;vil.push([x,z]);nv++;
+   const ry=Math.round(Math.atan2(-ddz/dl*sd,-ddx/dl*sd)/(Math.PI/2))*Math.PI/2;if(nf<1){w282Factory(pb,x,z,ry+Math.PI/2);nf++;}
+   else{for(let i=0;i<(isTouch?3:5);i++){const a=i/5*6.283+rnd(-.3,.3),r=rnd(13,19),hx=x+Math.cos(a)*r,hz=z+Math.sin(a)*r;if(!flat(hx,hz,6)||!free(hx,hz,7))continue;w282Farm(pb,hx,hz,0,Math.round(Math.atan2(x-hx,z-hz)/(Math.PI/2))*Math.PI/2,rnd(.85,1));nh++;}}break;}}
+ /* ロープウェイ：谷の駅（本道ぞい）→ いちばん高い山の頂。頂に展望台と山頂の駅 */
+ let rw=null;try{rw=w285Plan(pb,IN,MAIN,flat,free);}catch(e){console.warn('w285',e);}
+ /* 二番目に高い山の頂に塔 */let pg=null;if(IN.length>1){const T=IN[1],y=terrH(T.x,T.z);w279Pagoda(pb,T.x,T.z,1.05,y);pg=[Math.round(T.x),Math.round(T.z),Math.round(y)];}
+ pb.build(true);
+ const ot=w282Outer(),tr=w282Trees();
+ if(scene.fog){scene.fog.near*=.72;scene.fog.far*=.85;}
+ Object.assign(W282_STAT,{hills:IN.map(h=>[Math.round(h.x),Math.round(h.z),Math.round(h.H)]),vil:nv,farm:nh,factory:nf,rope:W282_RW&&{pts:W282_RW.pts,len:W282_RW.len,cars:W282_RW.cars},rw,pagoda:pg,outer:ot,trees:tr});}
+if(window.__TEST__)window.__T82={stat:()=>W282_STAT,on:()=>W282_ON,h:(x,z)=>[terrH(x,z),w282H(x,z)]};
+
+/* ===== v2.84 川の上に提灯の光だけが残る不具合 =====
+   川の上に建ちかけた家は w281Sweep で消えるが、家の正面より少し前に付けた提灯の光（発光の層）は家の範囲の外で消え残り、
+   水面の2m上に赤い丸が浮いていた（ステージ10 の大運河）。→ 片付けの後、川・池の上で地面より低い所にある発光の層の三角形をつぶす */
+function w284Glow(){const R=RIVER,RR=(typeof W238_RIV!=='undefined')?W238_RIV:null;
+ const inW=(x,z)=>{if(RR&&w238RivIn(x,z,-1))return true;if(R&&!RR&&Math.abs(z)<WH&&Math.abs(x-R.cx)<R.hw-1)return true;try{return typeof pondAt==='function'&&pondAt(x,z);}catch(e){return false;}};
+ const v=new THREE.Vector3();let nt=0;scene.updateMatrixWorld(true);
+ scene.traverse(o=>{try{if(!o.isMesh||o.isInstancedMesh||!o.material||o.material.type!=='MeshBasicMaterial'||!o.geometry||!o.geometry.attributes.color)return;
+  const P=o.geometry.attributes.position,I=o.geometry.index,n=I?I.count:P.count,bad=new Uint8Array(P.count),chk=new Uint8Array(P.count);let hit=0;
+  const isBad=i=>{if(!chk[i]){chk[i]=1;v.fromBufferAttribute(P,i).applyMatrix4(o.matrixWorld);if(v.y<-.5&&inW(v.x,v.z)){bad[i]=1;}}return bad[i];};
+  for(let t=0;t<n;t+=3){const a=I?I.getX(t):t,b=I?I.getX(t+1):t+1,c=I?I.getX(t+2):t+2;if(isBad(a)||isBad(b)||isBad(c)){P.setXYZ(b,P.getX(a),P.getY(a),P.getZ(a));P.setXYZ(c,P.getX(a),P.getY(a),P.getZ(a));hit++;}}
+  if(hit){P.needsUpdate=true;o.geometry.computeBoundingSphere();nt+=hit;}}catch(e){}});
+ if(window.__TEST__)window.__W284N=nt;}
+{const _bw=buildWorld0;buildWorld0=function(){const r=_bw.apply(this,arguments);try{if(RIVER||PONDS.length)w284Glow();}catch(e){console.warn('w284',e);}return r;};}
+
+/* ===== v2.85〜v2.86 茶畑の段丘（ステージ11）のロープウェー：乗れる大型のゴンドラ =====
+   v2.86：谷の駅 → 隣の茶の山の頂の「中間駅」（曲がり角・通り抜け）→ いちばん高い山の山頂駅。観光の空中散歩として長く、高く
+   ・交走式（大きなゴンドラ2台が上りと下りで行き来。両端の駅で約12秒止まり、中間駅はゆっくり通り抜ける。中間駅でも乗り降りできる）
+   ・駅：天衡の伝統（黒い瓦の大屋根・朱の柱・白壁の階段状の妻壁）と、ガラスの壁・鉄の索道機械の融合
+   ・支柱は線の下の地形と駅の床を見て高さを決める：ゴンドラの底が地面から9m以上（駅に近い所はなめらかに下りる）。駅の基壇に線が入らない
+   ・線の下・駅・支柱のまわりの家と木、建物の中に生えた木を取り除く */
+let W285=null;const W285_LANE=3.6,W285_HANG=5.6,W285_CL=5.6,W285_CW=3.4,W285_DW=12,W285_CLR=12,W285_TD=.42,W285_TMIN=30;
+function w285G(x,z){try{return terrH(x,z)||0;}catch(e){return 0;}}
+function w285SegD(p,a,b){const dx=b[0]-a[0],dz=b[1]-a[1],L=dx*dx+dz*dz||1,t=Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dz)/L));return Math.hypot(p[0]-a[0]-dx*t,p[1]-a[1]-dz*t);}
+/* 道すじを決める：谷の駅（本道の近く・平ら）→ 中間駅（隣の山の頂）→ 山頂駅。曲がりは30度まで */
+function w285Plan(pb,IN,MAIN,flat,free){if(!IN.length||!MAIN.length)return null;const T=IN[0],pag=IN[1]||null,LM2=BOUND-24;
+ const inB=(p)=>Math.abs(p[0])<LM2&&Math.abs(p[1])<LM2,road=(p)=>{let m=1e9;for(let k=0;k<MAIN.length;k+=3)m=Math.min(m,Math.hypot(MAIN[k][0]-p[0],MAIN[k][1]-p[1]));return m;};
+ let best=null;const RJ=(k)=>{if(window.__TEST__){const D=window.__W285D=window.__W285D||{};D[k]=(D[k]||0)+1;}};
+ for(const h of IN.slice(2)){const M=[h.x,h.z],dMT=Math.hypot(T.x-M[0],T.z-M[1]);if(dMT<80||dMT>240){RJ('dMT'+Math.round(dMT));continue;}const u1=[(T.x-M[0])/dMT,(T.z-M[1])/dMT],B=[T.x-u1[0]*15,T.z-u1[1]*15];
+  if(pag&&w285SegD([pag.x,pag.z],M,B)<26){RJ('pagMB');continue;}
+  for(let a=-48;a<=48;a+=4)for(let L0=60;L0<=220;L0+=8){const ca=Math.cos(a*Math.PI/180),sa=Math.sin(a*Math.PI/180),u0=[u1[0]*ca-u1[1]*sa,u1[0]*sa+u1[1]*ca],A=[M[0]-u0[0]*L0,M[1]-u0[1]*L0];
+   if(!inB(A)){RJ('inB');continue;}const dr=road(A);if(dr>110){RJ('road');continue;}if(pag&&w285SegD([pag.x,pag.z],A,M)<26){RJ('pagAM');continue;}if(Math.hypot(A[0]-T.x,A[1]-T.z)<90){RJ('nearT');continue;}
+   const tot=L0+dMT,sc=-Math.abs(tot-340)*.8-dr*1.2-Math.max(0,w285G(A[0],A[1])-2)*4-Math.abs(a)*.5+(h.top||0)*.3;if(best&&sc<=best.sc)continue;
+   if(!flat(A[0],A[1],11)||!free(A[0],A[1],15)){RJ('flatfree');continue;}best={A,M,B,sc,u1};}}
+ let S,uL;
+ if(best){S=[best.A,best.M,best.B];uL=best.u1;}
+ else{/* 見つからない時：前と同じ、まっすぐ山頂へ */let bk=null,bd=1e9;for(let k=10;k<MAIN.length-10;k+=4){const p=MAIN[k],d=Math.hypot(p[0]-T.x,p[1]-T.z);if(d<bd){bd=d;bk=k;}}if(bk==null)return null;
+  const p=MAIN[bk],dx=T.x-p[0],dz=T.z-p[1],dl=Math.hypot(dx,dz)||1;let A=null;for(const[fr,fe]of[[11,15],[8,11],[7,9]]){for(let off=20;off<90&&!A;off+=3)for(const sd of[1,-1]){if(A)break;const x=p[0]+dx/dl*off*sd,z=p[1]+dz/dl*off*sd;if(flat(x,z,fr)&&free(x,z,fe))A=[x,z];}if(A)break;}
+  if(!A)return null;uL=[dx/dl,dz/dl];S=[A,[T.x-uL[0]*15,T.z-uL[1]*15]];}
+ /* 山頂の展望台は山頂駅の裏から少し離す */const tY=terrH(T.x,T.z);w282Deck(pb,T.x-uL[1]*15+uL[0]*4,T.z+uL[0]*15+uL[1]*4,tY);
+ w285Build(S);return S.map(p=>p.map(Math.round));}
+function w285Build(S){const n=S.length,LG=[];
+ for(let i=0;i<n-1;i++){const dx=S[i+1][0]-S[i][0],dz=S[i+1][1]-S[i][1],L=Math.hypot(dx,dz);LG.push({ux:dx/L,uz:dz/L});}
+ /* 駅：向き（前＝となりの駅の方）・幅・床の高さ */const ST=[];
+ for(let i=0;i<n;i++){let hx,hz,mid=0;if(i===0){hx=LG[0].ux;hz=LG[0].uz;}else if(i===n-1){hx=-LG[i-1].ux;hz=-LG[i-1].uz;}else{hx=LG[i-1].ux+LG[i].ux;hz=LG[i-1].uz+LG[i].uz;const l=Math.hypot(hx,hz);hx/=l;hz/=l;mid=1;}
+  const hw=mid?13.6:9.6,c=S[i];let m=-1e9;for(let u=-14;u<=14;u+=2)for(let w=-hw;w<=hw;w+=2)m=Math.max(m,w285G(c[0]+hx*u-hz*w,c[1]+hz*u+hx*w));ST.push({c,hx,hz,mid,hw,deck:m+.45,ry:-Math.atan2(hz,hx)});}
+ /* ゴンドラの通り道（平面）：両端は駅の乗り場（前寄り3m）、中間駅は真ん中 */const Q=S.map((c,i)=>i===0?[c[0]+LG[0].ux*3,c[1]+LG[0].uz*3]:i===n-1?[c[0]-LG[n-2].ux*3,c[1]-LG[n-2].uz*3]:c.slice());
+ let s0=0;for(let i=0;i<n-1;i++){const g=LG[i];g.a=Q[i];g.b=Q[i+1];g.L=Math.hypot(g.b[0]-g.a[0],g.b[1]-g.a[1]);g.s0=s0;s0+=g.L;g.px=-g.uz;g.pz=g.ux;
+  g.y0=ST[i].deck+W285_HANG;g.y1=ST[i+1].deck+W285_HANG;g.e0=ST[i].mid?14.5:11.5;g.e1=ST[i+1].mid?14.5:11.5;g.d0=ST[i].deck;g.d1=ST[i+1].deck;}
+ const Ltot=s0;
+ /* 区間ごとに支柱を決める */const towers=[];let minCl=1e9;
+ for(const g of LG){const W=(u,w)=>[g.a[0]+g.ux*u+g.px*w,g.a[1]+g.uz*u+g.pz*w];
+  const gmax=(u)=>{let m=-1e9;for(const w of[-W285_LANE-2.2,-W285_LANE,0,W285_LANE,W285_LANE+2.2]){const q=W(u,w);m=Math.max(m,w285G(q[0],q[1]));}return m;};
+  /* 駅の中（屋根の下）は門形の滑車まで水平：中間駅は真ん中から13.2m、両端の駅は乗り場から10.2m */const k0=ST[LG.indexOf(g)].mid?13.2:10.2,k1=ST[LG.indexOf(g)+1].mid?13.2:10.2;const N=[{u:0,y:g.y0,st:1},{u:k0,y:g.y0,st:1},{u:g.L-k1,y:g.y1,st:1},{u:g.L,y:g.y1,st:1}];g.N=N;
+  const ropeY=(u)=>{let k=0;while(k<N.length-2&&u>N[k+1].u)k++;const a=N[k],b=N[k+1],t=Math.max(0,Math.min(1,(u-a.u)/(b.u-a.u))),sag=(a.st&&b.st)?0:(b.u-a.u)*.016;return a.y+(b.y-a.y)*t-sag*4*t*(1-t);};g.ropeY=ropeY;
+  /* ゴンドラの底が越えなければならない高さ：駅の上は床、駅の外は地面＋9m（駅から14mでなめらかに） */
+  const floorNeed=(u)=>{if(u<g.e0)return g.d0-.05;if(u>g.L-g.e1)return g.d1-.05;const r=Math.min(1,(u-g.e0)/30,(g.L-g.e1-u)/30);return gmax(u)+Math.max(1.5,W285_CLR*r);};
+  /* 支柱は等間隔（約70m）に置き、足りない所の両側の支柱を上げる（片側が駅なら支柱の側だけ、その分多く） */
+  {const Li=g.L-k1-k0,nt=Li>45?Math.max(1,Math.round(Li/70)):0;for(let i=1;i<=nt;i++){const u=k0+Li*i/(nt+1);N.push({u,y:Math.max(gmax(u)+W285_HANG+W285_CLR+4,w285G(...W(u,0))+W285_TMIN),t:1});}N.sort((a,b)=>a.u-b.u);
+   for(let it=0;it<60;it++){let any=false;for(let k=0;k<N.length-1;k++){const a=N[k],b=N[k+1];if(a.st&&b.st)continue;let worst=0,wt=.5;for(let u=a.u+1;u<b.u;u+=1.5){const lack=floorNeed(u)-(ropeY(u)-W285_HANG-.25);if(lack>worst){worst=lack;wt=(u-a.u)/(b.u-a.u);}}
+     if(worst>.05){any=true;if(!a.st&&!b.st){a.y+=worst+.3;b.y+=worst+.3;}else if(!a.st)a.y+=Math.min(12,(worst+.3)/Math.max(.25,1-wt));else b.y+=Math.min(12,(worst+.3)/Math.max(.25,wt));}}if(!any)break;}}
+  for(let u=g.e0+16;u<g.L-g.e1-16;u+=2)minCl=Math.min(minCl,ropeY(u)-W285_HANG-.25-gmax(u));
+  g.W=W;for(const t of N){if(t.st)continue;const q=W(t.u,0);t.x=q[0];t.z=q[1];towers.push([Math.round(q[0]),Math.round(q[1]),Math.round(t.y-w285G(q[0],q[1])),g]);}}
+ const M=new Merger(),Gm=new Merger(),Gl=new Merger();
+ for(const t of towers){const g=t[3],q=[t[0],t[1]];let gl=w285G(q[0],q[1]);for(const[a,b]of[[-3,-3],[3,-3],[-3,3],[3,3]])gl=Math.min(gl,w285G(q[0]+a,q[1]+b));const tt=g.N.find(x=>!x.st&&Math.round(x.x)===t[0]&&Math.round(x.z)===t[1]);
+  w285Tower(M,Gm,tt.x,gl,tt.z,tt.y,-Math.atan2(g.uz,g.ux));}
+ /* 索：区間ごと。中間駅では左右の線を角で折る（留め継ぎ） */
+ const seg=(x0,y0,z0,x1,y1,z1,th,col)=>{const L2=Math.hypot(x1-x0,z1-z0),len=Math.hypot(L2,y1-y0),pit=Math.atan2(y1-y0,L2),L=new LM(M,(x0+x1)/2,(y0+y1)/2,(z0+z1)/2,-Math.atan2(z1-z0,x1-x0));L.add(GB,col,len+.02,th,th,0,0,0,0,0,pit);};
+ const miter=(i,w)=>{const a=LG[i-1],b=LG[i],mx=a.px+b.px,mz=a.pz+b.pz,d=1+a.px*b.px+a.pz*b.pz;return[Q[i][0]+mx/d*w,Q[i][1]+mz/d*w];};
+ for(const lane of[-1,1])for(const[off,dy,th,col]of[[-.32,0,.1,0x2a2c30],[.32,0,.1,0x2a2c30],[0,-.55,.07,0x3a3c40]]){const w=lane*W285_LANE+off;
+  for(let i=0;i<LG.length;i++){const g=LG[i],A0=i===0?[g.a[0]+g.px*w,g.a[1]+g.pz*w]:miter(i,w),B0=i===LG.length-1?[g.b[0]+g.px*w,g.b[1]+g.pz*w]:miter(i+1,w);
+   if(i===0){seg(A0[0]-g.ux*13.4,g.y0+dy,A0[1]-g.uz*13.4,A0[0],g.y0+dy,A0[1],th,col);}if(i===LG.length-1){seg(B0[0],g.y1+dy,B0[1],B0[0]+g.ux*13.4,g.y1+dy,B0[1]+g.uz*13.4,th,col);}
+   let pu=0,py=g.ropeY(0),pp=A0;for(let u=4;;u+=4){const uu=Math.min(u,g.L),t=uu/g.L,yy=g.ropeY(uu),pq=[A0[0]+(B0[0]-A0[0])*t,A0[1]+(B0[1]-A0[1])*t];seg(pp[0],py+dy,pp[1],pq[0],yy+dy,pq[1],th,col);pp=pq;py=yy;if(uu>=g.L)break;}}}
+ const mesh=M.build(detMat);mesh.castShadow=!isTouch;mesh.receiveShadow=true;mesh.userData.keep=1;mesh.userData.keep285=1;WR.add(mesh);
+ const gm=Gm.build(glowMat2);gm.userData.keep=1;gm.userData.keep285=1;WR.add(gm);
+ const glm=new THREE.MeshStandardMaterial({vertexColors:true,transparent:true,opacity:.3,roughness:.08,metalness:.35,depthWrite:false});const gl=Gl.build(glm);gl.renderOrder=3;gl.userData.keep=1;gl.userData.keep285=1;WR.add(gl);
+ /* 速さ：ふだん 6.5m/s、両端で加速・減速、中間駅の前後はゆっくり（1.6m/s） */
+ const MIDS=LG.slice(1).map(g=>g.s0),vAt=(s)=>{let v=Math.min(6.5,.5+Math.sqrt(2*.5*Math.max(0,s)),.5+Math.sqrt(2*.5*Math.max(0,Ltot-s)));for(const m of MIDS)v=Math.min(v,1.6+Math.max(0,Math.abs(s-m)-10)*.4);return v;};
+ const TS=[0];for(let s=.5;s<=Ltot+.25;s+=.5)TS.push(TS[TS.length-1]+.5/vAt(s-.25));const Tt=TS[TS.length-1];
+ const cars=[];for(const lane of[1,-1]){const g=w285Cabin(lane);WR.add(g);cars.push({g,lane,ph:lane>0?0:.5,s:0,y:0,dock:-1,mid:0,x:0,z:0,hx:1,hz:0});}
+ W285={S,ST,LG,Q,Ltot,MIDS,TS,Tt,T:2*(W285_DW+Tt),cars,towers:towers.map(t=>t.slice(0,3)),minCl,ride:null,hint:0};
+ W282_RW={pts:towers.length+n,len:Math.round(Ltot),cars:2,near:(x,z)=>w285Near(x,z,4)};
+ for(const st of ST)w285Cells(st);
+ {const M2=new Merger(),G2=new Merger(),Q2=new Merger();for(const st of ST)w285Station(M2,G2,Q2,st);const m2=M2.build(detMat);m2.castShadow=!isTouch;m2.receiveShadow=true;m2.userData.keep=1;m2.userData.keep285=1;WR.add(m2);const g2=G2.build(glowMat2);g2.userData.keep=1;g2.userData.keep285=1;WR.add(g2);const q2=Q2.build(glm);q2.renderOrder=3;q2.userData.keep=1;q2.userData.keep285=1;WR.add(q2);}
+ w285Solids();
+ worldTick.push(dt=>{try{for(const c of W285.cars)w285Pos(c);if(!W285.late&&W285.cleared){W285.late=1;w285Inst();w285Purge();}}catch(e){}});for(const c of cars)w285Pos(c);}
+/* 駅の床の升目（0.8m）：ゴンドラが床の高さ近くを通る所を「溝」にする */
+function w285Cells(st){const H=W285,HW=st.hw+.7,cg={u0:-14.3,du:28.6/36,nu:36,w0:-HW,nw:Math.round(HW*2/.8)};cg.dw=HW*2/cg.nw;cg.t=new Uint8Array(cg.nu*cg.nw);
+ const smp=[];for(let s=0;s<=H.Ltot;s+=.4){const p=w285At(s);const dx=p.x-st.c[0],dz=p.z-st.c[1];if(Math.abs(dx)>40||Math.abs(dz)>40)continue;if(p.y-W285_HANG>st.deck+.6)continue;for(const l of[-1,1]){const wl=l*W285_LANE;smp.push([p.x-p.hz*wl,p.z+p.hx*wl,p.hx,p.hz]);}}
+ for(let i=0;i<cg.nu;i++)for(let j=0;j<cg.nw;j++){const u=cg.u0+(i+.5)*cg.du,w=cg.w0+(j+.5)*cg.dw,x=st.c[0]+st.hx*u-st.hz*w,z=st.c[1]+st.hz*u+st.hx*w;
+  for(const q of smp){const rx=x-q[0],rz=z-q[1],a=rx*q[2]+rz*q[3],b=-rx*q[3]+rz*q[2];if(Math.abs(a)<W285_CL/2+.55&&Math.abs(b)<W285_CW/2+.45){cg.t[i*cg.nw+j]=1;break;}}}
+ st.cg=cg;w285Stairs(st);st.inTr=(x,z)=>{const dx=x-st.c[0],dz=z-st.c[1],u=dx*st.hx+dz*st.hz,w=-dx*st.hz+dz*st.hx,i=Math.floor((u-cg.u0)/cg.du),j=Math.floor((w-cg.w0)/cg.dw);return i>=0&&i<cg.nu&&j>=0&&j<cg.nw&&cg.t[i*cg.nw+j]===1;};}
+/* 時間 → 通り道の位置 s（表を二分探索） */
+function w285SAt(tau){const H=W285,TS=H.TS;let lo=0,hi=TS.length-1;if(tau<=0)return 0;if(tau>=TS[hi])return H.Ltot;while(hi-lo>1){const m=(lo+hi)>>1;if(TS[m]<tau)lo=m;else hi=m;}return Math.min(H.Ltot,(lo+(tau-TS[lo])/(TS[hi]-TS[lo]))*.5);}
+/* 通り道の位置 s → 平面の位置・向き・線の高さ。中間駅の角はなめらかに曲がる（半径の代わりに前後9mを二次曲線で） */
+function w285At(s){const H=W285,LG=H.LG;s=Math.max(0,Math.min(H.Ltot,s));const R=9;
+ for(let j=1;j<LG.length;j++){const sj=LG[j].s0;if(Math.abs(s-sj)<R){const a=LG[j-1],b=LG[j],pa=[a.b[0]-a.ux*R,a.b[1]-a.uz*R],C=a.b,pb=[b.a[0]+b.ux*R,b.a[1]+b.uz*R],t=(s-sj+R)/(2*R),q=1-t;
+   const x=q*q*pa[0]+2*q*t*C[0]+t*t*pb[0],z=q*q*pa[1]+2*q*t*C[1]+t*t*pb[1],dx=2*q*(C[0]-pa[0])+2*t*(pb[0]-C[0]),dz=2*q*(C[1]-pa[1])+2*t*(pb[1]-C[1]),l=Math.hypot(dx,dz)||1;
+   const y=s<sj?a.ropeY(a.L-(sj-s)):b.ropeY(s-sj);return{x,z,hx:dx/l,hz:dz/l,y};}}
+ let k=0;while(k<LG.length-1&&s>LG[k].s0+LG[k].L)k++;const g=LG[k],u=s-g.s0;return{x:g.a[0]+g.ux*u,z:g.a[1]+g.uz*u,hx:g.ux,hz:g.uz,y:g.ropeY(u)};}
+/* ゴンドラの位置（WT から決まる）：端の駅で止まる → 向こうの端へ（中間駅はゆっくり通り抜ける） */
+function w285Pos(c){const H=W285,dw=W285_DW,Tt=H.Tt,tm=((WT/H.T+c.ph)%1+1)%1*H.T;let s,dock=-1,dir=0;
+ if(tm<dw){s=0;dock=0;}else if(tm<dw+Tt){s=w285SAt(tm-dw);dir=1;}else if(tm<2*dw+Tt){s=H.Ltot;dock=1;}else{s=w285SAt(Tt-(tm-2*dw-Tt));dir=-1;}
+ const p=w285At(s),w=c.lane*W285_LANE;c.s=s;c.dock=dock;c.dir=dir;c.left=dock===0?dw-tm:dock===1?2*dw+Tt-tm:0;c.mid=dock<0&&H.MIDS.some(m=>Math.abs(s-m)<9)?1:0;
+ c.hx=p.hx;c.hz=p.hz;c.x=p.x-p.hz*w;c.z=p.z+p.hx*w;c.y=p.y;c.g.position.set(c.x,p.y,c.z);c.g.rotation.y=-Math.atan2(p.hz,p.hx);
+ c.g.children[0].rotation.z=dir?Math.sin(WT*1.7+c.lane)*.01:0;c.floor=p.y-W285_HANG;}
+/* 線と駅のまわり（r＝余白） */
+function w285Near(x,z,r){const H=W285;if(!H)return false;for(const st of H.ST){const dx=x-st.c[0],dz=z-st.c[1],u=dx*st.hx+dz*st.hz,w=-dx*st.hz+dz*st.hx;if(Math.abs(u)<15+r&&Math.abs(w)<st.hw+2+r)return true;}
+ for(const g of H.LG)if(w285SegD([x,z],g.a,g.b)<W285_LANE+W285_CW/2+r)return true;return false;}
+/* 点の真上を通るゴンドラの底の高さ（線の下でなければ null） */
+function w285Bot(x,z,m){const H=W285;let best=null;for(const g of H.LG){const dx=x-g.a[0],dz=z-g.a[1],u=dx*g.ux+dz*g.uz,w=dx*g.px+dz*g.pz;if(u<-2||u>g.L+2||Math.abs(w)>W285_LANE+W285_CW/2+m)continue;const y=g.ropeY(Math.max(0,Math.min(g.L,u)))-W285_HANG-.25;best=best==null?y:Math.min(best,y);}return best;}
+function w285OnStairs(x,z,m){const H=W285;for(const st of H.ST)for(const S2 of st.stairs||[]){const n=S2.steps.length;if(!n)continue;const a=S2.steps[0],b=S2.steps[n-1],dx=x-st.c[0],dz=z-st.c[1],u=dx*st.hx+dz*st.hz,w=-dx*st.hz+dz*st.hx,hu=S2.au?.6:S2.SW/2+.8,hw=S2.au?S2.SW/2+.8:.6;if(u>Math.min(a.u,b.u)-hu-m&&u<Math.max(a.u,b.u)+hu+m&&w>Math.min(a.w,b.w)-hw-m&&w<Math.max(a.w,b.w)+hw+m)return true;}return false;}
+function w285InSt(x,z,m){const H=W285;for(const st of H.ST){const dx=x-st.c[0],dz=z-st.c[1],u=dx*st.hx+dz*st.hz,w=-dx*st.hz+dz*st.hx;if(Math.abs(u)<15+m&&Math.abs(w)<st.hw+4.5+m)return true;}return false;}
+/* ---------- 駅の建物（両端：奥に大滑車と白い妻壁／中間駅：通り抜け、真ん中に線を曲げる滑車） ---------- */
+function w285Station(M,Gm,Gl,st){const c=st.c,deck=st.deck,ry=st.ry,HW=st.hw,k=HW/9.6,mid=st.mid,L=new LM(M,c[0],deck,c[1],ry),G=new LM(Gm,c[0],deck,c[1],ry),Q=new LM(Gl,c[0],deck,c[1],ry);
+ const WW=0xf2efe8,TL=0x2c2e32,TL2=0x3a3d42,RED=0xa8402e,ST=0x8e887c,ST2=0x9a948a,WD=0x7a5236,ST3=0xb8b0a0,LS=W285_LANE;
+ /* 溝の升目（局所座標）：tr(u,w)、行 u の溝の帯の一覧 bands(u) */const cgS=st.cg,tr=(u,w)=>{const i=Math.floor((u-cgS.u0)/cgS.du),j=Math.floor((w-cgS.w0)/cgS.dw);return i>=0&&i<cgS.nu&&j>=0&&j<cgS.nw&&cgS.t[i*cgS.nw+j]===1;},bands=(u)=>{const i=Math.max(0,Math.min(cgS.nu-1,Math.floor((u-cgS.u0)/cgS.du))),B=[];let j=0;while(j<cgS.nw){if(!cgS.t[i*cgS.nw+j]){j++;continue;}let k=j;while(k<cgS.nw&&cgS.t[i*cgS.nw+k])k++;B.push([cgS.w0+j*cgS.dw,cgS.w0+k*cgS.dw]);j=k;}return B;},
+  gant=(u,yb)=>{const B=bands(u);let lo=-LS-2.3,hi=LS+2.3;for(const b of B){lo=Math.min(lo,b[0]-.7);hi=Math.max(hi,b[1]+.7);}for(const w of[lo,hi])L.add(GB,0x5a5e64,.4,yb,.4,u,yb/2,w);L.add(GB,0x5a5e64,.5,.5,hi-lo+.4,u,yb,(lo+hi)/2);return B.map(b=>(b[0]+b[1])/2);};
+ /* 両端の駅は屋根の奥の端を妻壁の内側（u=−14）で止める */const r0=mid?-12.4:-14,r1=mid?12.4:9.8,rc=(r0+r1)/2,rL=r1-r0;
+ /* 基壇（切り石・地面まで） */let gmin=1e9;for(const u of[-14,-7,0,7,14])for(const w of[-HW,0,HW])gmin=Math.min(gmin,w285G(c[0]+st.hx*u-st.hz*w,c[1]+st.hz*u+st.hx*w));const dep=deck-gmin+1.2;
+ /* v2.87 ゴンドラの通る所は床を掘り下げる（溝の深さ3.4m）：乗り場の床とゴンドラの床が同じ高さになり、床にめり込まない */
+ const TD=W285_TD,cg=st.cg,dB=Math.max(0,dep-TD);if(dB>0){L.add(GB,ST,28.6,dB,HW*2+1.4,0,-TD-dB/2,0);for(let y=-TD-.6;y>-dep+.3;y-=.9)L.add(GB,ST2,28.8,.08,HW*2+1.6,0,y,0);}
+ L.add(GB,0x4a4844,28.6,.1,HW*2+1.4,0,-TD+.05,0);
+ for(let i=0;i<cg.nu;i++){const u=cg.u0+(i+.5)*cg.du;let j=0;while(j<cg.nw){if(cg.t[i*cg.nw+j]){j++;continue;}let k=j;while(k<cg.nw&&!cg.t[i*cg.nw+k])k++;const w0=cg.w0+j*cg.dw,w1=cg.w0+k*cg.dw,wm=(w0+w1)/2,wl=w1-w0;
+   L.add(GB,ST,cg.du,TD-.12,wl,u,-(TD+.12)/2,wm);L.add(GB,ST3,cg.du,.12,wl,u,-.06,wm);if(i%2===0)L.add(GB,0xa8a090,.07,.03,wl,u-cg.du/2,.02,wm);
+   /* 溝のふちの黄色い線と柵（乗り場の外れ） */if(j>0){L.add(GB,0xd8b030,cg.du-.02,.03,.16,u,.03,w0+.12);}if(k<cg.nw){L.add(GB,0xd8b030,cg.du-.02,.03,.16,u,.03,w1-.12);}
+   j=k;}}
+ /* 朱の柱と梁 */const cols=mid?[-12,-6,0,6,12]:[-13.4,-6.7,0,4.8,9.4];for(const u of cols)for(const s of[-1,1]){if(tr(u,s*HW))continue;L.add(GB,RED,.6,8,.6,u,4,s*HW);L.add(GB,0x5a5850,.9,.3,.9,u,.15,s*HW);}
+ for(const s of[-1,1])L.add(GB,RED,rL-1,.6,.5,rc,7.7,s*HW);for(const u of cols)L.add(GB,RED,.5,.5,HW*2,u,7.75,0);
+ for(const u of cols)for(const s of[-1,1])L.add(GB,0x5a3422,1.6,.35,.8,u,8.1,s*(HW+.3));
+ /* 黒い瓦の大屋根：軒・二つの斜面・棟・反り上がる隅 */const rw=HW+1.4,ra=.33,rl=rw/Math.cos(ra),rh=rw*Math.tan(ra);L.add(GB,TL2,rL-.4,.3,HW*2+2.8,rc,8.45,0);
+ 
+ for(const s of[-1,1]){L.add(GB,TL,rL,.32,rl,rc,8.6+rh/2,s*rw/2,s*ra,0,0);for(let q=r0+.6;q<=r1-.4;q+=.9)L.add(GB,0x24262a,.12,.36,rl,q,8.65+rh/2,s*rw/2,s*ra,0,0);}
+ L.add(GB,0x1e2024,rL+.2,.5,.7,rc,8.6+rh+.1,0);L.add(GB,0xe8e4da,rL,.16,.74,rc,8.6+rh-.09,0);
+ for(const a of mid?[-1,1]:[1])for(const s of[-1,1]){L.add(GB,TL,2.6,.3,1,(a>0?r1:r0)-a*.6+a*.8,8.85,s*(HW+1.4),0,s*a*.5,a*.28);}for(const a of mid?[-1,1]:[1])L.add(GB,0x1e2024,.7,.9,.5,a>0?r1+.1:r0-.1,8.6+rh+.35,0,0,0,a*.4);
+ if(!mid){/* 奥の白壁と階段状の妻壁（屋根の内側に収める） */{const bk=st.stairs.find(S2=>S2.kind==='back');if(bk){const d0=bk.wd-1.8,d1=bk.wd+1.8,E0=-HW-.1,E1=HW+.1;L.add(GB,WW,.6,8.2,d0-E0,-14.2,4.1,(E0+d0)/2);L.add(GB,WW,.6,8.2,E1-d1,-14.2,4.1,(d1+E1)/2);L.add(GB,WW,.6,8.2-3.4,3.6,-14.2,3.4+(8.2-3.4)/2,bk.wd);L.add(GB,0x5a3422,.8,.3,4,-14.2,3.45,bk.wd);for(const e of[-1,1])L.add(GB,0x5a3422,.8,3.4,.3,-14.2,1.7,bk.wd+e*1.85);}else L.add(GB,WW,.6,8.2,HW*2+.2,-14.2,4.1,0);}{/* 階段状の妻壁：どの段も、その幅の屋根の高さより上に出る（屋根の端を隠す） */const E=[rw+.4,rw*.74,rw*.48,rw*.22,0];for(let i=0;i<4;i++){const hz=E[i],ty=8.6+rh*(1-E[i+1]/rw)+.8;L.add(GB,WW,.7,ty-4,hz*2,-14.25,(ty+4)/2,0);L.add(GB,TL,1,.32,hz*2+.5,-14.25,ty+.16,0);L.add(GB,0x1e2024,1.1,.5,.5,-14.25,ty+.5,hz-.1);L.add(GB,0x1e2024,1.1,.5,.5,-14.25,ty+.5,-hz+.1);}}
+  for(const s of[-1,1])for(const[u0,u1]of[[-13.4,-6.7],[-6.7,-.6]]){const um=(u0+u1)/2,ul=u1-u0;L.add(GB,WD,ul,.9,.18,um,.45,s*HW);Q.add(GB,0xbfe0ee,ul,2.8,.06,um,2.3,s*HW);L.add(GB,WD,ul,.14,.2,um,3.75,s*HW);for(let u=u0+1.1;u<u1;u+=1.1)L.add(GB,WD,.1,2.8,.16,u,2.3,s*HW);}
+  L.add(GB,0x4a4e54,4.8,2.2,6,-10.6,1.1,0);L.add(GB,0x3a3d42,5,.2,6.2,-10.6,2.3,0);for(const s of[-1,1])L.add(GB,0x6a6e74,.5,3.2,.5,-10.6,3.9,s*1.4);
+  L.add(GCY16,0x2a2c30,LS,.32,LS,-10.4,W285_HANG-.55,0);L.add(GCY16,0xa8402e,LS-.25,.36,LS-.25,-10.4,W285_HANG-.55,0);L.add(GCY16,0x4a4e54,.6,2.4,.6,-10.4,W285_HANG-1.8,0);
+  for(let q=0;q<4;q++)L.add(GB,0x4a4e54,LS*2-.6,.14,.2,-10.4,W285_HANG-.55,0,0,q*Math.PI/4,0);
+  L.add(GB,0x5a3422,.2,1.3,4.4,-13.9,6.4,0);L.add(GB,0xc8402e,.24,1,4,-13.85,6.4,0);G.add(GB,0xffd890,.05,.5,3,-13.7,6.4,0);
+  for(const u of[-8,-4.5])for(const s of[-1,1]){L.add(GB,WD,2.6,.12,.6,u,.55,s*7.9);L.add(GB,0x34373c,.12,.5,.5,u-1.1,.25,s*7.9);L.add(GB,0x34373c,.12,.5,.5,u+1.1,.25,s*7.9);}}
+ else{/* 中間駅：真ん中の柱から張り出す、線を曲げる滑車の列（ゴンドラの吊り手より上） */{const C=gant(0,W285_HANG+1.6);for(const w of C)for(const e of[-2,-1,0,1,2]){const wb=bands(e*1.1).map(b=>(b[0]+b[1])/2).sort((a,b)=>Math.abs(a-w)-Math.abs(b-w))[0];L.add(GCY16,0x2a2c30,.34,.22,.34,e*1.1,W285_HANG+.75,wb==null?w:wb);L.add(GB,0x5a5e64,.16,.9,.16,e*1.1,W285_HANG+1.2,wb==null?w:wb);}}
+  for(const u of[-9,9])for(const s of[-1,1]){if(tr(u-1.3,s*(HW-1.4))||tr(u+1.3,s*(HW-1.4)))continue;L.add(GB,WD,2.6,.12,.6,u,.55,s*(HW-1.4));L.add(GB,0x34373c,.12,.5,.5,u,.25,s*(HW-1.4));}
+  L.add(GB,0x5a3422,4.4,1.3,.2,0,6.4,HW-.1);L.add(GB,0xc8402e,4,1,.24,0,6.4,HW-.05);}
+ /* 前（と中間駅は後ろも）の門形の鉄骨と滑車 */for(const e of mid?[-1,1]:[1]){const C=gant(e*13.2,W285_HANG+1.2);for(const w of C){L.add(GB,0x3a3c40,1.6,.45,1.2,e*13.2,W285_HANG-.35,w);L.add(GCX16,0x2a2c30,.24,.5,.24,e*13.2,W285_HANG-.14,w);L.add(GB,0x5a5e64,.16,1.3,.16,e*13.2,W285_HANG+.5,w);}}
+ for(const s of[-1,1])G.add(GB,0xffe8c0,rL-2,.08,.08,rc,7.35,s*(HW-.35));for(const u of cols)G.add(GB,0xffd8a0,.4,.5,.4,u,6.6,0);
+ for(const u of[-13,13])for(const s of[-1,1]){if(tr(u,s*(HW-1.2)))continue;L.add(GB,0x7a6a58,1,.7,1,u,.35,s*(HW-1.2));L.add(GS,0x4a7a32,.8,.7,.8,u,1.1,s*(HW-1.2));}
+ /* v2.88 階段（床から地面まで）と、床のふちの柵 */const WD2=0x6a4a30,RL=0x8a6a44,eW=HW+.7;
+ for(const S2 of st.stairs){const au=S2.au,n=S2.steps.length;for(const k of S2.steps){const hh=k.top-k.gb;if(au){L.add(GB,k.i%2?ST2:ST,S2.T,hh-.06,S2.SW,k.u,(k.top-.06+k.gb)/2-deck,k.w);L.add(GB,ST3,S2.T,.06,S2.SW,k.u,k.top-deck-.03,k.w);}
+   else{L.add(GB,k.i%2?ST2:ST,S2.T,hh-.06,S2.SW,k.u,(k.top-.06+k.gb)/2-deck,k.w,0,Math.PI/2,0);L.add(GB,ST3,S2.T,.06,S2.SW,k.u,k.top-deck-.03,k.w,0,Math.PI/2,0);}}
+  if(n){const a=S2.steps[0],b=S2.steps[n-1],run=au?Math.abs(b.u-a.u):Math.abs(b.w-a.w),len=Math.hypot(run,b.top-a.top),ang=Math.atan2(a.top-b.top,run);
+   for(const e of[-1,1]){const off=e*(S2.SW/2+.08);for(let q=0;q<n;q+=3){const k=S2.steps[q];L.add(GB,WD2,.12,1.05,.12,au?k.u:k.u+off,k.top-deck+.52,au?k.w+off:k.w);}
+    const mu=(a.u+b.u)/2,mw=(a.w+b.w)/2,my=(a.top+b.top)/2-deck+1.05;if(au)L.add(GB,RL,len+.4,.1,.1,mu,my,mw+off,0,0,ang);else L.add(GB,RL,.1,.1,len+.4,mu+off,my,mw,(b.w>a.w?1:-1)*ang,0,0);}}}
+ {const cg=st.cg;const op=(u,s)=>st.stairs.some(S2=>S2.kind==='side'&&S2.s===s&&Math.abs(u-S2.u)<S2.SW/2+.2);
+  for(const s of[-1,1])for(let i=0;i<cg.nu;i++){const u=cg.u0+(i+.5)*cg.du,j=s<0?0:cg.nw-1;if(cg.t[i*cg.nw+j]||op(u,s))continue;if(!mid&&u<-13.9)continue;L.add(GB,RL,cg.du+.02,.09,.09,u,1.05,s*(eW-.08));if(i%2===0)L.add(GB,WD2,.1,1.05,.1,u,.52,s*(eW-.08));}
+  for(const e of mid?[-1,1]:[1])for(let j=0;j<cg.nw;j++){const w=cg.w0+(j+.5)*cg.dw,i=e<0?0:cg.nu-1;if(cg.t[i*cg.nw+j])continue;L.add(GB,RL,.09,.09,cg.dw+.02,e*14.22,1.05,w);if(j%2===0)L.add(GB,WD2,.1,1.05,.1,e*14.22,.52,w);}}
+}
+/* 階段の段：床の横のふちから外へ、蹴上げ0.3m・踏み面0.7mで地面まで下りる。両側で地面に届く方を使う（届かなければ近い方を長く） */
+function w285Stairs(st){const HW=st.hw+.7,R=.4,T=.6,SW=3.2,res=[];
+ /* 段の局所位置 (u,w) → 世界。足もとの地面は踏み面の範囲の最高・最低 */const wx=(u,w)=>[st.c[0]+st.hx*u-st.hz*w,st.c[1]+st.hz*u+st.hx*w];
+ const gFoot=(u,w,au,f)=>{let m=f>0?-1e9:1e9;const pu=au?T/2:SW/2,pw=au?SW/2:T/2;for(const a of[-pu,0,pu])for(const b of[-pw,0,pw]){const q=wx(u+a,w+b),g=w285G(q[0],q[1]);m=f>0?Math.max(m,g):Math.min(m,g);}return m;};
+ /* 候補：横（u=us、外へ ±w）と、両端の駅は奥（妻壁の戸口 w=wd、外へ −u） */const us=st.mid?3:7.1,wd=-5.6,C=[];
+ for(const s of[-1,1])C.push({kind:'side',s,o:(k)=>[us,s*(HW+(k+.5)*T)],au:0});if(!st.mid)C.push({kind:'back',s:0,o:(k)=>[-14.3-(k+.5)*T,wd],au:1});
+ for(const c of C){const g0=gFoot(...c.o(-1),c.au,-1);c.steps=[];if(st.deck-g0<.35&&st.deck-gFoot(...c.o(-1),c.au,1)<.35){c.ok=1;c.flat=1;continue;}let prev=st.deck;
+  for(let k=0;k<90;k++){const[u,w]=c.o(k),g=gFoot(u,w,c.au,1),top=Math.min(prev-.12,Math.max(st.deck-(k+1)*R,g+.03));c.steps.push({i:k,u,w,top,gb:Math.min(gFoot(u,w,c.au,-1),top)-.8});prev=top;
+   /* 次の踏み面の地面（いちばん低い所）から0.32m以下になったら終わり（歩いて上れる） */if(top-gFoot(...c.o(k+1),c.au,-1)<=.38){c.ok=1;break;}}}
+ let use=C.filter(c=>c.ok&&!c.flat).sort((a,b)=>a.steps.length-b.steps.length).filter((c,i)=>i===0||c.steps.length<=30).slice(0,2);if(!use.length&&!C.some(c=>c.flat)){use=[C.sort((a,b)=>a.steps[a.steps.length-1].top-b.steps[b.steps.length-1].top)[0]];}
+ st.cand=C.map(c=>[c.kind,c.s,c.ok?1:0,c.flat?1:0,c.steps.length,c.steps.length?+c.steps[c.steps.length-1].top.toFixed(1):null,+gFoot(...c.o(c.steps.length),c.au,-1).toFixed(1)]);
+ for(const c of use)res.push({kind:c.kind,s:c.s,u:c.kind==='side'?us:null,wd,T,SW,au:c.au,steps:c.steps});st.stairs=res;}
+/* ---------- 支柱：4本の脚が上へ細くなる鉄骨の塔、上に索を受ける腕 ---------- */
+function w285Tower(M,Gm,x,g,z,ry0,ry){const top=ry0-.12,h=top-g,L=new LM(M,x,g,z,ry),G=new LM(Gm,x,g,z,ry),C=0x6a6e74,C2=0x5a5e64,b0=1.2+h*.055,b1=.9;
+ L.add(GB,0x9a958a,b0*2+1.6,1.4,b0*2+1.6,0,.2,0);
+ for(const a of[-1,1])for(const b of[-1,1]){const dx=(b1-b0)*a,dz=(b1-b0)*b,len=Math.hypot(h,dx,dz);L.add(GB,C,.34,len,.34,a*(b0+b1)/2,h/2,b*(b0+b1)/2,Math.atan2(dz,h),0,-Math.atan2(dx,h));}
+ for(let y=3;y<h-1.5;y+=3.2){const hw=b0+(b1-b0)*y/h;for(const s of[-1,1]){L.add(GB,C2,hw*2,.16,.16,0,y,s*hw);L.add(GB,C2,.16,.16,hw*2,s*hw,y,0);}
+  const y2=Math.min(h-1.5,y+3.2),hw2=b0+(b1-b0)*y2/h;for(const s of[-1,1]){const dy=y2-y,ln=Math.hypot(dy,hw+hw2);L.add(GB,C2,.1,ln,.1,0,(y+y2)/2,s*(hw+hw2)/2,0,0,Math.atan2(hw+hw2,dy)*(s>0?1:-1));L.add(GB,C2,.1,ln,.1,s*(hw+hw2)/2,(y+y2)/2,0,-Math.atan2(hw+hw2,dy)*(s>0?1:-1),0,0);}}
+ /* 頭部：横の腕と、左右の線の受け（サドル）。腕は線の真下まで（ゴンドラの吊り手は外側を通る） */
+ L.add(GB,C,1.8,1.1,1.8,0,h-.55,0);L.add(GB,C2,1.2,.7,W285_LANE*2+.6,0,h-.35,0);
+ for(const s of[-1,1]){L.add(GB,0x3a3c40,4.2,.35,1.1,0,h-.05,s*W285_LANE,0,0,0);for(const e of[-1.4,0,1.4])L.add(GCX16,0x2a2c30,.22,.3,.22,e,h+.02,s*W285_LANE,0,Math.PI/2,0);}
+ L.add(GB,C,.12,1.6,.12,0,h+.8,0);G.add(GS,0xff3020,.22,.22,.22,0,h+1.65,0);
+ /* はしご */L.add(GB,0x8a8e94,.06,h-1,.06,b1*.4,h/2,b1+.25);L.add(GB,0x8a8e94,.06,h-1,.06,-b1*.4+.6,h/2,b1+.25);}
+/* ---------- ゴンドラ（原点は線の上の走行台） ---------- */
+function w285Cabin(lane){const grp=new THREE.Group(),sw=new THREE.Group();grp.add(sw);const M=new Merger(),Gm=new Merger(),Gl=new Merger(),L=new LM(M,0,0,0,0),G=new LM(Gm,0,0,0,0),Q=new LM(Gl,0,0,0,0);
+ const H=W285_HANG,CL=W285_CL,CW=W285_CW,fy=-H,ry=-H+2.9,RED=0xc8402e,WW=0xf2efe8,DK=0x34373c,o=lane*.95;
+ /* 走行台：線の上の車輪8つ */L.add(GB,0x4a4e54,3.4,.32,.9,0,.42,0);for(const e of[-1.2,-.4,.4,1.2])for(const s of[-.32,.32])L.add(GCX16,0x2a2c30,.2,.16,.2,e,.12,s,0,Math.PI/2,0);
+ /* 吊り手：外側へ出てから下り、屋根の真ん中へ（支柱の腕に当たらない） */L.add(GB,0x5a5e64,.36,.3,o<0?-o+.2:o+.2,0,.42,o/2);L.add(GB,0x5a5e64,.3,H-3.05,.3,0,(.42+ry+.3)/2,o);L.add(GB,0x5a5e64,.3,.3,Math.abs(o)+.15,0,ry+.3,o/2);
+ L.add(GB,0x5a5e64,.2,1.6,.2,.9,ry+1,o,0,0,.6);L.add(GB,0x5a5e64,.2,1.6,.2,-.9,ry+1,o,0,0,-.6);
+ /* 床・屋根 */L.add(GB,0x4a4c50,CL,.22,CW,0,fy-.11,0);L.add(GB,0x8a7a62,CL-.2,.03,CW-.2,0,fy+.015,0);
+ L.add(GB,WW,CL+.1,.32,CW+.1,0,ry+.06,0);L.add(GB,DK,CL+.2,.1,CW+.2,0,ry+.25,0);L.add(GB,WW,CL-1.4,.25,CW-1,0,ry+.42,0);
+ /* 下の赤い腰板（乗り口は開ける）と、窓の上の白い帯 */for(const s of[-1,1]){L.add(GB,RED,.12,1,CW,s*CL/2,fy+.5,0);for(const e of[-1,1])L.add(GB,RED,CL/2-.85,1,.12,e*(CL/4+.42),fy+.5,s*CW/2);}
+ for(const s of[-1,1]){L.add(GB,WW,.14,.45,CW,s*CL/2,ry-.22,0);L.add(GB,WW,CL,.45,.14,0,ry-.22,s*CW/2);}
+ /* 柱（四隅と乗り口のふち） */for(const a of[-1,1])for(const b of[-1,1]){L.add(GB,WW,.16,2.9,.16,a*CL/2,fy+1.45,b*CW/2);L.add(GB,DK,.1,2.45,.1,a*.82,fy+1.22,b*CW/2);}
+ /* 窓ガラス（端の面は大きな窓、横は乗り口の左右） */for(const s of[-1,1]){Q.add(GB,0xbfe0ee,.05,1.45,CW-.2,s*CL/2,fy+1.72,0);for(const e of[-1,1])Q.add(GB,0xbfe0ee,CL/2-.85,1.45,.05,e*(CL/4+.42),fy+1.72,s*CW/2);}
+ /* 中：両端の木の腰掛け・つり革の棒 */for(const s of[-1,1]){L.add(GB,0x8a6a40,.55,.12,CW-.5,s*(CL/2-.4),fy+.48,0);L.add(GB,DK,.4,.45,CW-.6,s*(CL/2-.4),fy+.22,0);}L.add(GB,0xb0b4b8,CL-1.2,.06,.06,0,ry-.35,0);
+ /* 灯り：屋根の下の帯（夜に見える）と前後の小さな灯 */G.add(GB,0xfff0d0,CL-.8,.04,.5,0,ry-.08,0);for(const s of[-1,1])G.add(GB,s>0?0xffffff:0xff4030,.08,.16,.4,s*(CL/2+.07),ry-.15,0);
+ const m=M.build(detMat);m.castShadow=!isTouch;sw.add(m);sw.add(Gm.build(glowMat2));
+ const gm=new THREE.MeshStandardMaterial({vertexColors:true,transparent:true,opacity:.28,roughness:.08,metalness:.35,depthWrite:false});const gl=Gl.build(gm);gl.renderOrder=3;sw.add(gl);
+ grp.userData.keep=1;grp.userData.keep285=1;return grp;}
+/* 駅の床の当たり（上に立てる）：1.6m の升目の箱。床のまわりは地面へ下りる段 */
+function w285Solids(){const H=W285;let n=0;
+ for(const st of H.ST){/* v2.94 升目は0.8m（回った駅でも、箱の角が床の外へ大きくはみ出して階段の段をふさがないように） */const cs=.8,HW=st.hw+.7;for(let u=-14.3+cs/2;u<14.3;u+=cs)for(let w=-HW+cs/2;w<HW;w+=cs){const aw=Math.abs(w),x=st.c[0]+st.hx*u-st.hz*w,z=st.c[1]+st.hz*u+st.hx*w,g=w285G(x,z);let top;
+   if(Math.abs(u)<=14.3&&aw<=HW)top=st.inTr&&st.inTr(x,z)?st.deck-W285_TD:st.deck;else continue;
+   if(top-g<.08)continue;const h2=cs/2+.02;addSolid({x0:x-h2,x1:x+h2,z0:z-h2,z1:z+h2,y0:Math.min(g,st.deck)-3,h:top,hp:1e9,arm:0,name:'stairstep',rc:null,step:true});n++;}
+ for(const S2 of st.stairs)for(const k of S2.steps)for(const dt of[-.15,.15])for(let da=-1.4;da<=1.41;da+=.4){/* 段は0.34m の小さな箱（角が下の段へはみ出さない） */const w=S2.au?k.w+da:k.w+dt,u=S2.au?k.u+dt:k.u+da,x=st.c[0]+st.hx*u-st.hz*w,z=st.c[1]+st.hz*u+st.hx*w,h2=.17;addSolid({x0:x-h2,x1:x+h2,z0:z-h2,z1:z+h2,y0:k.gb-3,h:k.top,hp:1e9,arm:0,name:'stairstep',rc:null,step:true});n++;}}
+ H.solids=n;}
+/* 線の下・駅・支柱のまわりの家と木、建物の中に生えた木を取り除く */
+function w285Clear(){const H=W285;if(!H)return;let nb=0,nt=0,ng=0;
+ const inTw=(x,z,r)=>H.towers.some(q=>Math.hypot(x-q[0],z-q[1])<r);
+ for(const b of buildings){if(!b.alive||b.name==='stairstep'||b.x1==null)continue;const cx=(b.x0+b.x1)/2,cz=(b.z0+b.z1)/2,r=Math.max(b.x1-b.x0,b.z1-b.z0)*.5;
+  const bot=w285Bot(cx,cz,1.5+r),hit=w285OnStairs(cx,cz,r)||w285InSt(cx,cz,r)||(bot!=null&&(b.h||0)>bot-1.5)||inTw(cx,cz,5+r);
+  if(hit){if(b.name==='landmark')continue;b.alive=false;b.hp=0;if(b.pb){try{b.pb.squash(b,1);}catch(e){}}else if(b.mesh)b.mesh.visible=false;nb++;}}
+ for(const p of PBS)if(p.dA||p.dG)p.flush();
+ try{gridBuild();}catch(e){}
+ const r2=w285Inst();nt=r2[0];ng=r2[1];w285Purge();
+ H.cleared=[nb,nt,ng,H.purged];}
+/* 駅の中（床から上14m）と階段にかかる、ほかの物（木など）を消す。小さな物は見えなくし、まとめた大きなメッシュは三角形をつぶす */
+function w285Purge(){const H=W285;let n=0;const vols=[];for(const st of H.ST){vols.push({st,u0:-14.8,u1:14.8,w:st.hw+1.3,y0:st.deck-.3,y1:st.deck+14});for(const S2 of st.stairs){const n2=S2.steps.length;if(n2){const a=S2.steps[0],b=S2.steps[n2-1],hw2=S2.SW/2+.6;vols.push({st,box:1,u0:Math.min(a.u,b.u)-(S2.au?.6:hw2),u1:Math.max(a.u,b.u)+(S2.au?.6:hw2),w0:Math.min(a.w,b.w)-(S2.au?hw2:.6),w1:Math.max(a.w,b.w)+(S2.au?hw2:.6),y0:b.top-.2,y1:st.deck+10});}}}
+ const inV=(x,y,z)=>{for(const V of vols){const st=V.st,dx=x-st.c[0],dz=z-st.c[1],u=dx*st.hx+dz*st.hz,w=-dx*st.hz+dz*st.hx;if(u<V.u0||u>V.u1||y<V.y0||y>V.y1)continue;if(V.box){if(w>V.w0&&w<V.w1)return true;}else if(Math.abs(w)<V.w)return true;}return false;};
+ const own=o=>{for(let q=o;q;q=q.parent)if(q.userData&&q.userData.keep285)return true;return false;};
+ const inH=(x,z,top,bot)=>{for(const V of vols){const st=V.st,dx=x-st.c[0],dz=z-st.c[1],u=dx*st.hx+dz*st.hz,w=-dx*st.hz+dz*st.hx;if(u<V.u0||u>V.u1||top<V.y0||bot>V.y1)continue;if(V.box){if(w>V.w0&&w<V.w1)return true;}else if(Math.abs(w)<V.w)return true;}return false;};
+ const v=new THREE.Vector3();scene.updateMatrixWorld(true);const list=[];scene.traverse(o=>{if(o.isMesh&&!o.isInstancedMesh&&o.visible&&o.geometry&&o.geometry.attributes&&o.geometry.attributes.position)list.push(o);});
+ for(const o of list){try{if(own(o))continue;const g=o.geometry,P=g.attributes.position;
+  if(P.count<4000){if(!g.boundingSphere)g.computeBoundingSphere();v.copy(g.boundingSphere.center).applyMatrix4(o.matrixWorld);const sc=o.matrixWorld.getMaxScaleOnAxis(),r=g.boundingSphere.radius*sc;
+   /* 床より下から生えて床を突き抜ける木も（横の位置が駅の中で、上の端が床より上） */if(inH(v.x,v.z,v.y+r,v.y-r)){o.visible=false;n++;}continue;}
+  const I=g.index,cnt=I?I.count:P.count,bad=new Int8Array(P.count);let hit=0;const isB=i=>{if(bad[i]===0){v.fromBufferAttribute(P,i).applyMatrix4(o.matrixWorld);bad[i]=inV(v.x,v.y,v.z)?1:-1;}return bad[i]===1;};
+  for(let t=0;t<cnt;t+=3){const a=I?I.getX(t):t,b=I?I.getX(t+1):t+1,c=I?I.getX(t+2):t+2;if(isB(a)||isB(b)||isB(c)){P.setXYZ(b,P.getX(a),P.getY(a),P.getZ(a));P.setXYZ(c,P.getX(a),P.getY(a),P.getZ(a));hit++;}}
+  if(hit){P.needsUpdate=true;n+=hit;}}catch(e){}}
+ H.purged=(H.purged||0)+n;}
+function w285Inst(){const H=W285;let nt=0,ng=0;const inTw=(x,z,r)=>H.towers.some(q=>Math.hypot(x-q[0],z-q[1])<r);
+ const m4=new THREE.Matrix4(),v=new THREE.Vector3(),q4=new THREE.Quaternion(),s4=new THREE.Vector3(),Z=new THREE.Matrix4().makeScale(0,0,0);
+ scene.updateMatrixWorld(true);scene.traverse(o=>{if(!o.isInstancedMesh||o.userData.keep285)return;try{if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();const hy=o.geometry.boundingBox.max.y;let ch=0;
+  for(let i=0;i<o.count;i++){o.getMatrixAt(i,m4);m4.decompose(v,q4,s4);if(s4.x===0&&s4.y===0)continue;v.applyMatrix4(o.matrixWorld);const top=v.y+hy*s4.y;let kill=w285InSt(v.x,v.z,1)||w285OnStairs(v.x,v.z,1.2)||inTw(v.x,v.z,4.5);
+   if(!kill){const bt=w285Bot(v.x,v.z,2);if(bt!=null&&top>bt-1)kill=true;}
+   /* 建物（展望台・亭・塔・家）の中に生えた木：建物の範囲＋1.5m の中で、建物の屋根より低い所から生えているもの */
+   if(!kill&&s4.y>.4){for(const b of gridNear(v.x,v.z,2)){if(!b.alive||b.name==='stairstep'||b.ghost)continue;if(v.x>b.x0-1.5&&v.x<b.x1+1.5&&v.z>b.z0-1.5&&v.z<b.z1+1.5&&v.y<(b.h||0)){kill=true;ng++;break;}}}
+   if(kill){o.setMatrixAt(i,Z);ch++;nt++;}}if(ch)o.instanceMatrix.needsUpdate=true;}catch(e){}});
+ return[nt,ng];}
+
+/* ---------- 乗る：ゴンドラの床の上に入ると乗る。中は歩ける。止まっている時か中間駅を通る時に、乗り口から出ると降りる ---------- */
+function w285Local(c,x,z){const dx=x-c.x,dz=z-c.z;return[dx*c.hx+dz*c.hz,-dx*c.hz+dz*c.hx];}
+{const _up=updatePlayer;updatePlayer=function(dt){const H=W285;if(!H)return _up.apply(this,arguments);
+ const r=H.ride;let pre=null;if(r&&!veh&&!P.dead)pre={x:P.x,z:P.z,hx:r.c.hx,hz:r.c.hz};
+ const res=_up.apply(this,arguments);
+ try{for(const c of H.cars)w285Pos(c);
+  if(r){if(veh||P.dead){H.ride=null;return res;}const c=r.c;let du=0,dw=0;if(pre){const dx=P.x-pre.x,dz=P.z-pre.z;du=dx*pre.hx+dz*pre.hz;dw=-dx*pre.hz+dz*pre.hx;}
+   r.u+=du;r.w+=dw;const hl=W285_CL/2-.45,hw=W285_CW/2-.35,door=Math.abs(r.u)<.75,canOut=c.dock>=0||c.mid;
+   if(canOut&&(Math.abs(r.w)>hw+.08||Math.abs(r.u)>hl+.08)){/* 駅では、どの向きでも床（溝でない所）へ出られる */const side=Math.abs(r.w)-hw>Math.abs(r.u)-hl;const tu=side?Math.max(-hl,Math.min(hl,r.u)):Math.sign(r.u)*(W285_CL/2+1.1),tw=side?Math.sign(r.w)*(W285_CW/2+1.1):Math.max(-hw,Math.min(hw,r.w));
+    const tx=c.x+c.hx*tu-c.hz*tw,tz=c.z+c.hz*tu+c.hx*tw;let stn=null;for(const st of H.ST){const dx=tx-st.c[0],dz=tz-st.c[1],uu=dx*st.hx+dz*st.hz,ww=-dx*st.hz+dz*st.hx;if(Math.abs(uu)<14.2&&Math.abs(ww)<st.hw+.6&&!st.inTr(tx,tz)){stn=st;break;}}
+    if(stn){H.ride=null;P.x=tx;P.z=tz;P.alt=stn.deck;P.vy=0;telop('ロープウェーを降りました','#9fe8ff','rwOff',4000);return res;}}
+   r.u=Math.max(-hl,Math.min(hl,r.u));r.w=Math.max(-hw,Math.min(hw,r.w));P.x=c.x+c.hx*r.u-c.hz*r.w;P.z=c.z+c.hz*r.u+c.hx*r.w;P.alt=c.floor;P.vy=0;P.vx*=.5;P.vz*=.5;
+   const st=c.dock>=0?'d'+c.dock:c.mid?'m':'v';if(st!==r.st){r.st=st;
+    if(st==='v')telop(c.dir>0?'発車します。中間駅を通って山頂駅まで約'+Math.round(H.Tt)+'秒':'発車します。谷の駅まで約'+Math.round(H.Tt)+'秒','#9fe8ff','rwGo'+c.dir,8000);
+    else if(st==='m')telop('中間駅をゆっくり通ります。乗り口から降りることもできます','#9fe8ff','rwMid',8000);
+    else telop(c.dock===1?'山頂駅に着きました。乗り口から外へ出られます':'谷の駅に着きました。乗り口から外へ出られます','#9fe8ff','rwArr'+c.dock,8000);}
+   return res;}
+  if(veh||P.dead)return res;
+  for(const c of H.cars){const[u,w]=w285Local(c,P.x,P.z);if(Math.abs(u)<W285_CL/2-.3&&Math.abs(w)<W285_CW/2-.2&&Math.abs(P.alt-c.floor)<1.1){H.ride={c,u,w,st:c.dock>=0?'d'+c.dock:c.mid?'m':'v'};P.alt=c.floor;P.vy=0;
+    telop(c.dock>=0?'ロープウェーに乗りました。発車まであと'+Math.max(1,Math.round(c.left))+'秒':'ロープウェーに乗りました','#9fe8ff','rwOn',6000);break;}}
+  if(!H.hint){for(const st of H.ST)if(Math.hypot(P.x-st.c[0],P.z-st.c[1])<28){H.hint=1;telop(st.mid?'ロープウェーの中間駅：ゆっくり通るゴンドラに歩いて入ると乗れます':'ロープウェーの駅：止まっているゴンドラに歩いて入ると乗れます','#9fe8ff','rwHint');break;}}
+ }catch(e){}return res;};}
+{const _bw=buildWorld0;buildWorld0=function(){W285=null;const r=_bw.apply(this,arguments);try{if(W285)w285Clear();}catch(e){console.warn('w285',e);}return r;};}
+{const _sg=startGame;startGame=function(){if(W285)W285.ride=null;return _sg.apply(this,arguments);};}
+if(window.__TEST__)window.__T85=()=>{const H=W285;if(!H)return null;return{S:H.S.map(p=>p.map(Math.round)),L:Math.round(H.Ltot),legs:H.LG.map(g=>Math.round(g.L)),towers:H.towers,minCl:+H.minCl.toFixed(1),decks:H.ST.map(s=>+s.deck.toFixed(1)),solids:H.solids,cleared:H.cleared,Tt:Math.round(H.Tt),
+ cars:H.cars.map(c=>({x:+c.x.toFixed(1),z:+c.z.toFixed(1),y:+c.y.toFixed(1),floor:+c.floor.toFixed(2),dock:c.dock,mid:c.mid,s:+c.s.toFixed(1),left:+(c.left||0).toFixed(1),hx:c.hx,hz:c.hz})),ride:H.ride?{u:+H.ride.u.toFixed(2),w:+H.ride.w.toFixed(2)}:null};};
+if(window.__TEST__)window.__T85tp=(x,z,a)=>{P.x=x;P.z=z;if(a!=null){P.alt=a;P.vy=0;}return[P.x,P.z,P.alt];};
+if(window.__TEST__)window.__T85P=()=>({x:+P.x.toFixed(2),z:+P.z.toFixed(2),alt:+P.alt.toFixed(2)});
+if(window.__TEST__)window.__T85G=()=>{P.hp=P.maxHp=1e9;P.iframe=1e9;};
+if(window.__TEST__)window.__T85B=(x,z)=>({bot:w285Bot(x,z,0),g:w285G(x,z)});
+if(window.__TEST__)window.__PMH=()=>{try{const b=new THREE.Box3().setFromObject(pm);return b.getSize(new THREE.Vector3()).toArray().map(v=>+v.toFixed(2));}catch(e){return String(e);}};
+if(window.__TEST__)window.__T85W=(dx,dz,on)=>{P.yaw=Math.atan2(-dx,-dz);keys.KeyW=!!on;};
+if(window.__TEST__)window.__T85ST=()=>W285.ST.map(st=>({cand:st.cand,c:st.c,hx:st.hx,hz:st.hz,hw:st.hw,deck:st.deck,stairs:st.stairs.map(S2=>({kind:S2.kind,s:S2.s,u:S2.u,au:S2.au,n:S2.steps.length,foot:S2.steps.length?S2.steps[S2.steps.length-1]:null,steps:S2.steps}))}));
+if(window.__TEST__)window.__T85X=(w)=>{if(W285&&W285.ride)W285.ride.w=w;};
+if(window.__TEST__)window.__T85TREE=()=>{const H=W285,out=[];const v=new THREE.Vector3(),m4=new THREE.Matrix4();scene.updateMatrixWorld(true);
+ const own=o=>{for(let q=o;q;q=q.parent)if(q.userData&&q.userData.keep285)return true;return false;};
+ const inS=(x,y,z)=>{for(let si=0;si<H.ST.length;si++){const st=H.ST[si],dx=x-st.c[0],dz=z-st.c[1],u=dx*st.hx+dz*st.hz,w=-dx*st.hz+dz*st.hx;if(Math.abs(u)<14&&Math.abs(w)<st.hw&&y>st.deck+.6&&y<st.deck+12)return si;}return -1;};
+ scene.traverse(o=>{if(!o.isMesh||!o.visible||own(o))return;try{if(o.isInstancedMesh){let n=0,ex=null;const g=o.geometry;if(!g.boundingBox)g.computeBoundingBox();for(let i=0;i<o.count;i++){o.getMatrixAt(i,m4);const e=m4.elements;if(e[0]===0&&e[5]===0&&e[10]===0)continue;v.set(0,(g.boundingBox.min.y+g.boundingBox.max.y)/2,0).applyMatrix4(m4).applyMatrix4(o.matrixWorld);const si=inS(v.x,v.y,v.z);if(si>=0){n++;ex=[si,v.x|0,v.y|0,v.z|0];}}if(n)out.push(['I',n,ex,o.count,o.geometry.type]);return;}
+  const P=o.geometry.attributes.position,I=o.geometry.index;let n=0,ex=null;const cnt=I?I.count:P.count;for(let t=0;t<cnt;t+=3){const a=I?I.getX(t):t,b=I?I.getX(t+1):t+1,c=I?I.getX(t+2):t+2;if(P.getX(a)===P.getX(b)&&P.getY(a)===P.getY(b)&&P.getZ(a)===P.getZ(b)&&P.getX(a)===P.getX(c))continue;v.fromBufferAttribute(P,a).applyMatrix4(o.matrixWorld);const si=inS(v.x,v.y,v.z);if(si>=0){n++;ex=[si,v.x|0,v.y|0,v.z|0];}}if(n)out.push(['M',n,ex,P.count,o.material.type,o.name,o.parent&&o.parent.type,o.userData&&Object.keys(o.userData).join(',')]);}catch(e){}});return out;};
+
+/* ===== v2.89 メダル「山頂制圧」の条件を厳しく・未取得のメダルはシルエットに =====
+   ・以前：どこかの山を歩いて高さ18m 以上まで登る（棚田・茶畑の段丘ですぐ取れた）
+   ・今：火の山の島（STAGE 6）で、火山の火口のふちまで登る（ヘリで飛んで行くのは数えない）
+   ・未取得のメダルは灰色ではなく、形だけの影（中の絵柄が見えない） */
+{const B=BADGES.find(b=>b[0]==='山頂制圧');if(B){B[1]='火の山の島（STAGE 6）で、火山の火口のふちまで登る';B[2]=()=>!!SST.crater;}}
+let W289_T=0,W291_FIX=0;/* v2.91 古い条件（どこかの山で18m）で取った「山頂制圧」は、火口のふちに登っていなければ取り消す（1回だけ） */
+{const _u=update;update=function(dt){/* v2.91 ベースの古い判定（どこかの山で18m）のバナー「山頂制圧！」を出さない：その判定済みの印を先に立てておく */try{if(!SST.peak)SST.peak=1;}catch(e){}try{if(!W291_FIX){W291_FIX=1;const i=BADGES.findIndex(b=>b[0]==='山頂制圧');if(i>=0&&SAVE.bdg&&SAVE.bdg[i]&&!SST.crater){delete SAVE.bdg[i];SAVE.bdg[i]=0;if(SAVE.badge===i)SAVE.badge=null;try{saveGame();}catch(e){}}}}catch(e){}const r=_u(dt);try{if(W245_ON&&state==='play'&&!P.dead&&!SST.crater&&!(veh&&veh.type==='heli')){W289_T-=dt;if(W289_T<=0){W289_T=.5;const V=W245_V,d=Math.hypot(P.x-V.x,P.z-V.z),th=terrH(P.x,P.z);
+ if(d<V.CR+22&&th>=V.H*.72&&P.alt<=th+3){SST.crater=1;showBanner('山頂制圧！','火の山の火口のふち（高さ '+Math.round(th)+'m）まで登りきった');try{badgeCheck();saveGame();}catch(e){}}}}}catch(e){}return r;};}
+(function(){try{const st=document.createElement('style');st.textContent='.bdI.lkd img,.bdCoin.lk .f{filter:brightness(0) invert(.32)!important;opacity:.9}';document.head.appendChild(st);}catch(e){}})();
+if(window.__TEST__)window.__T89={rim:()=>{const V=W245_V;const r=[];for(const k of[.6,.9,1,1.15,1.3,1.5])r.push([k,Math.round(terrH(V.x+V.CR*k,V.z)),Math.round(terrH(V.x,V.z+V.CR*k))]);return{V,r,ok:!!SST.crater};},tp:(x,z)=>{P.x=x;P.z=z;P.alt=terrH(x,z);P.vy=0;},on:()=>W245_ON,open:()=>openBarracks('bd'),bd:()=>{const i=BADGES.findIndex(b=>b[0]==='山頂制圧');return{i,got:!!SAVE.bdg[i],crater:!!SST.crater,peak:!!SST.peak};}};
+
+/* ===== v2.92 Mac のスクリーンショット（⌘+Shift+3/4/5）と操作キーがぶつかる・ダッシュが止まらない =====
+   原因：⌘ を押している間のキーは、離した時の keyup がブラウザに届かないことがある（Mac）。Shift が押されたままの扱いになり、ダッシュ（Shift）が延々と続いていた。
+   ⌘+Shift+4 の「4」も武器の切り替えになっていた。
+   ・⌘ / Ctrl / Option を押しながらのキーはゲームの操作に使わない（ほかの処理より先に止める）
+   ・⌘ / Ctrl を押した・離した時、画面から離れた時、キーの状態をすべて戻す
+   ・Shift が離れているのに押されたままになっていたら、次のキーやマウスの動きで戻す
+   ・ダッシュは C（v2.93 から Shift はダッシュに使わない） */
+(function(){const clearAll=()=>{try{for(const k in keys)keys[k]=false;input.dashReq=false;}catch(e){}};
+ const mod=e=>e.metaKey||e.ctrlKey||e.altKey;
+ addEventListener('keydown',e=>{const c=e.code||'';if(/^(Meta|OS|Control)/.test(c)){clearAll();e.stopImmediatePropagation();return;}
+  /* v2.93 Shift はゲームでは使わない（ダッシュは C） */if(/^Shift/.test(c)){keys.ShiftLeft=false;keys.ShiftRight=false;e.stopImmediatePropagation();return;}
+  if(mod(e)){e.stopImmediatePropagation();clearAll();return;}
+  if(!e.shiftKey){keys.ShiftLeft=false;keys.ShiftRight=false;}
+  /* C でもダッシュ（1回押すと1回） */if(c==='KeyC'&&!e.repeat){try{input.dashReq=true;}catch(er){}}},true);
+ addEventListener('keyup',e=>{const c=e.code||'';if(/^Shift/.test(c)){keys.ShiftLeft=false;keys.ShiftRight=false;e.stopImmediatePropagation();return;}if(/^(Meta|OS|Control|Alt)/.test(c))clearAll();if(!e.shiftKey){keys.ShiftLeft=false;keys.ShiftRight=false;}},true);
+ const fixShift=e=>{if(!e.shiftKey&&(keys.ShiftLeft||keys.ShiftRight)){keys.ShiftLeft=false;keys.ShiftRight=false;}if(e.metaKey&&Object.keys(keys).some(k=>keys[k]))clearAll();};
+ addEventListener('mousemove',fixShift,true);addEventListener('mousedown',fixShift,true);addEventListener('wheel',fixShift,{capture:true,passive:true});
+ document.addEventListener('visibilitychange',clearAll);addEventListener('blur',clearAll);
+ /* 操作説明の「Shift ダッシュ」に C を足す */const fixHelp=()=>{try{for(const b of document.querySelectorAll('b'))if(/^Shift/.test(b.textContent)&&/ダッシュ/.test(b.parentNode.textContent))b.textContent='C';}catch(e){}};fixHelp();setTimeout(fixHelp,1500);
+ try{for(const t of TSTEPS)if(t.m&&t.m.indexOf('PC：Shift')>=0)t.m=t.m.replace('PC：Shift','PC：C');}catch(e){}
+ {const _up=updatePlayer;updatePlayer=function(dt){keys.ShiftLeft=false;keys.ShiftRight=false;return _up.apply(this,arguments);};}
+ if(window.__TEST__)window.__T92={keys:()=>Object.keys(keys).filter(k=>keys[k]),raw:()=>JSON.stringify(keys)};})();
+
+/* ===== v2.95 天衡帝国の作り込み その3：ステージ12「玄都の外城」（スロット10） =====
+   ・都を囲む外城の大城壁：灰色のれんがの壁（高さ13m・厚さ16m）、外へ張り出す馬面（ばめん）、上は歩ける城壁の道と女墻（ひめがき）
+     大通りが壁を抜ける所に城門（トンネル）。正門の上に二層の楼閣、もう一つの門に一層の楼閣。内側には城壁へ上る石段（歩いて上れる）
+   ・城壁の外に堀（水）。城門の前は石の橋
+   ・家並み：灰色のれんがの四合院（中庭の家）と胡同。大通りぞいに伝統と未来の融合の建物（灰色のれんが・ガラス・木の格子・屋上の庭）
+   ・遠景：北の果てに内城の城壁と三層の門楼、白い基壇の上の金色の屋根の宮殿、九重の塔
+   ・交通：東西の大通りを路面電車（赤と生成りの二連の車両）が行き来する。架線柱と架線、線路
+   ・朝のもや */
+var W295_ON=false,W295={};
+try{ATM_FIX[10]=['mo','cd'];}catch(e){}
+const W295_ZW=-120,W295_TH=16,W295_H=13,W295_MZ0=-99,W295_MZ1=-84,W295_XE=900;
+{const _bw=buildWorld0;buildWorld0=function(si){W295_ON=((si||0)+1)===10;W295={gates:[],blocks:[],tram:[],stat:{fus:0,hut:0}};
+ /* 高速道路・鉄道は作らない（路面電車の大通りと城壁にかかるため） */let sv=null;if(W295_ON&&typeof LAYOUTS!=='undefined'){sv=LAYOUTS.map(L=>[L.hw,L.rail]);for(const L of LAYOUTS){L.hw=0;L.rail=0;}}
+ let r;try{r=_bw.apply(this,arguments);}finally{if(sv)LAYOUTS.forEach((L,i)=>{L.hw=sv[i][0];L.rail=sv[i][1];});}if(W295_ON)try{w295After();}catch(e){console.warn('w295',e);}return r;};}
+/* ---------- 計画：道の線が決まったら、城壁と門の位置を決める ---------- */
+function w295Plan(){if(!W295_ON||W295.plan)return;W295.plan=1;const L=WORLD_LINES||[];
+ for(const l of L)if(l.o==='v'&&l.a<W295_ZW-10&&l.b>W295_ZW+10)W295.gates.push({x:l.c});
+ W295.gates.sort((a,b)=>Math.abs(a.x)-Math.abs(b.x));W295.gates.forEach((g,i)=>g.main=i===0);
+ const h=L.filter(l=>l.o==='h'&&l.a<-150&&l.b>150).sort((a,b)=>Math.abs(a.c)-Math.abs(b.c))[0];W295.tz=h?h.c:null;
+ const z0=W295_ZW-W295_TH/2-14,z1=W295_MZ1+2;
+ /* 城壁・馬面・堀・内側の石段の所には区画を作らない */W295.blocks.push({x0:-W295_XE,x1:W295_XE,z0,z1});
+ W295.ramps=[];for(const g of W295.gates){const s=g.main?1:-1;const x0=g.x+s*16,x1=x0+s*24;W295.ramps.push({x0:Math.min(x0,x1),x1:Math.max(x0,x1),z0:W295_ZW-W295_TH/2-6,z1:W295_ZW-W295_TH/2,up:s});}}
+{const _gl=genLayout;genLayout=function(){const r=_gl.apply(this,arguments);return r;};}
+{const _wr=waterRects;waterRects=function(port){const W=_wr(port);if(W295_ON){w295Plan();for(const b of W295.blocks)W.push(b);}return W;};}
+/* 遠くの帯・遠景の家は、城壁の帯と北の宮殿の所をよける */
+{const _ri=w238RivIn;w238RivIn=function(x,z,m){if(W295_ON){if(z>W295_ZW-W295_TH/2-16&&z<W295_MZ1+4&&Math.abs(x)<W295_XE)return true;if(x>-620&&x<560&&z<-322&&z>-760)return true;}return _ri.apply(this,arguments);};}
+/* 地面の絵がまだ描ける間に：堀の水・城壁の下の地面・路面電車の線路 */
+{const _brz=buildRingZones;buildRingZones=function(si,lines){if(W295_ON)try{w295Paint();}catch(e){console.warn('w295p',e);}return _brz.apply(this,arguments);};}
+function w295Paint(){w295Plan();const gap=RW/2+5,E=Math.min(WH-4,700);
+ gR(-E,W295_ZW-W295_TH/2-14,E,W295_MZ0,'#8a8270');
+ let x=-E;const gs=W295.gates.map(g=>g.x).sort((a,b)=>a-b);for(const gx of gs.concat([E+gap])){const x1=gx-gap;if(x1>x+4)waterRect(x,x1,W295_MZ0,W295_MZ1,0x3e6a62);x=gx+gap;}
+ if(W295.tz!=null){const z=W295.tz;for(const o of[-2.3,-.9,.9,2.3])gR(-E,z+o-.07,E,z+o+.07,'#3a3a3c');for(let q=-E;q<E;q+=1.2)for(const o of[-1.6,1.6])gR(q,z+o-1,q+.35,z+o+1,'rgba(60,54,48,.55)');}
+ for(const r of W295.ramps)gR(r.x0,r.z0,r.x1,r.z1,'#8a8270');}
+/* ---------- 家並み：四合院と、大通りぞいの融合の建物 ---------- */
+function w295Fusion(mp,lot){const w=Math.max(8,Math.min(lot.w*1.2,20)),d=Math.max(8,Math.min(lot.d*1.2,17)),fl=Math.round(rnd(3,6)),FH=3.3,T=isTouch;
+ const BR=[0x7a766e,0x6e6a62,0x84807a][(Math.random()*3)|0],TL=0x2a2c30,GL=0x4a6272,WD=[0xa06a3c,0x8a5a34][(Math.random()*2)|0];
+ const e=bld(mp,lot.x,lot.z,lot.ry,w/2,d/2,fl*FH+4,{hp:240+fl*70,arm:.7,name:'tower'},(L,G)=>{
+  /* 下2層は灰色のれんがと木の店構え、上は段々に下がるガラスと木の格子 */L.add(GB,BR,w,FH*2,d,0,FH,0);for(const s of[-1,1]){L.add(GB,0x3a2a1e,w*.8,FH*1.2,.14,0,FH*.6,s*(d/2+.04));if(!T)G.add(GB,0xffd8a0,w*.7,.12,.06,0,FH*1.25,s*(d/2+.1));}
+  L.add(GB,TL,w+.8,.24,d+.8,0,FH*2+.12,0);for(const s of[-1,1])L.add(GB,TL,w+1.2,.2,.9,0,FH*2-.1,s*(d/2+.5),s*.35,0,0);
+  let y=FH*2+.24;const up=fl-2;for(let k=0;k<up;k++){const bw=w*(1-k*.06),bd=d*(1-k*.08);L.add(GB,0xe8e4dc,bw,.3,bd,0,y+.15,0);L.add(GB,GL,bw-.4,FH-.3,bd-.4,0,y+.3+(FH-.3)/2,0);
+   if(!T)for(let q=-4;q<=4;q++)L.add(GB,WD,.14,FH-.4,.3,q*bw*.1,y+FH/2+.1,bd/2-.05);if(k%2===0)for(const s of[-1,1])L.add(GB,0x4a7a34,bw*.9,.4,.6,0,y+.5,s*(bd/2-.2));if(!T&&(k%2))G.add(GB,0xfff0d0,bw*.6,.08,.06,0,y+FH*.6,bd/2-.1);y+=FH;}
+  /* 屋上：黒い瓦の小さな屋根の東屋と庭 */L.add(GB,0x5a7a3a,w*.7,.3,d*.6,0,y+.15,0);L.add(GB,0x8a3a2a,.3,2.2,.3,w*.15,y+1.4,d*.1);L.add(GB,0x8a3a2a,.3,2.2,.3,-w*.15,y+1.4,d*.1);L.add(GB,TL,w*.45,.25,d*.35,0,y+2.6,d*.1);
+  for(let k=0;k<3;k++)L.add(GS,k%2?0x4a7a34:0x5e8a3e,1.1,1.2,1.1,rnd(-w*.28,w*.28),y+.9,rnd(-d*.2,d*.2));});
+ try{e.eco=1;}catch(x){}W295.stat.fus++;return e;}
+/* 四合院：まわりを灰色のれんがの塀で囲み、北の正房・東西の廂房・南の倒座房が中庭を囲む。門は前（＋z）の端寄り */
+function w295Gable(L,x,y,z,len,dep,rise,col,alongZ){const a=Math.atan2(rise,dep/2),sl=Math.hypot(rise,dep/2)+.5;
+ for(const s of[-1,1]){if(!alongZ)L.add(GB,col,len+.6,.22,sl,x,y+rise/2,z+s*dep/4,s*a,0,0);else L.add(GB,col,sl,.22,len+.6,x+s*dep/4,y+rise/2,z,0,0,-s*a);}
+ if(!alongZ){L.add(GB,0x1e2024,len+.4,.32,.4,x,y+rise+.1,z);for(const t of[-1,1])L.add(GB,0x1e2024,.4,.7,.4,x+t*(len/2+.1),y+rise+.35,z,0,0,t*.35);}
+ else{L.add(GB,0x1e2024,.4,.32,len+.4,x,y+rise+.1,z);for(const t of[-1,1])L.add(GB,0x1e2024,.4,.7,.4,x,y+rise+.35,z+t*(len/2+.1),-t*.35,0,0);}}
+function w295Siheyuan(mp,lot){const W=Math.max(12,Math.min(lot.w*1.5,31)),D=Math.max(12,Math.min(lot.d*1.5,30)),BR=[0x7a766e,0x726e66,0x827e76][(Math.random()*3)|0],TL=0x2c2e32,RED=0x8e3426,WD=0x6a4a30,T=isTouch;
+ const e=bld(mp,lot.x,lot.z,lot.ry,W/2,D/2,6.5,{hp:260,arm:.6,name:'house'},(L,G)=>{const hw=W/2,hd=D/2,gx=hw*.55;
+  /* 中庭の地面 */L.add(GB,0xa8a296,W-1,.06,D-1,0,.03,0);
+  /* 塀（門のところは開ける） */const wall=(x0,x1,z0,z1)=>{const cx=(x0+x1)/2,cz=(z0+z1)/2,lx=Math.max(.5,x1-x0),lz=Math.max(.5,z1-z0);L.add(GB,BR,lx,2.8,lz,cx,1.4,cz);L.add(GB,TL,lx+.3,.28,lz+.3,cx,2.94,cz);};
+  wall(-hw,hw,-hd,-hd+.5);wall(-hw,-hw+.5,-hd,hd);wall(hw-.5,hw,-hd,hd);wall(-hw,gx-1.4,hd-.5,hd);wall(gx+1.4,hw,hd-.5,hd);
+  /* 門：赤い扉・小さな屋根・門の前の石 */L.add(GB,BR,3.4,3.4,1.2,gx,1.7,hd-.3);L.add(GB,RED,2,2.4,.16,gx,1.2,hd+.3);w295Gable(L,gx,3.4,hd-.3,3.8,2.4,.9,TL,0);for(const s of[-1,1])L.add(GB,0x9a958a,.5,.5,.6,gx+s*1.4,.25,hd+.6);
+  if(!T&&Math.random()<.6)for(const s of[-1,1])G.add(GS,0xff3a28,.28,.36,.28,gx+s*1.2,2.6,hd+.6);
+  /* 正房（北＝−z） */const mw=W*.66,md=5.4,mz=-hd+.5+md/2+.6;L.add(GB,BR,mw,3.6,md,0,1.8,mz);L.add(GB,0x9a958a,mw+.8,.4,md+1.6,0,.2,mz+.4);
+  for(let i=0;i<=5;i++)L.add(GB,RED,.3,3.4,.3,-mw/2+i*mw/5,1.9,mz+md/2+.5);for(let i=0;i<5;i++){L.add(GB,WD,mw/5-.5,2.2,.08,-mw/2+(i+.5)*mw/5,1.9,mz+md/2+.04);if(!T)G.add(GB,0xffd8a0,mw/5-1,.08,.05,-mw/2+(i+.5)*mw/5,2.6,mz+md/2+.1);}
+  w295Gable(L,0,3.6,mz+.3,mw+.8,md+2.2,1.8,TL,0);
+  /* 東西の廂房 */const sd=4.2,sl=D*.42,sz=-hd+md+2.8+sl/2;for(const s of[-1,1]){const sx=s*(hw-.5-sd/2-.3);L.add(GB,BR,sd,3,sl,sx,1.5,sz);for(let i=0;i<3;i++)L.add(GB,WD,.08,1.8,sl/3-.6,sx-s*(sd/2+.04),1.6,sz-sl/2+(i+.5)*sl/3);w295Gable(L,sx,3,sz,sl+.4,sd+1.6,1.3,TL,1);}
+  /* 南の倒座房（門の横） */const bw=W*.5,bz=hd-.5-1.9;L.add(GB,BR,bw,2.8,3.4,-hw+.5+bw/2+.2,1.4,bz);w295Gable(L,-hw+.5+bw/2+.2,2.8,bz,bw+.3,4.4,1,TL,0);
+  /* 中庭の木と鉢 */const tz=(mz+md/2+bz-1.7)/2;L.add(GC,0x5a4030,.22,3,.22,1,1.5,tz);L.add(GS,[0x4a7a34,0x5e8a3e,0x6a8a3a][(Math.random()*3)|0],2.2,2,2.2,1,3.6,tz);L.add(GB,0x6a5a48,.9,.6,.9,-2,.3,tz+1);L.add(GS,0x4a7a34,.6,.5,.6,-2,.85,tz+1);});
+ try{e.eco=1;}catch(x){}W295.stat.syh=(W295.stat.syh||0)+1;return e;}
+/* 小さな区画：灰色のれんがの平屋（切妻の瓦屋根）と小さな塀の前庭 */
+function w295Small(mp,lot){const W=Math.max(5,Math.min(lot.w*1.1,12)),D=Math.max(5,Math.min(lot.d*1.1,10)),BR=[0x7a766e,0x726e66,0x827e76][(Math.random()*3)|0],TL=0x2c2e32,RED=0x8e3426,T=isTouch;
+ const e=bld(mp,lot.x,lot.z,lot.ry,W/2,D/2,5,{hp:160,arm:.5,name:'house'},(L,G)=>{const hd=D*.55;L.add(GB,BR,W,3.2,hd,0,1.6,-D/2+hd/2);L.add(GB,RED,1.2,2.2,.1,0,1.1,-D/2+hd+.05);for(const s of[-1,1])L.add(GB,0x6a4a30,1.4,1.1,.08,s*W*.28,1.9,-D/2+hd+.04);
+  w295Gable(L,0,3.2,-D/2+hd/2,W+.4,hd+1.2,1.3,TL,0);L.add(GB,BR,.4,1.8,D-hd,-W/2+.2,.9,-D/2+hd+(D-hd)/2);L.add(GB,BR,.4,1.8,D-hd,W/2-.2,.9,-D/2+hd+(D-hd)/2);L.add(GB,BR,W,1.8,.4,0,.9,D/2-.2);L.add(GB,TL,W+.3,.22,.6,0,1.9,D/2-.2);
+  if(!T&&Math.random()<.4)G.add(GS,0xff3a28,.24,.32,.24,.9,2.3,-D/2+hd+.4);if(Math.random()<.5){L.add(GC,0x5a4030,.16,2.2,.16,W*.25,1.1,D*.25);L.add(GS,0x5e8a3e,1.3,1.3,1.3,W*.25,2.6,D*.25);}});
+ try{e.eco=1;}catch(x){}return e;}
+/* 大きな区画は2〜4つの四合院に分ける（あいだは細い胡同） */
+function w295SplitSyh(mp,lot){const c=Math.cos(lot.ry||0),s=Math.sin(lot.ry||0),sub=(dx,dz,w,d)=>({x:lot.x+c*dx+s*dz,z:lot.z-s*dx+c*dz,w,d,ry:lot.ry});
+ const nx=lot.w>=44?2:1,nz=lot.d>=42?2:1,w=lot.w/nx,d=lot.d/nz;let e=null;for(let i=0;i<nx;i++)for(let j=0;j<nz;j++){const l=sub((i+.5)*w-lot.w/2,(j+.5)*d-lot.d/2,w-3,d-3);if(Math.random()<.03)continue;const r=w295Siheyuan(mp,l);if(!e)e=r;}return e;}
+function w295Pick(mp,lot,orig){if(window.__TEST__)(W295.lots=W295.lots||[]).push([Math.round(lot.x),Math.round(lot.z),Math.round(lot.w),Math.round(lot.d)]);const tz=W295.tz,mg=W295.gates.find(g=>g.main);let near=99;if(tz!=null)near=Math.min(near,Math.abs(lot.z-tz));if(mg&&lot.z<W295_ZW)near=Math.min(near,Math.abs(lot.x-mg.x));
+ const p=near<40?.32:near<80?.12:.03;if(lot.w>=9&&lot.d>=9&&Math.random()<p)return w295Fusion(mp,lot);if(lot.w>=11&&lot.d>=11){if(Math.random()<.03){W295.stat.empty=(W295.stat.empty||0)+1;return null;}return w295SplitSyh(mp,lot);}W295.stat.hut++;return w295Small(mp,lot);}
+for(const k of['tower','cnModern','glass']){if(!STY[k])continue;const f=STY[k];STY[k]=function(mp,lot){if(!W295_ON||ASCL!==1)return f.apply(this,arguments);return w295Pick(mp,lot,STY.hutong||f);};}
+{const f=STY.hutong;if(f)STY.hutong=function(mp,lot){if(!W295_ON||ASCL!==1)return f.apply(this,arguments);return w295Pick(mp,lot,f);};}
+/* ---------- 組み立ての後 ---------- */
+function w295Clear(x0,x1,z0,z1){let n=0;for(const b of buildings){if(!b.alive||b.name==='stairstep'||b.x1==null||b.x1<x0||b.x0>x1||b.z1<z0||b.z0>z1)continue;b.alive=false;b.hp=0;if(b.pb){try{b.pb.squash(b,1);}catch(e){}}else if(b.mesh)b.mesh.visible=false;n++;}return n;}
+function w295Roof(L,x,y,z,w,d,col,rise,ry){/* 寄棟の瓦屋根（反りのある軒・棟・鴟尾） */const a=Math.atan2(rise,d/2),sl=Math.hypot(rise,d/2);
+ for(const s of[-1,1]){L.add(GB,col,w,.35,sl+.6,x,y+rise/2,z+s*d/4,s*a,0,0);}const ae=Math.atan2(rise,w*.18);for(const s of[-1,1])L.add(GB,col,Math.hypot(rise,w*.18)+.4,.35,d*.6,x+s*(w/2-w*.09),y+rise/2,z,0,0,-s*ae);
+ L.add(GB,0x1e2024,w*.66,.6,.7,x,y+rise+.1,z);for(const s of[-1,1]){L.add(GB,0x1e2024,.8,1.4,.6,x+s*w*.33,y+rise+.6,z);for(const t of[-1,1])L.add(GB,col,2.4,.3,.9,x+s*(w/2+.4),y+.35,z+t*(d/2+.3),0,s*t*.6,s*.25);}}
+function w295After(){const ZW=W295_ZW,TH=W295_TH,H=W295_H,zN=ZW-TH/2,zS=ZW+TH/2;let cl=0;
+ for(const b of W295.blocks)cl+=w295Clear(b.x0,b.x1,b.z0,b.z1);for(const r of W295.ramps)cl+=w295Clear(r.x0-2,r.x1+2,r.z0-2,r.z1);
+ const M=new Merger(),G=new Merger(),BR=0x7c776c,BR2=0x6c675e,BR3=0x8a8478,TL=0x2a2c30,RED=0x9a3a2a,gap=RW/2+1,E=W295_XE;
+ const gs=W295.gates.map(g=>g.x).sort((a,b)=>a-b);const segs=[];{let x=-E;for(const gx of gs){segs.push([x,gx-gap]);x=gx+gap;}segs.push([x,E]);}
+ const near=(x)=>Math.abs(x)<BOUND+80;
+ for(const[x0,x1]of segs){if(x1-x0<1)continue;const L=new LM(M,(x0+x1)/2,0,ZW,0),w=x1-x0,dl=near((x0+x1)/2)||w<400;
+  /* 壁本体（下が少し広い）・れんがの段・城壁の道・外の女墻（凸凹）・内の低い壁 */L.add(GB,BR,w,H,TH,0,H/2,0);L.add(GB,BR2,w,1.6,TH+1.2,0,.8,0);
+  if(dl)for(let y=1.8;y<H-.5;y+=1.1)for(const s of[-1,1])L.add(GB,y%2.2<1.1?BR2:BR3,w,.07,.06,0,y,s*(TH/2+.02));
+  L.add(GB,0x9a958a,w,.12,TH-1.2,0,H+.06,0);L.add(GB,BR,w,1,.7,0,H+.5,-(TH/2-.35));
+  /* 外（南＝敵の来る側）に凸凹の女墻 */L.add(GB,BR,w,.9,.8,0,H+.45,TH/2-.4);for(let q=x0+1.2;q<x1-1;q+=2.6){if(!near(q)&&((q|0)%3))continue;L.add(GB,BR3,1.3,1.4,.8,q-(x0+x1)/2,H+1.6,TH/2-.4);}}
+ /* 馬面（外＝南へ張り出す） */const bast=[];for(let x=-E+30;x<E;x+=58){if(gs.some(g=>Math.abs(g-x)<34))continue;bast.push(x);const L=new LM(M,x,0,zS+4,0);L.add(GB,BR,12,H,8,0,H/2,0);L.add(GB,BR2,12.8,1.6,8.8,0,.8,0);L.add(GB,0x9a958a,11,.12,7,0,H+.06,0);
+  for(let q=-5.4;q<=5.5;q+=2.6)L.add(GB,BR3,1.3,1.4,.8,q,H+1.6,4-.4);for(const s of[-1,1])L.add(GB,BR3,.8,1.4,1.3,s*(6-.4),H+1.6,1.2);
+  if(near(x)&&((x+E)/58|0)%2===0){/* 見張りの小さな櫓 */L.add(GB,0x6a665e,7,3.2,5,0,H+1.6,.5);L.add(GB,RED,7.2,.4,5.2,0,H+3.4,.5);w295Roof(L,0,H+3.6,.5,9,7,TL,1.8);}}
+ /* 城門：トンネル（両側の壁・天井のアーチ）と、上の楼閣 */
+ for(const g of W295.gates){const L=new LM(M,g.x,0,ZW,0),Gl=new LM(G,g.x,0,ZW,0),hw=gap,Ht=9.2;
+  L.add(GB,BR,hw*2,H-Ht,TH,0,Ht+(H-Ht)/2,0);for(const s of[-1,1]){L.add(GB,0x5a564e,.6,Ht,TH,s*(hw-.3),Ht/2,0);}
+  for(let k=0;k<=12;k++){const a=Math.PI*k/12,x=Math.cos(a)*(hw-.3),y=Ht-3.6+Math.sin(a)*3.6;for(const s of[-1,1])L.add(GB,0x9a958a,1,.9,.5,x,y,s*(TH/2+.05),0,0,a-Math.PI/2);}
+  L.add(GB,0x4a463e,hw*2-1,.5,TH-.2,0,Ht-.1,0);
+  /* 門扉（開いている）と額 */for(const s of[-1,1])L.add(GB,0x6a3020,.3,7,hw-1,s*(hw-.6),3.5,-TH/2+hw*.5-.4,0,s*1.3,0);L.add(GB,0x2a1e16,5,1.6,.3,0,Ht+1.6,TH/2+.2);Gl.add(GB,0xd8b060,4,1.1,.1,0,Ht+1.6,TH/2+.36);
+  /* 楼閣 */const tw=g.main?34:20,td=g.main?14:11,c1=g.main?6.4:5;L.add(GB,0x9a958a,tw+2,.6,td+2,0,H+.3,0);
+  for(let i=0;i<=(g.main?8:5);i++){const x=-tw/2+i*tw/(g.main?8:5);for(const s of[-1,1])L.add(GB,RED,.7,c1,.7,x,H+.6+c1/2,s*(td/2));}
+  L.add(GB,0x6a665e,tw-1.4,c1-.6,td-1.4,0,H+.6+(c1-.6)/2,0);for(let i=0;i<(g.main?8:5);i++){const x=-tw/2+(i+.5)*tw/(g.main?8:5);for(const s of[-1,1]){L.add(GB,0x3a2a20,2.2,2.2,.1,x,H+3.6,s*(td/2-.68));Gl.add(GB,0xffc878,1.8,.12,.05,x,H+2.6,s*(td/2-.62));}}
+  w295Roof(L,0,H+.6+c1,0,tw+5,td+5,TL,3);
+  if(g.main){const y2=H+.6+c1+2.2;L.add(GB,0x6a665e,tw*.7,5,td*.7,0,y2+2.5,0);for(let i=0;i<=6;i++){const x=-tw*.35+i*tw*.7/6;for(const s of[-1,1])L.add(GB,RED,.6,5,.6,x,y2+2.5,s*td*.35);}w295Roof(L,0,y2+5,0,tw*.7+5,td*.7+5,TL,3.4);}
+  /* 赤い提灯 */for(const s of[-1,1]){Gl.add(GS,0xff3a28,.5,.65,.5,s*(hw+2.5),Ht+.2,TH/2+.9);L.add(GB,0x3a2a1e,.08,.08,1.4,s*(hw+2.5),Ht+1.1,TH/2+.5);}
+  /* 堀の上の石の橋（欄干と、両側のアーチの面） */const zb0=W295_MZ0-1,zb1=W295_MZ1+1,Lb=new LM(M,g.x,0,(zb0+zb1)/2,0);for(const s of[-1,1]){Lb.add(GB,0xa8a296,.5,1.1,zb1-zb0,s*(gap+3.6),.55,0);for(let q=zb0+1;q<zb1;q+=2)Lb.add(GB,0xa8a296,.7,1.4,.7,s*(gap+3.6),.7,q-(zb0+zb1)/2);
+   Lb.add(GB,0x8a8478,.4,2.4,zb1-zb0,s*(gap+4.1),-1.1,0);Lb.add(GB,0x2a2e2c,.2,1.6,(zb1-zb0)*.6,s*(gap+4.32),-1.4,0);}}
+ /* 内側の石段（城壁の上へ） */for(const r of W295.ramps){const L=new LM(M,0,0,0,0),n=Math.ceil(H/.4),T=(r.x1-r.x0)/n;for(let k=0;k<n;k++){const top=Math.min(H,(k+1)*.4),x=r.up>0?r.x0+(k+.5)*T:r.x1-(k+.5)*T;L.add(GB,k%2?BR2:BR,T,top,r.z1-r.z0,x,top/2,(r.z0+r.z1)/2);}
+  L.add(GB,BR,r.x1-r.x0,1,.5,(r.x0+r.x1)/2,0,r.z0-.25);}
+ const m=M.build(detMat);m.castShadow=!isTouch;m.receiveShadow=true;m.userData.keep=1;WR.add(m);const gm=G.build(glowMat2);gm.userData.keep=1;WR.add(gm);
+ /* 当たり：城壁（門のところは天井だけ）・馬面・楼閣・石段 */const sol=(x0,x1,z0,z1,y0,h,step)=>addSolid({x0,x1,z0,z1,y0,h,hp:1e9,arm:0,name:'stairstep',rc:null,step:!!step});
+ for(const[x0,x1]of segs){const a=Math.max(x0,-BOUND-60),b=Math.min(x1,BOUND+60);if(b>a)sol(a,b,zN,zS,0,H);}
+ for(const g of W295.gates){sol(g.x-gap,g.x+gap,zN,zS,9.2,H);const tw=g.main?34:20,td=g.main?14:11;sol(g.x-tw/2,g.x+tw/2,ZW-td/2,ZW+td/2,H,H+(g.main?16:9));}
+ for(const x of bast)if(Math.abs(x)<BOUND+60)sol(x-6,x+6,zS,zS+8,0,H);
+ /* 城壁の上のふちの壁（落ちないように）：外は女墻、内は低い壁。内側の石段の上は開ける */{const a=-BOUND-60,b=BOUND+60;sol(a,b,zS-.8,zS,H-.5,H+1.5);const op=W295.ramps.map(r=>[r.x0,r.x1]).sort((p,q)=>p[0]-q[0]);let x=a;for(const[r0,r1]of op.concat([[b,b]])){if(r0>x)sol(x,r0,zN,zN+.7,H-.5,H+1.1);x=Math.max(x,r1);}}
+ for(const r of W295.ramps){const n=Math.ceil(H/.4),T=(r.x1-r.x0)/n;for(let k=0;k<n;k++){const top=Math.min(H,(k+1)*.4),xc=r.up>0?r.x0+(k+.5)*T:r.x1-(k+.5)*T;for(let z=r.z0+.2;z<r.z1;z+=.4)sol(xc-T/2+.02,xc+T/2-.02,z-.2,z+.2,0,top,1);}}
+ try{gridBuild();}catch(e){}
+ w295Palace();w295Tram();
+ /* 霧を少し近く（朝のもや） */try{if(scene.fog&&scene.fog.far)scene.fog.far=Math.min(scene.fog.far,isTouch?640:900);}catch(e){}
+ W295.stat.cleared=cl;}
+/* ---------- 遠景：北の内城と宮殿 ---------- */
+function w295Palace(){const M=new Merger(),G=new Merger(),L=new LM(M,0,0,0,0),Gl=new LM(G,0,0,0,0),mg=W295.gates.find(g=>g.main),cx=mg?mg.x:0,ZI=-340,BR=0x6e6a62,RED=0x9a3426,GOLD=0xc8962a,WH2=0xe4e0d6,TL=0x2a2c30;
+ /* 内城の城壁（赤い壁と黄色い瓦の笠）と三層の門楼 */L.add(GB,RED,1180,15,14,-30,7.5,ZI);L.add(GB,GOLD,1182,.8,15,-30,15.4,ZI);
+ L.add(GB,BR,40,18,20,cx,9,ZI);const y=18;for(let k=0;k<3;k++){const w=36-k*8,d=16-k*3,yy=y+k*7;L.add(GB,RED,w-2,6,d-2,cx,yy+3,ZI);w295Roof(L,cx,yy+6,ZI,w+4,d+4,GOLD,2.6);}
+ /* 白い三段の基壇と金色の屋根の大殿（3つ） */const halls=[[-420,48,26,16],[-500,40,22,13],[-570,56,28,18]];for(const[z,w,d,h]of halls){for(let k=0;k<3;k++)L.add(GB,WH2,w+24-k*6,1.6,d+20-k*5,cx,.8+k*1.6,z);const b=4.8;L.add(GB,RED,w,h,d,cx,b+h/2,z);
+   for(let i=0;i<=8;i++)L.add(GB,0xb04030,.9,h,.9,cx-w/2+i*w/8,b+h/2,z+d/2+.6);w295Roof(L,cx,b+h,z,w+8,d+8,GOLD,6);w295Roof(L,cx,b+h+5,z,w*.7,d*.6,GOLD,4);}
+ /* 東西の回廊と脇殿 */for(const s of[-1,1]){L.add(GB,RED,8,6,180,cx+s*90,3,-490);w295Roof(L,cx+s*90,6,-490,12,184,GOLD,2);for(const z of[-440,-520]){L.add(GB,WH2,32,2,22,cx+s*60,1,z);L.add(GB,RED,24,9,14,cx+s*60,6.5,z);w295Roof(L,cx+s*60,11,z,30,20,GOLD,4);}}
+ /* 九重の塔 */{const px=cx+190,pz=-470;L.add(GB,WH2,22,3,22,px,1.5,pz);for(let k=0;k<9;k++){const w=12-k*.9,yy=3+k*6.2;L.add(GB,k%2?0xb84a34:RED,w,5.2,w,px,yy+2.6,pz);L.add(GB,TL,w+4,.5,w+4,px,yy+5.4,pz);for(const s of[-1,1])for(const t of[-1,1])L.add(GB,TL,2,.4,.8,px+s*(w/2+1.6),yy+5.6,pz+t*(w/2+1.6),0,s*t*.8,s*.3);}L.add(GC,GOLD,.5,9,.5,px,3+9*6.2+4.5,pz);Gl.add(GS,0xffd890,.9,.9,.9,px,3+9*6.2+9.2,pz);}
+ /* 松の並木 */for(let i=0;i<60;i++){const x=cx+rnd(-260,260),z=rnd(-660,-360);if(Math.abs(x-cx)<70&&z>-600)continue;L.add(GC,0x5a4030,.5,6,.5,x,3,z);L.add(GCO,0x2e5a2e,3.6,5,3.6,x,7,z);L.add(GCO,0x386a34,2.8,4,2.8,x,9.5,z);}
+ const m=M.build(detMat);m.userData.keep=1;m.userData.sea=true;WR.add(m);const gm=G.build(glowMat2);gm.userData.keep=1;gm.userData.sea=true;WR.add(gm);}
+/* ---------- 路面電車 ---------- */
+function w295TramCar(){const M=new Merger(),G=new Merger(),L=new LM(M,0,0,0,0),Gl=new LM(G,0,0,0,0),RED=0xa8322a,CR=0xeee4cc,DK=0x2a2c30,GLS=0x34485a;
+ for(const s of[-1,1]){const x=s*4.7;L.add(GB,RED,9,1.4,2.7,x,1.2,0);L.add(GB,CR,9,1.7,2.7,x,2.75,0);L.add(GB,GLS,8.2,1.1,2.74,x,2.75,0);L.add(GB,CR,9.1,.3,2.75,x,3.75,0);L.add(GB,DK,9.2,.25,2.9,x,4.0,0);L.add(GB,0x3a3c40,7,.3,2,x,.35,0);
+  for(const q of[-3,3])L.add(GCX16,0x1e1e20,.45,.4,.45,x+q,.45,1.2,0,Math.PI/2,0),L.add(GCX16,0x1e1e20,.45,.4,.45,x+q,.45,-1.2,0,Math.PI/2,0);Gl.add(GB,0xfff0d0,8,.08,2.4,x,3.62,0);}
+ L.add(GB,0x2a2a2c,.4,3,2.5,0,2.2,0);/* 先頭と最後尾（丸みのある顔と前照灯） */for(const s of[-1,1]){L.add(GB,RED,.8,1.4,2.5,s*9.6,1.2,0);L.add(GB,GLS,.6,1.4,2.4,s*9.55,2.8,0);Gl.add(GB,s>0?0xfff6d8:0xff4030,.08,.3,.5,s*9.98,1.6,.8);Gl.add(GB,s>0?0xfff6d8:0xff4030,.08,.3,.5,s*9.98,1.6,-.8);}
+ /* パンタグラフ */L.add(GB,0x5a5e64,.1,1.6,.1,-.6,4.9,0,0,0,.6);L.add(GB,0x5a5e64,.1,1.6,.1,.6,4.9,0,0,0,-.6);L.add(GB,0x5a5e64,1.8,.08,.8,0,5.6,0);
+ const g=new THREE.Group(),m=M.build(detMat);m.castShadow=!isTouch;g.add(m);g.add(G.build(glowMat2));g.userData.keep=1;return g;}
+function w295Tram(){if(W295.tz==null)return;const z=W295.tz,E=BOUND-6,M=new Merger(),L=new LM(M,0,0,0,0);
+ /* 架線柱（歩道の端）と架線 */for(let x=-E;x<=E;x+=24){for(const s of[-1,1]){L.add(GC,0x4a4e54,.14,6.6,.14,x,3.3,z+s*(RW/2-.4));L.add(GB,0x4a4e54,.08,.08,RW/2-.6,x,6.2,z+s*(RW/4))}}
+ for(const o of[-1.6,1.6])L.add(GB,0x2a2c30,E*2,.04,.04,0,5.9,z+o);
+ /* 停留所：屋根つきの島 */for(const sx of[-120,0,120]){L.add(GB,0xa8a296,14,.25,1.8,sx,.12,z);L.add(GB,0x9a3a2a,.2,2.6,.2,sx-5,1.4,z);L.add(GB,0x9a3a2a,.2,2.6,.2,sx+5,1.4,z);L.add(GB,0x2a2c30,12,.2,2.4,sx,2.8,z);}
+ const m=M.build(detMat);m.userData.keep=1;WR.add(m);
+ const cars=[];for(const[o,s0,v]of[[-1.6,-E+20,6.5],[1.6,E-20,-6.5]]){const g=w295TramCar();WR.add(g);cars.push({g,o,s:s0,v,wait:0});}
+ W295.tram=cars;W295.stops=[-120,0,120];
+ worldTick.push(dt=>{for(const c of W295.tram){if(c.wait>0){c.wait-=dt;}else{const ns=c.s+c.v*dt;if(Math.abs(ns)>E-12){c.v=-c.v;c.wait=4;}else{for(const sx of W295.stops){if((c.s-sx)*(ns-sx)<=0){c.wait=8;break;}}c.s=ns;}}
+  c.g.position.set(c.s,.05,z+c.o);c.g.rotation.y=c.v>0?0:Math.PI;}});}
+if(window.__TEST__)window.__T95={lines:()=>({B:BOUND,R:RING,RW,L:(WORLD_LINES||[]).map(l=>[l.o,Math.round(l.c),Math.round(l.a),Math.round(l.b)])}),on:()=>W295_ON,info:()=>({lots:(W295.lots||[]).filter(l=>l[0]>40&&l[1]>-45&&l[1]<56),gates:W295.gates,tz:W295.tz,ramps:W295.ramps,stat:W295.stat,hw:typeof WORLD_HW!=='undefined'&&WORLD_HW?WORLD_HW.length:0,tram:(W295.tram||[]).map(c=>[Math.round(c.s),c.o])})};
+/* 玄都の外城では高架の自動車道を作らない（路面電車の大通りの上をふさいでいた） */
+{const _e=elevatedRoad;elevatedRoad=function(){if(W295_ON)return;return _e.apply(this,arguments);};}
+
 if(window.__TEST__)window.__nk={KJ,kjSpawn,KJAI,nkDemoTick,nkBomberModel,NK,nkOffer,nkClaim,nkStart,nkRun,nkBest,nkFrame,scene,get WR(){return WR},get chests(){return chests},get webs(){return webs}};
 /* ---------- バージョン表示と更新 ---------- */
-const GAME_VER='2.77';
+const GAME_VER='2.95';
 function verCmp(a,b){const x=String(a).split('.').map(Number),y=String(b).split('.').map(Number);for(let i=0;i<Math.max(x.length,y.length);i++){const d=(x[i]||0)-(y[i]||0);if(d)return d>0?1:-1;}return 0;}
 function hardReload(){try{saveGame();}catch(e){}const u=location.pathname+'?r='+Date.now()+location.hash;try{location.replace(u);}catch(e){location.reload();}}
 let VER_NEW=null;
@@ -18774,17 +19927,17 @@ function startIntro(n){
  cineUI(true,'STAGE '+n+'<small>'+T.name+'　降下作戦</small>');
  const L=STARTPT,a=L.yaw+rnd(-.5,.5);CIN.dir=[-Math.sin(a),-Math.cos(a)];CIN.yaw=Math.atan2(CIN.dir[1],-CIN.dir[0])*0;
  CIN.trYaw=Math.atan2(-CIN.dir[1],CIN.dir[0]);
- CIN.p0=[L.x-CIN.dir[0]*190,L.z-CIN.dir[1]*190];CIN.sp=48;CIN.alt=68;CIN.tOver=190/48;
+ CIN.p0=[L.x-CIN.dir[0]*190,L.z-CIN.dir[1]*190];CIN.sp=48;CIN.alt=68;CIN.tOver=190/48;{/* v2.78 地形の高さに合わせて飛ぶ・降りる */const g0=w278G(L.x,L.z);let mh=g0;for(let q=-190;q<=260;q+=10)mh=Math.max(mh,w278G(L.x+CIN.dir[0]*q,L.z+CIN.dir[1]*q));CIN.gy=g0;CIN.alt=Math.max(68+g0,mh+34);}
  JL=JL||jumperList();
  const sy=Math.sin(L.yaw),cy=Math.cos(L.yaw);
- JL.forEach((j,i)=>{j.st='in';j.tj=CIN.tOver-1.1+i*.32;j.tx=L.x+cy*j.ox+sy*j.oz;j.tz=L.z-sy*j.ox+cy*j.oz;j.g.visible=false;j.gl.visible=false;j.vx=j.vy=j.vz=0;j.w=0;});
+ JL.forEach((j,i)=>{j.st='in';j.tj=CIN.tOver-1.1+i*.32;j.tx=L.x+cy*j.ox+sy*j.oz;j.tz=L.z-sy*j.ox+cy*j.oz;j.g.visible=false;j.gl.visible=false;j.vx=j.vy=j.vz=0;j.w=0;j.gy=w278G(j.tx,j.tz);});
  P.x=L.x;P.z=L.z;P.yaw=L.yaw;P.pitch=.1;P.vx=P.vz=0;P.alt=0;
- camera.position.set(L.x+CIN.dir[1]*30,10,L.z-CIN.dir[0]*30);
+ camera.position.set(L.x+CIN.dir[1]*30,(CIN.gy||0)+10,L.z-CIN.dir[0]*30);
 }
 function trPosIn(t){return[CIN.p0[0]+CIN.dir[0]*CIN.sp*t,CIN.alt,CIN.p0[1]+CIN.dir[1]*CIN.sp*t];}
-function landJ(j){j.st='land';j.g.position.set(j.tx,0,j.tz);j.g.rotation.set(0,j.isP?STARTPT.yaw:j.g.rotation.y,0);j.gl.visible=false;j.g.visible=true;ring(j.tx,0,j.tz,3,.3);if(j.a){j.a.x=j.tx;j.a.z=j.tz;j.a.yaw=j.g.rotation.y;}}
+function landJ(j){j.st='land';j.g.position.set(j.tx,j.gy||0,j.tz);j.g.rotation.set(0,j.isP?STARTPT.yaw:j.g.rotation.y,0);j.gl.visible=false;j.g.visible=true;ring(j.tx,j.gy||0,j.tz,3,.3);if(j.a){j.a.x=j.tx;j.a.z=j.tz;j.a.yaw=j.g.rotation.y;}}
 function finishIntro(){
- P.alt=0;P.vy=0;P.boost=1;for(const a of allies){a.alt=0;a.vy=0;a.fuel=1;}
+ P.alt=w278G(STARTPT.x,STARTPT.z);P.vy=0;P.boost=1;for(const a of allies){a.alt=0;a.vy=0;a.fuel=1;}
  for(const j of JL)if(j.st!=='land')landJ(j);
  for(const j of JL){j.g.rotation.x=0;j.g.rotation.z=0;}
  for(const a of allies){if(a.down){a.g.rotation.set(-1.45,a.yaw,0);a.g.position.set(a.x,(a.alt||0)+.35,a.z);}}
@@ -18815,7 +19968,7 @@ function startOutro(final){
   const ax=(j.x-CIN.lz[0])*CIN.dir[0]+(j.z-CIN.lz[1])*CIN.dir[1];if(ax>-20){j.x-=CIN.dir[0]*(ax+21+rnd(0,3));j.z-=CIN.dir[1]*(ax+21+rnd(0,3));}}
  const px=-CIN.dir[1],pz=CIN.dir[0];let side=1;for(const sd of[1,-1]){if(!insideBuilding(CIN.ramp[0]-CIN.dir[0]*16+px*sd*13,CIN.ramp[1]-CIN.dir[1]*16+pz*sd*13,2,5)){side=sd;break;}}
  CIN.cam=[CIN.ramp[0]-CIN.dir[0]*16+px*side*13,5.5,CIN.ramp[1]-CIN.dir[1]*16+pz*side*13];
- CIN.look=new THREE.Vector3(CIN.from[0],40,CIN.from[1]);CIN.v=new THREE.Vector3();
+ CIN.og=w278G(CIN.lz[0],CIN.lz[1]);CIN.cam[1]=Math.max(CIN.og,w278G(CIN.cam[0],CIN.cam[2]))+5.5;CIN.look=new THREE.Vector3(CIN.from[0],40+CIN.og,CIN.from[1]);CIN.v=new THREE.Vector3();
 }
 function endOutro(){
  for(const j of JL){j.g.visible=false;j.st='gone';}
@@ -18835,23 +19988,23 @@ function updateCine(dt){
    if(j.st==='in'&&t>=j.tj){j.st='fall';j.g.visible=true;const p=trPosIn(t);j.x=p[0]-CIN.dir[0]*14;j.y=p[1]-1.5;j.z=p[2]-CIN.dir[1]*14;j.vx=CIN.dir[0]*16;j.vz=CIN.dir[1]*16;j.vy=-2;j.ft=0;}
    if(j.st==='fall'||j.st==='glide'){
     j.ft+=dt;
-    if(j.st==='fall'){j.vy=Math.max(-34,j.vy-28*dt);j.vx*=Math.exp(-dt*.8);j.vz*=Math.exp(-dt*.8);if(j.ft>1.5||j.y<38){j.st='glide';j.gl.visible=true;j.gs=0;}}
+    if(j.st==='fall'){j.vy=Math.max(-34,j.vy-28*dt);j.vx*=Math.exp(-dt*.8);j.vz*=Math.exp(-dt*.8);if(j.ft>1.5||j.y<(j.gy||0)+38){j.st='glide';j.gl.visible=true;j.gs=0;}}
     else{j.gs=Math.min(1,j.gs+dt*3);j.gl.scale.setScalar(.2+.8*j.gs);j.vy+=(-7-j.vy)*Math.min(1,dt*3);
-     const dx=j.tx-j.x,dz=j.tz-j.z,d=Math.hypot(dx,dz)||1,tt=Math.max(.5,(j.y-0)/7),sp=Math.min(16,d/tt);
+     const dx=j.tx-j.x,dz=j.tz-j.z,d=Math.hypot(dx,dz)||1,tt=Math.max(.5,(j.y-(j.gy||0))/7),sp=Math.min(16,d/tt);
      j.vx+=(dx/d*sp-j.vx)*Math.min(1,dt*2);j.vz+=(dz/d*sp-j.vz)*Math.min(1,dt*2);}
     j.x+=j.vx*dt;j.y+=j.vy*dt;j.z+=j.vz*dt;
     const hv=Math.hypot(j.vx,j.vz),yaw=Math.atan2(-j.vx,-j.vz);
     j.g.position.set(j.x,j.y,j.z);j.g.rotation.set(j.st==='fall'?-1.25:-.15,yaw,j.st==='glide'?clamp(Math.sin(t*1.3+j.ox)*.2,-.3,.3):Math.sin(t*3)*.1,'YXZ');
     j.legL.rotation.x=j.st==='fall'?.5:Math.sin(t*2)*.2;j.legR.rotation.x=j.st==='fall'?-.3:-Math.sin(t*2)*.2;
-    if(j.y<=0.05){landJ(j);if(j.isP)CIN.landT=t;sfxBoom&&0;}
+    {const gq=w278G(j.x,j.z);if(j.y<gq)j.y=gq;if(j.y<=Math.max(j.gy||0,gq)+.25){landJ(j);if(j.isP)CIN.landT=t;sfxBoom&&0;}}
    }
   }
   // camera
   const pp=pj.st==='in'?null:pj.g.position;
   let cx,cy,cz,lx,ly,lz;
-  if(!pp){cx=STARTPT.x+CIN.dir[1]*36;cy=14;cz=STARTPT.z-CIN.dir[0]*36;lx=tp[0];ly=tp[1];lz=tp[2];}
+  if(!pp){cx=STARTPT.x+CIN.dir[1]*36;cy=(CIN.gy||0)+14;cz=STARTPT.z-CIN.dir[0]*36;lx=tp[0];ly=tp[1];lz=tp[2];}
   else if(pj.st!=='land'){const hv=Math.hypot(pj.vx,pj.vz)||1,fx=pj.vx/hv,fz=pj.vz/hv;cx=pp.x-fx*9;cy=pp.y+4.5;cz=pp.z-fz*9;lx=pp.x+fx*4;ly=pp.y-2;lz=pp.z+fz*4;}
-  else{cx=pp.x+Math.sin(STARTPT.yaw)*8;cy=3.5;cz=pp.z+Math.cos(STARTPT.yaw)*8;lx=pp.x;ly=1.5;lz=pp.z;}
+  else{cx=pp.x+Math.sin(STARTPT.yaw)*8;cy=pp.y+3.5;cz=pp.z+Math.cos(STARTPT.yaw)*8;lx=pp.x;ly=pp.y+1.5;lz=pp.z;}
   const k=Math.min(1,dt*(pp?4:2));camera.position.x+=(cx-camera.position.x)*k;camera.position.y+=(cy-camera.position.y)*k;camera.position.z+=(cz-camera.position.z)*k;
   camera.lookAt(lx,ly,lz);sky.position.copy(camera.position);
   if(CIN.landT&&t>CIN.landT+.9&&JL.every(j=>j.st==='land'))finishIntro();
@@ -18880,7 +20033,7 @@ function updateCine(dt){
     const k=Math.min(sp*dt,d);if(d>1e-4){j.x+=dx/d*k;j.z+=dz/d*k;}j.w+=k*.9;
     const behind=-((j.x-lz[0])*D0+(j.z-lz[1])*D1);let ty=0;
     if(j.st!=='run')ty=behind>11?clamp((17.6-behind)/6.6,0,1)*1.6:1.6;
-    const yaw=d>.05?Math.atan2(-dx,-dz):j.g.rotation.y;j.g.position.set(j.x,ty,j.z);j.g.rotation.set(0,yaw,0);j.legL.rotation.x=Math.sin(j.w)*.8;j.legR.rotation.x=-Math.sin(j.w)*.8;
+    const yaw=d>.05?Math.atan2(-dx,-dz):j.g.rotation.y;j.g.position.set(j.x,ty+(j.st==='run'?w278G(j.x,j.z):(CIN.og||0)),j.z);j.g.rotation.set(0,yaw,0);j.legL.rotation.x=Math.sin(j.w)*.8;j.legR.rotation.x=-Math.sin(j.w)*.8;
    }
    if(!CIN.allT&&JL.every(j=>j.st==='gone'||j.st==='seat'))CIN.allT=t;
   }
@@ -18888,11 +20041,11 @@ function updateCine(dt){
    if(u>1.3)for(const j of JL)if(j.st==='seat'){j.st='gone';j.g.visible=false;}
    if(u>1.9){const e=Math.min(1,(u-1.9)/3.2);y=1.4+e*e*34;tilt=1.45-e*.6;x=lz[0]+CIN.dir[0]*e*e*20;z=lz[1]+CIN.dir[1]*e*e*20;}
    if(u>2)endOutro();}
-  trSet(x,y,z,ry,tilt,ramp);
-  if(t<tC)for(const j of JL){if(j.st==='wait'&&j.g.visible){j.g.position.set(j.x,0,j.z);}}
+  trSet(x,y+(CIN.og||0),z,ry,tilt,ramp);
+  if(t<tC)for(const j of JL){if(j.st==='wait'&&j.g.visible){j.g.position.set(j.x,w278G(j.x,j.z),j.z);}}
   const cc=CIN.cam,kc=Math.min(1,dt*3);
   camera.position.x+=(cc[0]-camera.position.x)*kc;camera.position.y+=(cc[1]-camera.position.y)*kc;camera.position.z+=(cc[2]-camera.position.z)*kc;
-  if(t<tB||(CIN.allT&&t-CIN.allT>1.9))CIN.v.set(TRN.g.position.x,TRN.g.position.y+2.5,TRN.g.position.z);else CIN.v.set(lz[0]-CIN.dir[0]*13,2.4,lz[1]-CIN.dir[1]*13);
+  if(t<tB||(CIN.allT&&t-CIN.allT>1.9))CIN.v.set(TRN.g.position.x,TRN.g.position.y+2.5,TRN.g.position.z);else CIN.v.set(lz[0]-CIN.dir[0]*13,2.4+(CIN.og||0),lz[1]-CIN.dir[1]*13);
   CIN.look.lerp(CIN.v,Math.min(1,dt*2.5));camera.lookAt(CIN.look);sky.position.copy(camera.position);
   if(t>tA-2&&t<tB+.5&&Math.random()<dt*30)emit(x+rnd(-10,10),.3,z+rnd(-10,10),rnd(-8,8),rnd(1,3),rnd(-8,8),0xb89a78,rnd(1,2.2),rnd(.6,1.1),-1,false);
   return;
