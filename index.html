@@ -18171,7 +18171,7 @@ if(window.__TEST__)window.__T89={rim:()=>{const V=W245_V;const r=[];for(const k 
    ・遠景：北の果てに内城の城壁と三層の門楼、白い基壇の上の金色の屋根の宮殿、九重の塔
    ・交通：東西の大通りを路面電車（赤と生成りの二連の車両）が行き来する。架線柱と架線、線路
    ・朝のもや */
-var W295_ON=false,W295={};
+var W295_ON=false,W295={},W296_ON=false;
 try{ATM_FIX[10]=['mo','cd'];}catch(e){}
 const W295_ZW=-120,W295_TH=16,W295_H=13,W295_MZ0=-99,W295_MZ1=-84,W295_XE=900;
 {const _bw=buildWorld0;buildWorld0=function(si){W295_ON=((si||0)+1)===10;W295={gates:[],blocks:[],tram:[],stat:{fus:0,hut:0}};
@@ -18220,11 +18220,11 @@ function w295Siheyuan(mp,lot){const W=Math.max(12,Math.min(lot.w*1.5,31)),D=Math
   /* 門：赤い扉・小さな屋根・門の前の石 */L.add(GB,BR,3.4,3.4,1.2,gx,1.7,hd-.3);L.add(GB,RED,2,2.4,.16,gx,1.2,hd+.3);w295Gable(L,gx,3.4,hd-.3,3.8,2.4,.9,TL,0);for(const s of[-1,1])L.add(GB,0x9a958a,.5,.5,.6,gx+s*1.4,.25,hd+.6);
   if(!T&&Math.random()<.6)for(const s of[-1,1])G.add(GS,0xff3a28,.28,.36,.28,gx+s*1.2,2.6,hd+.6);
   /* 正房（北＝−z） */const mw=W*.66,md=5.4,mz=-hd+.5+md/2+.6;L.add(GB,BR,mw,3.6,md,0,1.8,mz);L.add(GB,0x9a958a,mw+.8,.4,md+1.6,0,.2,mz+.4);
-  for(let i=0;i<=5;i++)L.add(GB,RED,.3,3.4,.3,-mw/2+i*mw/5,1.9,mz+md/2+.5);for(let i=0;i<5;i++){L.add(GB,WD,mw/5-.5,2.2,.08,-mw/2+(i+.5)*mw/5,1.9,mz+md/2+.04);if(!T)G.add(GB,0xffd8a0,mw/5-1,.08,.05,-mw/2+(i+.5)*mw/5,2.6,mz+md/2+.1);}
+  if(!T)for(let i=0;i<=5;i++)L.add(GB,RED,.3,3.4,.3,-mw/2+i*mw/5,1.9,mz+md/2+.5);else L.add(GB,RED,mw,.3,.3,0,3.3,mz+md/2+.5);for(let i=0;i<(T?0:5);i++){L.add(GB,WD,mw/5-.5,2.2,.08,-mw/2+(i+.5)*mw/5,1.9,mz+md/2+.04);if(!T)G.add(GB,0xffd8a0,mw/5-1,.08,.05,-mw/2+(i+.5)*mw/5,2.6,mz+md/2+.1);}
   w295Gable(L,0,3.6,mz+.3,mw+.8,md+2.2,1.8,TL,0);
-  /* 東西の廂房 */const sd=4.2,sl=D*.42,sz=-hd+md+2.8+sl/2;for(const s of[-1,1]){const sx=s*(hw-.5-sd/2-.3);L.add(GB,BR,sd,3,sl,sx,1.5,sz);for(let i=0;i<3;i++)L.add(GB,WD,.08,1.8,sl/3-.6,sx-s*(sd/2+.04),1.6,sz-sl/2+(i+.5)*sl/3);w295Gable(L,sx,3,sz,sl+.4,sd+1.6,1.3,TL,1);}
+  /* 東西の廂房 */const sd=4.2,sl=D*.42,sz=-hd+md+2.8+sl/2;for(const s of[-1,1]){const sx=s*(hw-.5-sd/2-.3);L.add(GB,BR,sd,3,sl,sx,1.5,sz);for(let i=0;i<(T?1:3);i++)L.add(GB,WD,.08,1.8,T?sl-1:sl/3-.6,sx-s*(sd/2+.04),1.6,T?sz:sz-sl/2+(i+.5)*sl/3);w295Gable(L,sx,3,sz,sl+.4,sd+1.6,1.3,TL,1);}
   /* 南の倒座房（門の横） */const bw=W*.5,bz=hd-.5-1.9;L.add(GB,BR,bw,2.8,3.4,-hw+.5+bw/2+.2,1.4,bz);w295Gable(L,-hw+.5+bw/2+.2,2.8,bz,bw+.3,4.4,1,TL,0);
-  /* 中庭の木と鉢 */const tz=(mz+md/2+bz-1.7)/2;L.add(GC,0x5a4030,.22,3,.22,1,1.5,tz);L.add(GS,[0x4a7a34,0x5e8a3e,0x6a8a3a][(Math.random()*3)|0],2.2,2,2.2,1,3.6,tz);L.add(GB,0x6a5a48,.9,.6,.9,-2,.3,tz+1);L.add(GS,0x4a7a34,.6,.5,.6,-2,.85,tz+1);});
+  /* 中庭の木と鉢 */const tz=(mz+md/2+bz-1.7)/2;L.add(GC,0x5a4030,.22,3,.22,1,1.5,tz);L.add(GS,[0x4a7a34,0x5e8a3e,0x6a8a3a][(Math.random()*3)|0],2.2,2,2.2,1,3.6,tz);if(!T){L.add(GB,0x6a5a48,.9,.6,.9,-2,.3,tz+1);L.add(GS,0x4a7a34,.6,.5,.6,-2,.85,tz+1);}});
  try{e.eco=1;}catch(x){}W295.stat.syh=(W295.stat.syh||0)+1;return e;}
 /* 小さな区画：灰色のれんがの平屋（切妻の瓦屋根）と小さな塀の前庭 */
 function w295Small(mp,lot){const W=Math.max(5,Math.min(lot.w*1.1,12)),D=Math.max(5,Math.min(lot.d*1.1,10)),BR=[0x7a766e,0x726e66,0x827e76][(Math.random()*3)|0],TL=0x2c2e32,RED=0x8e3426,T=isTouch;
@@ -18235,10 +18235,10 @@ function w295Small(mp,lot){const W=Math.max(5,Math.min(lot.w*1.1,12)),D=Math.max
 /* 大きな区画は2〜4つの四合院に分ける（あいだは細い胡同） */
 function w295SplitSyh(mp,lot){const c=Math.cos(lot.ry||0),s=Math.sin(lot.ry||0),sub=(dx,dz,w,d)=>({x:lot.x+c*dx+s*dz,z:lot.z-s*dx+c*dz,w,d,ry:lot.ry});
  const nx=lot.w>=44?2:1,nz=lot.d>=42?2:1,w=lot.w/nx,d=lot.d/nz;let e=null;for(let i=0;i<nx;i++)for(let j=0;j<nz;j++){const l=sub((i+.5)*w-lot.w/2,(j+.5)*d-lot.d/2,w-3,d-3);if(Math.random()<.03)continue;const r=w295Siheyuan(mp,l);if(!e)e=r;}return e;}
-function w295Pick(mp,lot,orig){if(window.__TEST__)(W295.lots=W295.lots||[]).push([Math.round(lot.x),Math.round(lot.z),Math.round(lot.w),Math.round(lot.d)]);const tz=W295.tz,mg=W295.gates.find(g=>g.main);let near=99;if(tz!=null)near=Math.min(near,Math.abs(lot.z-tz));if(mg&&lot.z<W295_ZW)near=Math.min(near,Math.abs(lot.x-mg.x));
+function w295Pick(mp,lot,orig){if(W296_ON&&W295.tz===undefined){const h=(WORLD_LINES||[]).filter(l=>l.o==='h'&&l.a<-150&&l.b>150).sort((a,b)=>Math.abs(Math.abs(a.c)-110)-Math.abs(Math.abs(b.c)-110))[0];W295.tz=h?h.c:null;}if(window.__TEST__)(W295.lots=W295.lots||[]).push([Math.round(lot.x),Math.round(lot.z),Math.round(lot.w),Math.round(lot.d)]);const tz=W295.tz,mg=W295.gates.find(g=>g.main);let near=99;if(tz!=null)near=Math.min(near,Math.abs(lot.z-tz));if(mg&&lot.z<W295_ZW)near=Math.min(near,Math.abs(lot.x-mg.x));
  const p=near<40?.32:near<80?.12:.03;if(lot.w>=9&&lot.d>=9&&Math.random()<p)return w295Fusion(mp,lot);if(lot.w>=11&&lot.d>=11){if(Math.random()<.03){W295.stat.empty=(W295.stat.empty||0)+1;return null;}return w295SplitSyh(mp,lot);}W295.stat.hut++;return w295Small(mp,lot);}
-for(const k of['tower','cnModern','glass']){if(!STY[k])continue;const f=STY[k];STY[k]=function(mp,lot){if(!W295_ON||ASCL!==1)return f.apply(this,arguments);return w295Pick(mp,lot,STY.hutong||f);};}
-{const f=STY.hutong;if(f)STY.hutong=function(mp,lot){if(!W295_ON||ASCL!==1)return f.apply(this,arguments);return w295Pick(mp,lot,f);};}
+for(const k of['tower','cnModern','glass']){if(!STY[k])continue;const f=STY[k];STY[k]=function(mp,lot){if(!(W295_ON||W296_ON)||ASCL!==1)return f.apply(this,arguments);return w295Pick(mp,lot,STY.hutong||f);};}
+{const f=STY.hutong;if(f)STY.hutong=function(mp,lot){if(!(W295_ON||W296_ON)||ASCL!==1)return f.apply(this,arguments);return w295Pick(mp,lot,f);};}
 /* ---------- 組み立ての後 ---------- */
 function w295Clear(x0,x1,z0,z1){let n=0;for(const b of buildings){if(!b.alive||b.name==='stairstep'||b.x1==null||b.x1<x0||b.x0>x1||b.z1<z0||b.z0>z1)continue;b.alive=false;b.hp=0;if(b.pb){try{b.pb.squash(b,1);}catch(e){}}else if(b.mesh)b.mesh.visible=false;n++;}return n;}
 function w295Roof(L,x,y,z,w,d,col,rise,ry){/* 寄棟の瓦屋根（反りのある軒・棟・鴟尾） */const a=Math.atan2(rise,d/2),sl=Math.hypot(rise,d/2);
@@ -18301,12 +18301,12 @@ function w295TramCar(){const M=new Merger(),G=new Merger(),L=new LM(M,0,0,0,0),G
  L.add(GB,0x2a2a2c,.4,3,2.5,0,2.2,0);/* 先頭と最後尾（丸みのある顔と前照灯） */for(const s of[-1,1]){L.add(GB,RED,.8,1.4,2.5,s*9.6,1.2,0);L.add(GB,GLS,.6,1.4,2.4,s*9.55,2.8,0);Gl.add(GB,s>0?0xfff6d8:0xff4030,.08,.3,.5,s*9.98,1.6,.8);Gl.add(GB,s>0?0xfff6d8:0xff4030,.08,.3,.5,s*9.98,1.6,-.8);}
  /* パンタグラフ */L.add(GB,0x5a5e64,.1,1.6,.1,-.6,4.9,0,0,0,.6);L.add(GB,0x5a5e64,.1,1.6,.1,.6,4.9,0,0,0,-.6);L.add(GB,0x5a5e64,1.8,.08,.8,0,5.6,0);
  const g=new THREE.Group(),m=M.build(detMat);m.castShadow=!isTouch;g.add(m);g.add(G.build(glowMat2));g.userData.keep=1;return g;}
-function w295Tram(){if(W295.tz==null)return;const z=W295.tz,E=BOUND-6,M=new Merger(),L=new LM(M,0,0,0,0);
+function w295Tram(){if(W295.tz==null)return;const z=W295.tz,E=BOUND-6,M=new Merger(),L=new LM(M,0,0,0,0),GR=new THREE.Group();/* 南北の道のときは東西の形で作って90度回す */if(W295.tv)GR.rotation.y=Math.PI/2;GR.userData.keep=1;WR.add(GR);
  /* 架線柱（歩道の端）と架線 */for(let x=-E;x<=E;x+=24){for(const s of[-1,1]){L.add(GC,0x4a4e54,.14,6.6,.14,x,3.3,z+s*(RW/2-.4));L.add(GB,0x4a4e54,.08,.08,RW/2-.6,x,6.2,z+s*(RW/4))}}
  for(const o of[-1.6,1.6])L.add(GB,0x2a2c30,E*2,.04,.04,0,5.9,z+o);
  /* 停留所：屋根つきの島 */for(const sx of[-120,0,120]){L.add(GB,0xa8a296,14,.25,1.8,sx,.12,z);L.add(GB,0x9a3a2a,.2,2.6,.2,sx-5,1.4,z);L.add(GB,0x9a3a2a,.2,2.6,.2,sx+5,1.4,z);L.add(GB,0x2a2c30,12,.2,2.4,sx,2.8,z);}
- const m=M.build(detMat);m.userData.keep=1;WR.add(m);
- const cars=[];for(const[o,s0,v]of[[-1.6,-E+20,6.5],[1.6,E-20,-6.5]]){const g=w295TramCar();WR.add(g);cars.push({g,o,s:s0,v,wait:0});}
+ const m=M.build(detMat);m.userData.keep=1;GR.add(m);
+ const cars=[];for(const[o,s0,v]of[[-1.6,-E+20,6.5],[1.6,E-20,-6.5]]){const g=w295TramCar();GR.add(g);cars.push({g,o,s:s0,v,wait:0});}
  W295.tram=cars;W295.stops=[-120,0,120];
  worldTick.push(dt=>{for(const c of W295.tram){if(c.wait>0){c.wait-=dt;}else{const ns=c.s+c.v*dt;if(Math.abs(ns)>E-12){c.v=-c.v;c.wait=4;}else{for(const sx of W295.stops){if((c.s-sx)*(ns-sx)<=0){c.wait=8;break;}}c.s=ns;}}
   c.g.position.set(c.s,.05,z+c.o);c.g.rotation.y=c.v>0?0:Math.PI;}});}
@@ -18314,9 +18314,60 @@ if(window.__TEST__)window.__T95={lines:()=>({B:BOUND,R:RING,RW,L:(WORLD_LINES||[
 /* 玄都の外城では高架の自動車道を作らない（路面電車の大通りの上をふさいでいた） */
 {const _e=elevatedRoad;elevatedRoad=function(){if(W295_ON)return;return _e.apply(this,arguments);};}
 
+/* ===== v2.96 天衡帝国の作り込み その4：ステージ13「天衡・玄都」（スロット72：宮城の都） =====
+   ・宮城（金色の屋根の宮殿・堀・門）はそのまま。まわりの街を、ステージ12と同じ灰色のれんがの四合院・平屋・融合の建物に（v295 の w295Pick を使う）
+   ・高速道路・鉄道は作らず、宮城の外の東西の大通りに路面電車（v295 の w295Tram）
+   ・遠景：南の地平線に外城の大城壁と正門の楼閣（ステージ12でくぐった城壁。都の内と外がつながる）。北西に連なる山並み
+   ・宮城の西の池に、屋根つきの遊覧船
+   ・朝のもや */
+try{ATM_FIX[72]=['mo','cd'];}catch(e){}
+{const _bw=buildWorld0;buildWorld0=function(si){W296_ON=((si||0)+1)===72;let sv=null;if(W296_ON&&typeof LAYOUTS!=='undefined'){sv=LAYOUTS.map(L=>[L.hw,L.rail]);for(const L of LAYOUTS){L.hw=0;L.rail=0;}}
+ let r;try{r=_bw.apply(this,arguments);}finally{if(sv)LAYOUTS.forEach((L,i)=>{L.hw=sv[i][0];L.rail=sv[i][1];});}
+ if(W296_ON)try{w296After();}catch(e){console.warn('w296',e);}W296_ON=false;return r;};}
+{const _e=elevatedRoad;elevatedRoad=function(){if(W296_ON)return;return _e.apply(this,arguments);};}
+/* 遠くの帯・遠景の家は、南の外城の城壁の帯と北西の山をよける */
+const W296_ZS=640;
+{const _ri=w238RivIn;w238RivIn=function(x,z,m){if(W296_ON){if(Math.abs(z-W296_ZS)<30)return true;if(w296MtH(x,z)>.5)return true;}return _ri.apply(this,arguments);};}
+function w296MtH(x,z){/* 北西の山並み：x<−300 かつ z<−300 の先から立ち上がる */const d=Math.min(-x-360,-z-380);if(d<0)return 0;const n=Math.sin(x*.011)*Math.cos(z*.009)*.5+Math.sin((x+z)*.023)*.3+.6;return Math.min(1,d/260)*(140+120*n);}
+function w296After(){/* 端から端まで通る道を選ぶ（東西が無ければ南北）。南北なら東西の形で作って回す（x=c → 回したときの z=c の位置） */{const L=WORLD_LINES||[],h=L.filter(l=>l.o==='h'&&l.a<-150&&l.b>150)[0],v=L.filter(l=>l.o==='v'&&l.a<-150&&l.b>150).sort((a,b)=>Math.abs(b.c)-Math.abs(a.c))[0];if(h){W295.tz=h.c;W295.tv=0;}else if(v){W295.tz=v.c;W295.tv=1;}else W295.tz=null;}
+ if(W295.tz!=null){/* 線路は組み立ての後なので地面の絵に描けない → 細い板で */const M=new Merger(),L=new LM(M,0,0,0,0),z=W295.tz,E=BOUND-6;for(const o of[-2.3,-.9,.9,2.3])L.add(GB,0x3a3a3c,E*2,.04,.12,0,.03,z+o);for(let x=-E;x<E;x+=1.2)for(const o of[-1.6,1.6])L.add(GB,0x4a4440,.35,.03,2,x,.015,z+o);const m=M.build(detMat);m.userData.keep=1;m.receiveShadow=true;if(W295.tv)m.rotation.y=Math.PI/2;WR.add(m);
+  try{w295Tram();}catch(e){console.warn('w296tram',e);}}
+ w296FarWall();w296Mountains();w296Boats();
+ try{if(scene.fog&&scene.fog.far)scene.fog.far=Math.min(scene.fog.far,isTouch?680:950);}catch(e){}}
+/* 南の地平線の外城の城壁（見た目だけ） */
+function w296FarWall(){const M=new Merger(),L=new LM(M,0,0,W296_ZS,0),BR=0x7c776c,BR2=0x6c675e,TL=0x2a2c30,RED=0x9a3a2a,Z=W296_ZS;
+ L.add(GB,BR,1800,13,16,0,6.5,0);L.add(GB,BR2,1800,1.6,17.2,0,.8,0);for(let x=-880;x<=880;x+=4.8)L.add(GB,BR,1.4,1.4,.8,x,13.7,-7.6);
+ for(let x=-870;x<=870;x+=58){if(Math.abs(x)<30)continue;L.add(GB,BR,12,13,8,x,6.5,-12);}
+ /* 正門の楼閣（二層） */L.add(GB,0x4a463e,18,9,17,0,4.5,0);L.add(GB,0x9a958a,36,.6,16,0,13.3,0);for(let i=0;i<=8;i++)for(const s of[-1,1])L.add(GB,RED,.7,6.4,.7,-17+i*34/8,16.8,s*7);L.add(GB,0x6a665e,32,5.8,12.6,0,16.5,0);
+ w295Roof(L,0,20,0,39,19,TL,3);L.add(GB,0x6a665e,24,5,10,0,25.7,0);w295Roof(L,0,28.2,0,29,15,TL,3.4);
+ /* 堀 */L.add(GB,0x3e6a62,1800,.2,14,0,.1,22);
+ const m=M.build(detMat);m.userData.keep=1;m.userData.sea=true;WR.add(m);}
+/* 北西の山並み（遠景）：粗い格子の山の面と、斜面の木 */
+function w296Mountains(){const S=24,X0=-1500,X1=-300,Z0=-1500,Z1=-320,nx=Math.round((X1-X0)/S),nz=Math.round((Z1-Z0)/S),pos=[],col=[],idx=[],c=new THREE.Color();
+ for(let j=0;j<=nz;j++)for(let i=0;i<=nx;i++){const x=X0+i*S,z=Z0+j*S,h=w296MtH(x,z)-1;pos.push(x,h,z);const t=Math.min(1,h/220);c.setRGB(.36-.08*t+.25*Math.max(0,t-.75),.46-.12*t+.25*Math.max(0,t-.75),.32-.06*t+.3*Math.max(0,t-.75));col.push(c.r,c.g,c.b);}
+ for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const a=j*(nx+1)+i,b=a+1,d=a+nx+1,e=d+1;if(pos[a*3+1]<0&&pos[b*3+1]<0&&pos[d*3+1]<0&&pos[e*3+1]<0)continue;idx.push(a,d,b,b,d,e);}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('color',new THREE.Float32BufferAttribute(col,3));g.setIndex(idx);g.computeVertexNormals();
+ const m=new THREE.Mesh(g,new THREE.MeshLambertMaterial({vertexColors:true,}));m.userData.keep=1;m.userData.sea=true;m.receiveShadow=false;WR.add(m);
+ /* 尾根に小さな塔（見張りの烽火台のような） */const M=new Merger(),L=new LM(M,0,0,0,0);for(const[x,z]of[[-700,-760],[-980,-560],[-820,-1080]]){const h=w296MtH(x,z);L.add(GB,0x8a8478,10,8,10,x,h+3,z);w295Roof(L,x,h+7,z,12,12,0x2a2c30,2.4);}const mm=M.build(detMat);mm.userData.keep=1;mm.userData.sea=true;WR.add(mm);
+ W295.stat.mt=idx.length/3;}
+/* 宮城の西の池の遊覧船（いちばん大きな池を往復） */
+function w296Boats(){let P=null,A=0;for(const p of PONDS){const a=(p.x1-p.x0)*(p.z1-p.z0);if(a>A&&p.x1-p.x0>30&&p.z1-p.z0>30){A=a;P=p;}}if(!P)return;
+ const mk=()=>{const M=new Merger(),G=new Merger(),L=new LM(M,0,0,0,0),Gl=new LM(G,0,0,0,0),RED=0xa8322a,WD=0x6a4a30,GOLD=0xc8962a;
+  L.add(GB,WD,9,1.1,3.2,0,.55,0);for(const s of[-1,1])L.add(GB,WD,1.6,1.1,1.6,s*4.8,.55,0,0,Math.PI/4,0);L.add(GB,0xe8dcc0,8.4,.1,2.8,0,1.12,0);
+  for(const x of[-3,-1,1,3])for(const s of[-1,1])L.add(GB,RED,.18,2.2,.18,x,2.2,s*1.2);L.add(GB,0xc8b890,6.8,1,.06,0,1.7,1.25);L.add(GB,0xc8b890,6.8,1,.06,0,1.7,-1.25);
+  w295Roof(L,0,3.3,0,8.2,3.6,GOLD,1.1);for(const s of[-1,1])Gl.add(GS,0xff3a28,.25,.32,.25,s*3.2,2.6,1.5);
+  const g=new THREE.Group(),m=M.build(detMat);m.castShadow=!isTouch;g.add(m);g.add(G.build(glowMat2));g.userData.keep=1;return g;};
+ const y=(typeof PWL==='number'?PWL:-2)+.05,cars=[];const lx=P.x1-P.x0>=P.z1-P.z0;
+ for(let i=0;i<2;i++){const g=mk();WR.add(g);cars.push({g,s:i?.7:.2,v:(i?-1:1)*.035});}
+ worldTick.push(dt=>{for(const c of cars){c.s+=c.v*dt*(lx?40/(P.x1-P.x0):40/(P.z1-P.z0));if(c.s<.1||c.s>.9)c.v=-c.v;const t=Math.max(.1,Math.min(.9,c.s));
+  const x=lx?P.x0+(P.x1-P.x0)*t:(P.x0+P.x1)/2+(c===cars[0]?-1:1)*(P.x1-P.x0)*.18,z=lx?(P.z0+P.z1)/2+(c===cars[0]?-1:1)*(P.z1-P.z0)*.18:P.z0+(P.z1-P.z0)*t;
+  c.g.position.set(x,y+Math.sin(WT*1.2+t*9)*.05,z);c.g.rotation.y=lx?(c.v>0?0:Math.PI):(c.v>0?-Math.PI/2:Math.PI/2);}});
+ W295.stat.boats=cars.length;}
+if(window.__TEST__)window.__T96={info:()=>({tz:W295.tz,stat:W295.stat,tram:(W295.tram||[]).length,ponds:PONDS.length})};
+
 if(window.__TEST__)window.__nk={KJ,kjSpawn,KJAI,nkDemoTick,nkBomberModel,NK,nkOffer,nkClaim,nkStart,nkRun,nkBest,nkFrame,scene,get WR(){return WR},get chests(){return chests},get webs(){return webs}};
 /* ---------- バージョン表示と更新 ---------- */
-const GAME_VER='2.95';
+const GAME_VER='2.96';
 function verCmp(a,b){const x=String(a).split('.').map(Number),y=String(b).split('.').map(Number);for(let i=0;i<Math.max(x.length,y.length);i++){const d=(x[i]||0)-(y[i]||0);if(d)return d>0?1:-1;}return 0;}
 function hardReload(){try{saveGame();}catch(e){}const u=location.pathname+'?r='+Date.now()+location.hash;try{location.replace(u);}catch(e){location.reload();}}
 let VER_NEW=null;
