@@ -5766,7 +5766,7 @@ cv.addEventListener('webglcontextlost',ev=>{ev.preventDefault();CTXL=true;try{if
 cv.addEventListener('webglcontextrestored',()=>{CTXL=false;try{applyQuality();}catch(err){}ldrHide();},false);
 /* ===================== v1.21 : 高火力爆弾の宝箱・空爆「地獄の火炎」 ===================== */
 var NK={used:false,chest:null,cine:false,t:0,d:null,fx:null,cloud:null,ct:0,hud:'',fog:null,kills:0,said:0};
-const NK_R=150,NK_SHOCK=62;
+const NK_R=300,NK_SHOCK=95;
 function hqSay(txt,sec){
  try{const el=$('hqR');$('hqRt').textContent=txt;el.classList.add('on');clearTimeout(hqSay.t);hqSay.t=setTimeout(()=>el.classList.remove('on'),(sec||5)*1000);}catch(e){}
  try{if(!window.speechSynthesis||muted||VOL.voice<=.01)return;speechSynthesis.cancel();
@@ -5912,7 +5912,7 @@ function nkCloudF(F,dt){
  // キノコ雲
  const cy=26+170*(1-Math.exp(-T/3.6)),cr=14+50*(1-Math.exp(-T/3.2)),tube=cr*.55,stR=7+7*(1-Math.exp(-T/3)),fire=Math.exp(-T/3.4);
  const fade=T>35?Math.max(0,1-(T-35)/15):1;F.cm.opacity=fade;F.cm.emissive.setRGB(.95*fire+.06,.42*fire+.025,.07*fire);
- _nkSm.setRGB(.5,.46,.43);let n=0;
+ _nkSm.setRGB(.21,.19,.18);let n=0;
  for(const q of F.P2){let x,y,z,sz,heat=0;
   if(q.k===0){const h=q.h;y=h*cy;const rr=stR*(1-.3*h)*(.4+q.r*.8);x=Math.cos(q.a+T*.3)*rr;z=Math.sin(q.a+T*.3)*rr;sz=(stR*.9+3)*q.s*(1+h*.4);heat=1-h;}
   else if(q.k===1){const ph=q.b+T*.9,R2=cr+Math.cos(ph)*tube*.8;x=Math.cos(q.a)*R2;z=Math.sin(q.a)*R2;y=cy+Math.sin(ph)*tube*.6;sz=tube*.55*q.s;heat=Math.max(0,-Math.sin(ph));}
@@ -5933,8 +5933,8 @@ function nkClearFx(){const F=NK.fx;if(!F)return;for(const o of[F.dome,F.rg,F.fb,
 function nkBoom(){
  const F=NK.fx,x=F.x,z=F.z;NK.boom=true;F.T=0;
  flashScr(1,'#ffffff');shake=Math.max(shake,2.2);
- try{noise(5,1200,30,1.1,'lowpass');tone(48,18,5,.9,'sine');tone(90,30,2.2,.6,'sawtooth');}catch(e){}
- for(let k=1;k<6;k++)delayed.push({t:k*.45,fn:()=>{try{noise(1.6,700,40,.55,'lowpass');}catch(e){}}});
+ 
+ 
  scorch(x,z,70);
  const host=!(NET.on&&!NET.host);
  // 建物：衝撃波が届いた順に全壊
@@ -5945,7 +5945,7 @@ function nkBoom(){
  // 敵：範囲内に絶大なダメージ
  if(host){for(const e of enemies){if(e.dying)continue;const dd=Math.hypot(e.x-x,e.z-z);if(dd>NK_R)continue;
    delayed.push({t:dd/NK_SHOCK,fn:()=>{if(!e.dying&&enemies.includes(e))hitEnemy(e,99999,{ix:e.x-x,iz:e.z-z,power:14});}});}
-  if(boss&&!boss.dead&&Math.hypot(boss.x-x,boss.z-z)<NK_R+40){delayed.push({t:1.6,fn:()=>{if(!boss||boss.dead)return;try{for(const t of (boss.tur||[]))if(!t.dead)hitTurret(t,9e9);}catch(e){}try{if(!boss.tl)hitBoss(boss.maxhp*.3);else{boss.tl=0;hitBoss(boss.maxhp*.3);}}catch(e){}}});}}
+  if(boss&&!boss.dead&&Math.hypot(boss.x-x,boss.z-z)<NK_R+40){delayed.push({t:1.6,fn:()=>{if(!boss||boss.dead)return;try{for(const t of (boss.tur||[]))if(!t.dead)hitTurret(t,9e9);}catch(e){}try{if(!boss.tl)hitBoss(boss.maxhp*.6);else{boss.tl=0;hitBoss(boss.maxhp*.6);}}catch(e){}}});}}
  // 焼け跡の炎と煙
  {let made=0;for(let k=0;k<30&&made<6;k++){const a=Math.random()*6.283,r=NK_R*rnd(.2,.8);const fx2=clamp(x+Math.cos(a)*r,-BOUND,BOUND),fz2=clamp(z+Math.sin(a)*r,-BOUND,BOUND);if(Math.hypot(fx2-P.x,fz2-P.z)<45)continue;made++;delayed.push({t:1+r/NK_SHOCK,fn:()=>{try{if(Math.hypot(fx2-P.x,fz2-P.z)>35)addFire(fx2,fz2,rnd(16,26));}catch(e){}}});}}
 }
@@ -5994,8 +5994,8 @@ function nkCine(dt){
   if(Math.abs(camera.fov-fv)>.01){camera.fov=fv;camera.updateProjectionMatrix();}}sky.position.copy(camera.position);
  if(shake>.01){camera.position.x+=rnd(-1,1)*shake*1.2;camera.position.y+=rnd(-1,1)*shake*.8;camera.position.z+=rnd(-1,1)*shake*1.2;}
  if(NK.boom&&NK.fx){const T=NK.fx.T,cd=Math.hypot(cx-d.x,cz-d.z);if(Math.abs(NK_SHOCK*T-cd)<10)shake=Math.max(shake,1.5);if(T<.25)flashScr(1,'#ffffff');
-  if(T>2.4&&NK.said===0){NK.said=1;cineUI(true,'地獄の火炎<small>着弾確認　半径150m 壊滅</small>');}
-  if(T>7.8)nkEnd();}
+  if(T>2.4&&NK.said===0){NK.said=1;cineUI(true,'地獄の火炎<small>着弾確認　半径300m 壊滅</small>');}
+  if(T>11.5)nkEnd();}
 }
 function nkEnd(){
  NK.cine=false;cineUI(false);$('hud').style.display=NK.hud||'';if(NK.fov0){camera.fov=NK.fov0;camera.updateProjectionMatrix();}
@@ -18364,10 +18364,127 @@ function w296Boats(){let P=null,A=0;for(const p of PONDS){const a=(p.x1-p.x0)*(p
   c.g.position.set(x,y+Math.sin(WT*1.2+t*9)*.05,z);c.g.rotation.y=lx?(c.v>0?0:Math.PI):(c.v>0?-Math.PI/2:Math.PI/2);}});
  W295.stat.boats=cars.length;}
 if(window.__TEST__)window.__T96={info:()=>({tz:W295.tz,stat:W295.stat,tram:(W295.tram||[]).length,ponds:PONDS.length})};
+/* ===== v2.97 空爆「地獄の火炎」：威力2倍・必ずステージ中央・爆風の描写 =====
+   ・半径 150→300m（c194.py で NK_R=300、衝撃波 62→95m/s）、母艦への打撃 30→60%
+   ・投下位置は常にステージ中央 (0,0)
+   ・爆風：衝撃の半球（凝結の白いもや）の後ろから、地面を這う土煙と瓦礫の壁が街を押し流して広がる。
+     地上のカメラでその壁が迫り、のみ込まれる（暗転・揺れ・遅れて轟音）。その後、黒いキノコ雲と黒い雨。 */
+var W297_CEN={x:0,z:0};
+nkBest=function(px,pz){return {x:W297_CEN.x,z:W297_CEN.z};};
+var W297=null;
+function w297G(x,z){try{return Math.max(0,terrH(x,z)||0);}catch(e){return 0;}}
+/* 地上カメラの位置：中心から R*1.06 の円上で、建物の中でなく、なるべく道の上 */
+function w297CamSpot(cx,cz,a0){
+ const R=NK_R*1.06;let best=null,bs=-1;
+ for(let k=0;k<48;k++){const a=a0+(k%2?1:-1)*Math.ceil(k/2)*.06,x=cx+Math.cos(a)*R,z=cz+Math.sin(a)*R;
+  if(insideBuilding(x,z,3))continue;let s=1;try{if(onRoad(x,z,0))s+=2;}catch(e){}
+  try{if(typeof inSea==='function'&&inSea(x,z,2))s-=1.5;}catch(e){}
+  s-=Math.abs(a-a0)*.4;if(s>bs){bs=s;best={x,z,a};}}
+ return best||{x:cx+Math.cos(a0)*R,z:cz+Math.sin(a0)*R,a:a0};
+}
+function w297Build(F){
+ const N=isTouch?220:420,ND=isTouch?160:320,NR=isTouch?600:1400;
+ const wm=new THREE.MeshLambertMaterial({color:0xffffff,fog:false,transparent:true,opacity:.86,depthWrite:false});
+ const wall=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,isTouch?1:2),wm,N);wall.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+ wall.instanceColor=new THREE.InstancedBufferAttribute(new Float32Array(N*3).fill(.4),3);wall.frustumCulled=false;wall.count=0;scene.add(wall);
+ const dm=new THREE.MeshLambertMaterial({color:0xffffff,fog:false});
+ const deb=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),dm,ND);deb.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+ deb.instanceColor=new THREE.InstancedBufferAttribute(new Float32Array(ND*3).fill(.3),3);deb.frustumCulled=false;deb.count=0;scene.add(deb);
+ /* 黒い雨（カメラのまわりに降る細い筋） */
+ const rp=new Float32Array(NR*6),rg=new THREE.BufferGeometry();rg.setAttribute('position',new THREE.BufferAttribute(rp,3));
+ const rm=new THREE.LineBasicMaterial({color:0x14110e,transparent:true,opacity:0,depthWrite:false,fog:false});
+ const rain=new THREE.LineSegments(rg,rm);rain.frustumCulled=false;rain.visible=false;scene.add(rain);
+ const RD=[];for(let i=0;i<NR;i++)RD.push({x:rnd(-90,90),y:rnd(0,70),z:rnd(-90,90),v:rnd(26,38)});
+ /* 土煙の壁の粒：半分は全周、半分は地上カメラの向き（±40°）に寄せる */
+ const Q=[];for(let i=0;i<N;i++){const focus=i%3!==0;Q.push({focus,ao:focus?rnd(-.7,.7):Math.random()*6.283,l:Math.random(),j:rnd(0,1),s:rnd(.75,1.3),b:Math.random()*6.283,c:Math.random()});}
+ const D=[];for(let i=0;i<ND;i++)D.push({on:0});
+ W297={F,wall,wm,deb,dm,rain,rm,rp,RD,Q,D,N,ND,di:0,cam:null,eng:0,end:0,rainT:0,snd:0};
+ return W297;
+}
+function w297Clear(){const W=W297;if(!W)return;for(const o of[W.wall,W.deb,W.rain]){scene.remove(o);try{o.geometry.dispose();o.material.dispose();}catch(e){}}W297=null;}
+function w297Deb(x,y,z,vx,vy,vz,col){const W=W297;if(!W)return;const d=W.D[W.di++%W.ND];
+ Object.assign(d,{on:1,x,y,z,vx,vy,vz,t:0,L:rnd(2.2,3.6),sx:rnd(.5,3.6),sy:rnd(.3,1.6),sz:rnd(.5,3),rx:rnd(0,6),ry:rnd(0,6),wx:rnd(-6,6),wy:rnd(-6,6),col:col==null?(Math.random()<.5?0x3c342c:0x5a5048):col});}
+const _w297O=new THREE.Object3D(),_w297C=new THREE.Color();
+function w297Tick(dt){
+ const W=W297;if(!W)return;const F=W.F;if(!F||F.T<0)return;const T=F.T,cx=F.x,cz=F.z,RM=NK_R*1.22;
+ const sr=NK_SHOCK*T,grow=Math.min(1,T/.7),out=sr>NK_R?Math.max(0,1-(sr-NK_R)/(RM-NK_R)):1;
+ const ca=W.cam?W.cam.a:0;
+ /* 土煙の壁 */
+ let n=0;if(out>0&&T>.15){for(const q of W.Q){const a=q.focus?ca+q.ao:q.ao;const rr=Math.max(0,sr-q.j*14-q.l*8);
+   const x=cx+Math.cos(a)*rr,z=cz+Math.sin(a)*rr,g=w297G(x,z);
+   const h=q.l*q.l*42*grow;const y=g+2+h+Math.sin(T*3+q.b)*1.2;
+   const sz=(5+q.l*7)*q.s*grow*(.55+.45*out)*(1+.25*Math.sin(T*4+q.b));
+   _w297O.position.set(x,y,z);_w297O.rotation.set(q.b+T*1.6,a,q.b*.5-T*1.1);_w297O.scale.set(sz*1.25,sz*(.8+q.l*.4),sz);_w297O.updateMatrix();W.wall.setMatrixAt(n,_w297O.matrix);
+   const hot=Math.max(0,1-T/1.2)*(1-q.l);const lt=.55+.45*q.l;_w297C.setRGB((.24+.14*q.c)*lt+.5*hot,(.2+.12*q.c)*lt+.25*hot,(.17+.09*q.c)*lt+.05*hot);
+   W.wall.setColorAt(n,_w297C);n++;}}
+ W.wall.count=n;W.wall.instanceMatrix.needsUpdate=true;if(W.wall.instanceColor)W.wall.instanceColor.needsUpdate=true;
+ /* 前線で巻き上げる瓦礫 */
+ if(out>0&&T>.2&&T<5){const k=isTouch?3:6;for(let i=0;i<k;i++){const a=(Math.random()<.6?ca+rnd(-.6,.6):Math.random()*6.283),rr=sr-rnd(0,12);
+   const x=cx+Math.cos(a)*rr,z=cz+Math.sin(a)*rr,sp=NK_SHOCK*rnd(.8,1.3);w297Deb(x,w297G(x,z)+rnd(1,16),z,Math.cos(a)*sp,rnd(3,16),Math.sin(a)*sp);}}
+ /* 瓦礫の動き */
+ let m=0;for(const d of W.D){if(!d.on)continue;d.t+=dt;if(d.t>d.L){d.on=0;continue;}
+  d.vy-=22*dt;d.vx*=1-.35*dt;d.vz*=1-.35*dt;d.x+=d.vx*dt;d.y+=d.vy*dt;d.z+=d.vz*dt;const g=w297G(d.x,d.z);if(d.y<g+.3){d.y=g+.3;d.vy*=-.25;d.vx*=.6;d.vz*=.6;}
+  d.rx+=d.wx*dt;d.ry+=d.wy*dt;const f=Math.min(1,(d.L-d.t)/.4);
+  _w297O.position.set(d.x,d.y,d.z);_w297O.rotation.set(d.rx,d.ry,0);_w297O.scale.set(d.sx*f,d.sy*f,d.sz*f);_w297O.updateMatrix();W.deb.setMatrixAt(m,_w297O.matrix);_w297C.setHex(d.col);W.deb.setColorAt(m,_w297C);m++;}
+ W.deb.count=m;W.deb.instanceMatrix.needsUpdate=true;if(W.deb.instanceColor)W.deb.instanceColor.needsUpdate=true;
+ if(!W.eng&&T>5){W.eng=1;w297Roar();}
+ /* 黒い雨 */
+ const rt=W.end?W.rainT:T;let ro=0;if(W.end){ro=.5*Math.max(0,1-W.rainT/18);}else ro=T>5.5?Math.min(.55,(T-5.5)*.25):0;
+ if(ro>.01){W.rain.visible=true;W.rm.opacity=ro;const c=camera.position,p=W.rp;
+  for(let i=0;i<W.RD.length;i++){const r=W.RD[i];r.y-=r.v*dt;if(r.y<-5){r.y+=75;r.x=rnd(-90,90);r.z=rnd(-90,90);}
+   const x=c.x+r.x,y=c.y-20+r.y,z=c.z+r.z;p[i*6]=x;p[i*6+1]=y;p[i*6+2]=z;p[i*6+3]=x+.25;p[i*6+4]=y+2.6;p[i*6+5]=z+.1;}
+  W.rain.geometry.attributes.position.needsUpdate=true;}else W.rain.visible=false;
+}
+/* 爆発の瞬間：無音に近い閃光 → 少し遅れて地鳴り（轟音は壁がカメラに届いたとき） */
+function w297Boom(){const W=W297;if(!W)return;
+ try{tone(3400,3150,2.2,.035,'sine');tone(46,22,2.4,.5,'sine');}catch(e){}
+ const d=NK.d,dir=NK.dir,sx=-dir.y,sz=dir.x,ox=-dir.x*.7+sx*.7,oz=-dir.y*.7+sz*.7;
+ W.cam=w297CamSpot(d.x,d.z,Math.atan2(oz,ox));
+}
+function w297Roar(){try{noise(4.2,1100,40,1.25,'lowpass');tone(38,16,4.5,.95,'sine');tone(80,28,2.6,.55,'sawtooth');}catch(e){}
+ for(let k=1;k<6;k++)delayed.push({t:.5+k*.55,fn:()=>{try{noise(1.8,600,35,.5,'lowpass');}catch(e){}}});}
+/* ---- 組み込み ---- */
+{const _bf=nkBuildFx;nkBuildFx=function(x,z,par,mini){const F=_bf.apply(this,arguments);if(!mini){try{w297Clear();w297Build(F);F.puffs.scale.setScalar(1.35);}catch(e){console.warn(e);}}return F;};}
+{const _bo=nkBoom;nkBoom=function(){const r=_bo.apply(this,arguments);try{w297Boom();}catch(e){console.warn(e);}return r;};}
+{const _ct=nkCloudTick;nkCloudTick=function(dt){const r=_ct.apply(this,arguments);try{w297Tick(dt);}catch(e){console.warn(e);}return r;};}
+{const _cx=nkClearFx;nkClearFx=function(){try{w297Clear();}catch(e){}return _cx.apply(this,arguments);};}
+/* 建物が衝撃波で崩れるとき、外へ吹き飛ぶ瓦礫を足す */
+{const _co=collapse;collapse=function(b){try{if(W297&&NK.fx&&NK.fx.T>=0&&NK.fx.T<6&&b&&b.alive){const F=NK.fx,dx=b.x-F.x,dz=b.z-F.z,L=Math.hypot(dx,dz)||1;
+   const k=isTouch?2:4,h=Math.max(3,b.h||6);for(let i=0;i<k;i++){const sp=NK_SHOCK*rnd(.5,1.1);w297Deb(b.x+rnd(-3,3),rnd(1,h),b.z+rnd(-3,3),dx/L*sp+rnd(-6,6),rnd(2,12),dz/L*sp+rnd(-6,6),Math.random()<.5?null:0x8a7e70);}}}catch(e){}
+ return _co.apply(this,arguments);};}
+/* カメラ：着弾後の3つの場面（遠景 → 地上で爆風にのみ込まれる → 黒いキノコ雲と黒い雨） */
+{const _nc=nkCine;nkCine=function(dt){const r=_nc.apply(this,arguments);try{
+ const W=W297;if(!W||!NK.cine||!NK.boom||!NK.fx||!W.cam)return r;const T=NK.fx.T,d=NK.d,F=NK.fx;
+ const tHit=Math.hypot(W.cam.x-d.x,W.cam.z-d.z)/NK_SHOCK;let cx,cy,cz,lx,ly,lz;
+ if(T<1.5)return r;
+ if(T<tHit+1.6){/* 地上：爆心を見上げる。壁がのみ込むと後ろへ押される */
+  const ux=Math.cos(W.cam.a),uz=Math.sin(W.cam.a),push=T>tHit?Math.min(30,(T-tHit)*26):0;
+  cx=W.cam.x+ux*push;cz=W.cam.z+uz*push;cy=w297G(cx,cz)+5.5+(T>tHit?Math.sin(T*30)*.4:0);
+  lx=d.x;lz=d.z;ly=40+Math.min(80,T*14);
+  if(T>tHit-.35&&!W.eng){W.eng=1;w297Roar();shake=Math.max(shake,3.2);}
+  if(T>tHit-.15&&T<tHit+1.4){flashScr(Math.min(.92,.5+(T-tHit+.15)*1.5),'#2e241c');shake=Math.max(shake,2.4);}
+  if(scene.fog){if(!W.fc)W.fc=scene.fog.color.clone();if(T>tHit-.25){const e=Math.min(1,(T-tHit+.25)/.4);scene.fog.color.setHex(0x4a3c30);scene.fog.near=2+40*(1-e);scene.fog.far=24+500*(1-e);}}
+  if(Math.abs(T-tHit+.6)<.04&&!W.say){W.say=1;cineUI(true,'爆風到達');}
+ }else{/* 遠景：ゆっくり回り込みながら黒いキノコ雲 */
+  const k=T-(tHit+1.6),a=W.cam.a+.15+k*.05,D=NK_R*1.4;cx=d.x+Math.cos(a)*D;cz=d.z+Math.sin(a)*D;cy=120+k*5;lx=d.x;lz=d.z;ly=120+Math.min(60,k*8);
+  if(!W.pan){W.pan=1;flashScr(.6,'#1a1410');}
+  if(scene.fog&&W.fc){const e=Math.min(1,k/2.5);scene.fog.color.setHex(0x4a3c30).lerp(W.fc,e);scene.fog.near=20+200*e;scene.fog.far=200+700*e;if(e>=1){scene.fog.color.copy(W.fc);}}
+ }
+ camera.position.set(cx,cy,cz);camera.lookAt(lx,ly,lz);sky.position.copy(camera.position);
+ if(shake>.01){camera.position.x+=rnd(-1,1)*shake*1.2;camera.position.y+=rnd(-1,1)*shake*.8;camera.position.z+=rnd(-1,1)*shake*1.2;}
+ if(camera.fov!==NK.fov0&&NK.fov0){camera.fov=NK.fov0;camera.updateProjectionMatrix();}
+}catch(e){console.warn(e);}return r;};}
+/* ムービーが終わっても黒い雨はしばらく降る */
+{const _na=nkAbort;nkAbort=function(){try{if(W297&&W297.fc&&scene.fog)scene.fog.color.copy(W297.fc);}catch(e){}return _na.apply(this,arguments);};}
+{const _ne=nkEnd;nkEnd=function(){try{if(W297&&W297.fc&&scene.fog)scene.fog.color.copy(W297.fc);}catch(e){}const r=_ne.apply(this,arguments);try{if(W297){W297.end=1;W297.rainT=0;}}catch(e){}return r;};}
+{const _cf=nkCloudF;nkCloudF=function(F,dt){const r=_cf.apply(this,arguments);try{if(W297&&W297.end&&F===W297.F){W297.rainT+=dt;}}catch(e){}return r;};}
+if(window.__TEST__)window.__T97={W:()=>W297,fx:()=>NK.fx&&{T:NK.fx.T,x:NK.fx.x,z:NK.fx.z},cam:()=>W297&&W297.cam,
+ info:()=>{const W=W297;return W&&{wall:W.wall.count,deb:W.deb.count,rain:W.rain.visible,cam:W.cam,eng:W.eng};},
+ cq:()=>NK.cq?{n:NK.cq.length,i:NK.ci}:null};
 
 if(window.__TEST__)window.__nk={KJ,kjSpawn,KJAI,nkDemoTick,nkBomberModel,NK,nkOffer,nkClaim,nkStart,nkRun,nkBest,nkFrame,scene,get WR(){return WR},get chests(){return chests},get webs(){return webs}};
 /* ---------- バージョン表示と更新 ---------- */
-const GAME_VER='2.96';
+const GAME_VER='2.97';
 function verCmp(a,b){const x=String(a).split('.').map(Number),y=String(b).split('.').map(Number);for(let i=0;i<Math.max(x.length,y.length);i++){const d=(x[i]||0)-(y[i]||0);if(d)return d>0?1:-1;}return 0;}
 function hardReload(){try{saveGame();}catch(e){}const u=location.pathname+'?r='+Date.now()+location.hash;try{location.replace(u);}catch(e){location.reload();}}
 let VER_NEW=null;
