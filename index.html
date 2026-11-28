@@ -18481,10 +18481,59 @@ function w297Roar(){try{noise(4.2,1100,40,1.25,'lowpass');tone(38,16,4.5,.95,'si
 if(window.__TEST__)window.__T97={W:()=>W297,fx:()=>NK.fx&&{T:NK.fx.T,x:NK.fx.x,z:NK.fx.z},cam:()=>W297&&W297.cam,
  info:()=>{const W=W297;return W&&{wall:W.wall.count,deb:W.deb.count,rain:W.rain.visible,cam:W.cam,eng:W.eng};},
  cq:()=>NK.cq?{n:NK.cq.length,i:NK.ci}:null};
+/* ---- 図鑑（資料館）の空爆デモ：小さな街の模型を置き、爆風の壁が街を吹き飛ばす様子を見せる ---- */
+function w297TownBuild(root){
+ const H=[],rr=(a,b)=>a+Math.random()*(b-a);
+ const NH=isTouch?380:620;
+ for(let i=0;i<NH;i++){const d=Math.sqrt(Math.random())*430,a=Math.random()*6.283,x=Math.cos(a)*d,z=Math.sin(a)*d;
+  const c=Math.max(0,1-d/260);const tall=Math.random()<.08+.35*c;
+  const w=tall?rr(12,22):rr(8,15),dd=tall?rr(12,22):rr(8,14),h=tall?rr(30,80)*(.5+c):rr(6,13);
+  const col=tall?[0xc8ccd2,0xa9b4bf,0xe2ddd2,0x8f9aa6][i%4]:[0xe8dcc4,0xd6c6a8,0xf0ece2,0xc9b79a,0xb8a890][i%5];
+  H.push({x,z,w,d:dd,h,col,ry:a+rr(-.3,.3),dist:d,st:0,t:0});}
+ const geo=new THREE.BoxGeometry(1,1,1);geo.translate(0,.5,0);
+ const im=new THREE.InstancedMesh(geo,new THREE.MeshLambertMaterial({color:0xffffff}),H.length);im.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+ im.instanceColor=new THREE.InstancedBufferAttribute(new Float32Array(H.length*3),3);im.frustumCulled=false;root.add(im);
+ /* 地面（街の円盤と道） */
+ const gc=document.createElement('canvas');gc.width=gc.height=512;const g=gc.getContext('2d');g.fillStyle='#8a9a6c';g.fillRect(0,0,512,512);
+ g.strokeStyle='#6f6a62';g.lineWidth=6;for(let k=-4;k<=4;k++){g.beginPath();g.moveTo(256+k*56,0);g.lineTo(256+k*56,512);g.stroke();g.beginPath();g.moveTo(0,256+k*56);g.lineTo(512,256+k*56);g.stroke();}
+ const gm=new THREE.Mesh(new THREE.CircleGeometry(450,64),new THREE.MeshLambertMaterial({map:new THREE.CanvasTexture(gc)}));gm.rotation.x=-Math.PI/2;gm.position.y=.4;root.add(gm);
+ const sc=document.createElement('canvas');sc.width=sc.height=256;const s=sc.getContext('2d');const rg=s.createRadialGradient(128,128,0,128,128,128);rg.addColorStop(0,'rgba(30,24,20,.9)');rg.addColorStop(.62,'rgba(40,32,26,.75)');rg.addColorStop(.7,'rgba(40,32,26,0)');s.fillStyle=rg;s.fillRect(0,0,256,256);
+ const scm=new THREE.Mesh(new THREE.CircleGeometry(NK_R*1.12,48),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(sc),transparent:true,opacity:0,depthWrite:false}));scm.rotation.x=-Math.PI/2;scm.position.y=.9;root.add(scm);
+ /* 爆風の壁（小さな版） */
+ const NW=isTouch?150:240,wall=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,1),new THREE.MeshLambertMaterial({color:0xffffff,transparent:true,opacity:.88,depthWrite:false}),NW);
+ wall.instanceMatrix.setUsage(THREE.DynamicDrawUsage);wall.instanceColor=new THREE.InstancedBufferAttribute(new Float32Array(NW*3).fill(.35),3);wall.frustumCulled=false;wall.count=0;root.add(wall);
+ const Q=[];for(let i=0;i<NW;i++)Q.push({a:i/NW*6.283+rr(-.02,.02),l:Math.random(),j:Math.random(),s:rr(.8,1.25),b:Math.random()*6.283,c:Math.random()});
+ const T={H,im,gm,scm,wall,Q};w297TownReset(T);return T;
+}
+function w297TownReset(T){for(let i=0;i<T.H.length;i++){const h=T.H[i];h.st=0;h.t=0;h.px=h.x;h.py=0;h.pz=h.z;h.rx=0;h.rz=0;w297TownSet(T,i,h.w,h.h,h.d);_w297C.setHex(h.col);T.im.setColorAt(i,_w297C);}
+ T.im.instanceMatrix.needsUpdate=true;T.im.instanceColor.needsUpdate=true;T.scm.material.opacity=0;T.wall.count=0;}
+function w297TownSet(T,i,sx,sy,sz){const h=T.H[i];_w297O.position.set(h.px,h.py,h.pz);_w297O.rotation.set(h.rx,h.ry,h.rz);_w297O.scale.set(sx,sy,sz);_w297O.updateMatrix();T.im.setMatrixAt(i,_w297O.matrix);}
+function w297TownTick(T,F,dt){
+ if(!F||F.T<0)return;const t=F.T,sr=NK_SHOCK*t,RM=NK_R*1.22,grow=Math.min(1,t/.6),out=sr>NK_R?Math.max(0,1-(sr-NK_R)/(RM-NK_R)):1;let ch=0,cc=0;
+ for(let i=0;i<T.H.length;i++){const h=T.H[i];
+  if(h.st===0&&h.dist<NK_R&&h.dist<sr){h.st=1;h.t=0;const a=Math.atan2(h.z,h.x),k=(1-h.dist/NK_R)*.6+.4;h.vx=Math.cos(a)*NK_SHOCK*rnd(.5,1.1)*k;h.vz=Math.sin(a)*NK_SHOCK*rnd(.5,1.1)*k;h.vy=rnd(6,22)*k;h.wx=rnd(-4,4);h.wz=rnd(-4,4);}
+  if(h.st===1){h.t+=dt;h.vy-=30*dt;h.px+=h.vx*dt;h.pz+=h.vz*dt;h.py=Math.max(0,h.py+h.vy*dt);h.rx+=h.wx*dt;h.rz+=h.wz*dt;h.vx*=1-1.2*dt;h.vz*=1-1.2*dt;
+   const f=Math.max(0,1-h.t/1.6);w297TownSet(T,i,h.w*(.4+.6*f),h.h*(.15+.85*f),h.d*(.4+.6*f));
+   _w297C.setHex(h.col).lerp(_w297C2.setHex(0x2c241e),Math.min(1,h.t*1.2));T.im.setColorAt(i,_w297C);cc=1;
+   if(h.t>1.6){h.st=2;h.px=h.x+(h.px-h.x)*.25;h.pz=h.z+(h.pz-h.z)*.25;h.py=0;h.rx=0;h.rz=0;w297TownSet(T,i,h.w*1.2,1.2,h.d*1.2);_w297C.setHex(0x3a322b);T.im.setColorAt(i,_w297C);}
+   ch=1;}
+ }
+ if(ch)T.im.instanceMatrix.needsUpdate=true;if(cc||ch)T.im.instanceColor.needsUpdate=true;
+ T.scm.material.opacity=Math.min(.85,t*.35);const sk=Math.min(1,sr/(NK_R*1.12));T.scm.scale.setScalar(Math.max(.01,sk));
+ let n=0;if(out>0&&t>.1){for(const q of T.Q){const r=Math.max(0,sr-q.j*14-q.l*8),x=Math.cos(q.a)*r,z=Math.sin(q.a)*r,y=2+q.l*q.l*42*grow+Math.sin(t*3+q.b)*1.2;
+   const sz=(8+q.l*9)*q.s*grow*(.55+.45*out);_w297O.position.set(x,y,z);_w297O.rotation.set(q.b+t*1.6,q.a,-t);_w297O.scale.set(sz*1.25,sz*(.8+q.l*.4),sz);_w297O.updateMatrix();T.wall.setMatrixAt(n,_w297O.matrix);
+   const hot=Math.max(0,1-t/1.2)*(1-q.l),lt=.55+.45*q.l;_w297C.setRGB((.24+.14*q.c)*lt+.5*hot,(.2+.12*q.c)*lt+.25*hot,(.17+.09*q.c)*lt+.05*hot);T.wall.setColorAt(n,_w297C);n++;}}
+ T.wall.count=n;T.wall.instanceMatrix.needsUpdate=true;T.wall.instanceColor.needsUpdate=true;
+}
+const _w297C2=new THREE.Color();
+{const _db=nkDemoBuild;nkDemoBuild=function(){const r=_db.apply(this,arguments);try{const D=VW.nkDemo;if(D){D.town=w297TownBuild(D.root);}}catch(e){console.warn(e);}return r;};}
+{const _dt=nkDemoTick;nkDemoTick=function(dt){const D=VW.nkDemo,hadF=D&&D.F;const r=_dt.apply(this,arguments);try{const E=VW.nkDemo;if(E&&E.town){if(E.F){if(!E.F._p){E.F._p=1;try{tone(46,22,1.6,.25,'sine');}catch(e){}}w297TownTick(E.town,E.F,dt);}else if(hadF)w297TownReset(E.town);}}catch(e){console.warn(e);}return r;};}
+{const _vb2=vBuildModel;vBuildModel=function(){const r=_vb2.apply(this,arguments);if(VW.nkDemo){VW.tx=0;VW.ty=6;VW.tz=0;VW.dist=62;VW.pitch=.42;}return r;};}
+{const _vs=nkViewerSetup;nkViewerSetup=function(){const r=_vs.apply(this,arguments);try{ZK_DESC['空爆「地獄の火炎」']='ライフが残りわずかになると、各ステージで1回だけ司令部が七色に光る宝箱を届けてくれる。拾うと大型爆撃機が飛来し、ステージの中央へ超高火力爆弾を投下。閃光のあと、土煙と瓦礫の爆風の壁が街を押し流して広がり、半径300m（戦場のほぼ全域）の建物・自然物・敵をまとめて吹き飛ばす。黒いキノコ雲が立ちのぼり、黒い雨が降る。';}catch(e){}return r;};}
 
 if(window.__TEST__)window.__nk={KJ,kjSpawn,KJAI,nkDemoTick,nkBomberModel,NK,nkOffer,nkClaim,nkStart,nkRun,nkBest,nkFrame,scene,get WR(){return WR},get chests(){return chests},get webs(){return webs}};
 /* ---------- バージョン表示と更新 ---------- */
-const GAME_VER='2.97';
+const GAME_VER='2.98';
 function verCmp(a,b){const x=String(a).split('.').map(Number),y=String(b).split('.').map(Number);for(let i=0;i<Math.max(x.length,y.length);i++){const d=(x[i]||0)-(y[i]||0);if(d)return d>0?1:-1;}return 0;}
 function hardReload(){try{saveGame();}catch(e){}const u=location.pathname+'?r='+Date.now()+location.hash;try{location.replace(u);}catch(e){location.reload();}}
 let VER_NEW=null;
